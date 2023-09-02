@@ -1,7 +1,11 @@
 import "./App.css";
+import Table from "./components/Table";
 import { Link } from "react-router-dom";
-import DemoGrid from "./DemoGrid";
+import RenderPesajesTable from "./components/RenderPesajesTable";
+import RenderGananciasTable from "./components/RenderGananciasTable";
 
+
+ /*
 function Home() {
   return (
     <div>
@@ -21,6 +25,7 @@ function Home() {
       </div>
   );
 }
+*/
 
 export function About() {
   return (
@@ -47,5 +52,12 @@ export function Contact() {
 }
 
 export function App() {
-  return <Home/>;
-}
+  return (
+    <div className="table_container">
+      <h1>Reusable sortable table with React</h1>
+      <RenderGananciasTable />
+      <br />
+    </div>
+  );
+};
+

@@ -41,12 +41,12 @@ export const  DemoGrid = (props) =>  {
           return columns[index];
         }
       
-        function colwidth(key)
+/*        function colwidth(key)
         {
           var index = this.props.headers.indexOf(key); 
           return `column-width:${this.props.headerwidthpct[index]}%`;
         }
-      
+ */     
         function columnWidth(props,key)
         {
           var index = props.headers.indexOf(key); 
@@ -59,8 +59,9 @@ export const  DemoGrid = (props) =>  {
       }
       
         function sortBy(filteredData,key) {
-          //Todo: data returned??
-          filteredData[key] = filteredData[key] * -1
+            //={setData(sortBy(filteredData,headerKeyMapping(props.headers,props.columns,key)))}
+//            filteredData,headerKeyMapping(props.headers,props.columns,key)
+//            filteredData[key] = filteredData[key] * -1
         }
       
         function capitalize(str) {
@@ -76,9 +77,8 @@ export const  DemoGrid = (props) =>  {
             <thead>
             <tr>
                 {props.headers.map((key)=>{return (
-                <th style={columnWidth(props,key)} 
-//                onClick={setData(sortBy(filteredData,headerKeyMapping(props.headers,props.columns,key)))}
-                onClick={sortBy(filteredData,headerKeyMapping(props.headers,props.columns,key))}
+                <th style={columnWidth(props,key)}
+                onClick={sortBy}
                 className={props.sortKey === key? 'active':''}
                 key={key}> 
                 {capitalize(key)}
