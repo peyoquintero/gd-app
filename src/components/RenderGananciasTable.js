@@ -1,5 +1,5 @@
 import Table from "./Table";
-
+import {filteredGData} from "./helpers"
 const columns = [
   { label: "Codigo", accessor: "Codigo" },
   { label: "Fecha Inicial", accessor: "FechaInicial" },
@@ -15,7 +15,8 @@ const columns = [
  tableData = tableData.map((obj,index) => ({ ...obj, id: index }))
 
 //gridColumns: ['Fecha','Codigo','Peso','Marca','Operacion'],
-const RenderGananciasTable = () => {
+const RenderGananciasTable = (props) => {
+  tableData = filteredGData(tableData,props.filterKey,props.excludeFilter);
   return (
     <>
       <Table

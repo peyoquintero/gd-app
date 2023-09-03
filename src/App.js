@@ -55,7 +55,7 @@ export function App() {
   return (
     <div className="table_container">
       <h1>Reusable sortable table with React</h1>
-      <RenderGananciasTable />
+      <RenderGananciasTable filterKey="220" excludeFilter=""/>
       <br />
     </div>
   );

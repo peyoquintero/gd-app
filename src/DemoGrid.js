@@ -1,10 +1,9 @@
 import React, { useState  } from 'react';
 
-function filteredGData(props,gData) {
+function filteredGData(props,filteredData) {
     let filterKey = props.filterKey && props.filterKey.toLowerCase()
     let sortOrders= props.columns.reduce((o, key) => ((o[key] = 1), o), {})
     const order = sortOrders[props.sortKey] || 1
-    let filteredData = gData.filter(w=>(props.excludeChar==="") || (w.Codigo.indexOf(props.excludeChar) === -1))
     if (filterKey) {
         filteredData = filteredData.filter((row) => {
         return Object.keys(row).filter(w=>w!==props.excludeFilter).some((key) => {
