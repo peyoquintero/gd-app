@@ -2,7 +2,7 @@ import "./App.css";
 import Table from "./components/Table";
 import { Link } from "react-router-dom";
 import RenderPesajesTable from "./components/RenderPesajesTable";
-import RenderGananciasTable from "./components/RenderGananciasTable";
+import Ganancias from "./components/Ganancias";
 
 
  /*
@@ -55,7 +55,7 @@ export function App() {
   return (
     <div className="table_container">
       <h1>Reusable sortable table with React</h1>
-      <RenderGananciasTable filterKey="220" excludeFilter=""/>
+      <Ganancias filterKey="220" excludeFilter=""/>
       <br />
     </div>
   );

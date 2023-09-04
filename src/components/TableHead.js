@@ -13,9 +13,9 @@ const TableHead = ({ columns, handleSorting }) => {
     return (
      <thead>
       <tr>
-       {columns.map(({ label, accessor }) => {
+       {columns.map(({ label, accessor, width }) => {
         return (
-         <th key={accessor} onClick={() => handleSortingChange(accessor)}>
+         <th key={accessor} style={{witdh:width }} onClick={() => handleSortingChange(accessor)}>
           {label}
          </th>
         );

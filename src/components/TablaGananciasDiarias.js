@@ -1,12 +1,12 @@
 import Table from "./Table";
 import {filteredGData} from "./helpers"
 const columns = [
-  { label: "Codigo", accessor: "Codigo" },
-  { label: "Fecha Inicial", accessor: "FechaInicial" },
-  { label: "Fecha Final", accessor: "FechaFinal" },
-  { label: "Peso Inicial", accessor: "PesoInicial" },
-  { label: "Peso Final", accessor: "PesoFinal" },
-  { label: "Ganancia", accessor: "Ganancia" },
+  { label: "Codigo", accessor: "Codigo",width:"15%" },
+  { label: "Fecha Inicial", accessor: "FechaInicial",width:"20%" },
+  { label: "Fecha Final", accessor: "FechaFinal",width:"20%" },
+  { label: "Peso Inicial", accessor: "PesoInicial",width:"15%" },
+  { label: "Peso Final", accessor: "PesoFinal",width:"15%" },
+  { label: "Ganancia", accessor: "Ganancia",width:"15%" },
  ];
 
  let tableData = [{Codigo:'101','FechaInicial':Date(),'FechaFinal':Date(),'PesoInicial':220,'PesoFinal':240,'Ganancia':20},
@@ -15,7 +15,7 @@ const columns = [
  tableData = tableData.map((obj,index) => ({ ...obj, id: index }))
 
 //gridColumns: ['Fecha','Codigo','Peso','Marca','Operacion'],
-const RenderGananciasTable = (props) => {
+const TablaGananciasDiarias = (props) => {
   tableData = filteredGData(tableData,props.filterKey,props.excludeFilter);
   return (
     <>
@@ -28,4 +28,4 @@ const RenderGananciasTable = (props) => {
   );
 };
 
-export default RenderGananciasTable;
+export default TablaGananciasDiarias;
