@@ -5,15 +5,14 @@ import { useSortableTable } from "./useSortableTable";
 
 const Table = ({ caption, data, columns }) => {
 // ToDo; Fix sorting
-//const [tableData, setTableData] = useState([]);
-//useEffect(() => { setTableData(data) }, [])
-console.log(`Table data length=${data.length}`)
+const [tableData, setTableData] = useState([]);
+useEffect(() => { setTableData(data) }, [])
 return (
     <>
       <table className="table">
-        <caption>{caption}</caption>
+        <caption>{`data length=${data.length}, tbLength:${tableData.length}`}</caption>
         <TableHead {...{ columns }} />
-        <TableBody {...{ data, columns }} />
+        <TableBody {...{ tableData, columns }} />
       </table>
     </>
   );
