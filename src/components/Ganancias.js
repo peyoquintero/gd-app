@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import TablaGananciasDiarias from "./TablaGananciasDiarias"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, transform,validLoteOptions} from "./helpers"
 import axios from "axios";
 const Ganancias = (props) => {
@@ -15,32 +16,39 @@ const Ganancias = (props) => {
       });
 
       const [gridData,setGridData] = useState([])
+      const [hisPesajes,setHispesajes] = useState([])
       const [lotes,setLotes] = useState([])
       const [fechasPesaje,setFechasPesaje] = useState([])
 
-      let scrubbedData = [];
-      let resultCabezas = ''
-//      let fechasPesaje = [];
-      let resultGanancia = "";
-      let resultMedia = "";
-      let resultUltPeso = "";
-      let resultDias = "";
+      const [captions,setCaptions] = useState({
+         resultCabezas : "",
+         resultGanancia : "",
+         resultMedia : "",
+         resultUltPeso : "",
+         resultDias : "",
+        })
 
       const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
       useEffect(()=>{
         axios.get(url)
         .then((response)=>{
-          setGridData(response.data);
-          let hispesajes = transform(response.data)
-          setFechasPesaje([...new Set( hispesajes.map(obj => obj.Fecha)) ]);
-          setLotes(validLoteOptions([...new Set( hispesajes.map(obj => obj.Lote))]));
+          let allPesajes = transform(response.data); 
+          let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
+          setHispesajes(allPesajes);
+          setFechasPesaje(allFechas);
+          setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
           setFilters({
-            ...filters,
-            fechaInicial: fechasPesaje[0] ?? new Date('2020-01-01T00:00:00'),
-            fechaFinal : fechasPesaje[fechasPesaje.length-1] ?? new Date()
-          });
-  
+            fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
+            fechaFinal : allFechas[allFechas.length-1] ?? new Date(),
+            filtroCodigo: "",
+            filtroMarca: "",
+            filtroPeso: "",
+            filtroLote: "",
+            fiExacta: false,
+            ffExacta: false,
+            filtroVentas: false,
+              });
         }
         )
       },[]);
@@ -54,9 +62,7 @@ const Ganancias = (props) => {
       };
 
       const applyFilters = (event) => {
-        scrubbedData = cleanData(gridData); 
 
-        let hisPesajes = transform(gridData)
         let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote !== 'MUERTO'); 
         if (filters.filtroMarca!=="*" && filters.filtroMarca!=="") 
         {
@@ -78,13 +84,16 @@ const Ganancias = (props) => {
           } 
         }    
 
-        resultGanancia = captionGanancia(gridDataResults);
-        resultCabezas = captionCabezas(scrubbedData.length,gridData.length)
-        resultUltPeso = captionUltPeso(gridDataResults);
-        resultDias = captionDias(gridDataResults);
-        resultMedia = captionMedia(gridDataResults);
-
         setGridData(gridDataResults);  
+
+        let scrubbedData = cleanData(gridDataResults);
+        setCaptions({
+        resultGanancia : captionGanancia(scrubbedData),
+        resultCabezas : captionCabezas(scrubbedData.length,gridDataResults.length),
+        resultUltPeso : captionUltPeso(scrubbedData),
+        resultDias : captionDias(scrubbedData),
+        resultMedia : captionMedia(scrubbedData)
+        })
 
       }
 
@@ -118,18 +127,21 @@ const Ganancias = (props) => {
           </select>
         </label>
           <input style={{marginTop:'25px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleFilterChange}/>
-          <label style={{marginTop:'25px'}}>=</label>
+          <label style={{marginTop:'25px',marginLeft:'0px'}}>=</label>
         <label>Solo Ventas
-          <input style={{marginTop:'25px'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
+          <input type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
         </label>
         <button onClick={applyFilters}>Ok</button>
       </section>      
       <section className="totals">
-      <span >{resultCabezas} </span> 
-      <span>{resultGanancia}</span> 
-      <span>{resultMedia}</span>   
-      <span>{resultUltPeso}</span>
-      <span>{resultDias}</span> 
+      <label >{captions.resultCabezas}</label> 
+      <label>{captions.resultGanancia}</label> 
+      <label>{captions.resultMedia}</label>   
+      <label>{captions.resultUltPeso}</label>
+      <label>{captions.resultDias}</label> 
+      </section>
+      <section>
+        <TablaGananciasDiarias gridData={gridData}></TablaGananciasDiarias>
       </section>
     </React.Fragment>
     );

@@ -26,7 +26,8 @@ function getDefaultSorting(defaultTableData, columns) {
 }
 
 export const useSortableTable = (data, columns) => {
-  const [tableData, setTableData] = useState(getDefaultSorting(data, columns));
+//  const [tableData, setTableData] = useState(getDefaultSorting(data, columns));
+const [tableData, setTableData] = useState(data);
 
   const handleSorting = (sortField, sortOrder) => {
     if (sortField) {
