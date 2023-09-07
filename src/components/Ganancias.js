@@ -88,6 +88,8 @@ const Ganancias = (props) => {
 
         let gridDataResults = ganancias(hispesajesFiltered,filtros.fechaInicial,filtros.fiExacta,filtros.fechaFinal,filtros.ffExacta,filtros.filtroVentas);
 
+        gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }))
+
         setGridData(gridDataResults);  
 
         if (filtros.filtroPeso!=="*" && filtros.filtroPeso.trim()!=="") 

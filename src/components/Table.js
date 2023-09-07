@@ -6,7 +6,7 @@ import { useSortableTable } from "./useSortableTable";
 const Table = ({ caption, data, columns }) => {
 // ToDo; Fix sorting
 const [tableData, setTableData] = useState([]);
-useEffect(() => { setTableData(data) }, [])
+useEffect(() => { setTableData(data) }, [data]);
 return (
     <>
       <table className="table">

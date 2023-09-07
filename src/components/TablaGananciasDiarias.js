@@ -9,14 +9,12 @@ const columns = [
  ];
 
 const TablaGananciasDiarias = (props) => {
-  
-  let tableData = props.gridData.map((obj,index) => ({ ...obj, id: index }))
-  console.log(`TablaGananciasDiarias props.gridDataLegth=${tableData.length}`)
+  console.log(`TablaGananciasDiarias props.gridDataLegth=${props.gridData.length}`)
   return (
     <>
       <Table
-        caption={tableData.length}
-        data={tableData}
+        caption={props.gridData.length}
+        data={props.gridData}
         columns={columns}
       />
     </>
