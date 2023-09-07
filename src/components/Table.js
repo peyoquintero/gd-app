@@ -10,7 +10,6 @@ useEffect(() => { setTableData(data) }, [data]);
 return (
     <>
       <table className="table">
-        <caption>{`data length=${data.length}, tbLength:${tableData.length}`}</caption>
         <TableHead {...{ columns }} />
         <TableBody {...{ tableData, columns }} />
       </table>

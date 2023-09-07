@@ -115,7 +115,8 @@ const Ganancias = (props) => {
       }
 
     return (
-      <React.Fragment>
+      <>
+  <div class="container">
       <section>
         <label>Codigo
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
@@ -127,7 +128,7 @@ const Ganancias = (props) => {
           <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
         </label>
         <label>Lote
-        <select style={{display:'block', width:'120px', height:'30px'}} name="filtroLote" onChange={handleFilterChange}>
+        <select style={{display:'block', width:'120px', height:'30px'}} className="freeinput" name="filtroLote" onChange={handleFilterChange}>
           {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
@@ -146,7 +147,7 @@ const Ganancias = (props) => {
           <input style={{marginTop:'25px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
           <label style={{marginTop:'25px',marginLeft:'0px'}}>=</label>
         <label>Solo Ventas
-          <input type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleCheckboxChange}/>
+          <input type="checkbox"  style={{marginTop:'25px'}}  id="checkbox3" name="filtroVentas" onChange={handleCheckboxChange}/>
         </label>
         <button onClick={applyFilters}>Ok</button>
       </section>      
@@ -160,7 +161,8 @@ const Ganancias = (props) => {
       <section>
         <TablaGananciasDiarias gridData={gridData}></TablaGananciasDiarias>
       </section>
-    </React.Fragment>
+      </div>
+    </>
     );
   };
   
