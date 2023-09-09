@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TablaGananciasDiarias from "./TablaGananciasDiarias"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, transform,validLoteOptions} from "./helpers"
 import axios from "axios";
-const Ganancias = (props) => {
+const Ganancias = () => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",
         filtroMarca: "",
@@ -68,7 +68,6 @@ const Ganancias = (props) => {
           [name]: event.target.checked,
         });
       };
-
 
       const applyFilters = (event) => {
 

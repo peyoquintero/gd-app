@@ -1,63 +1,46 @@
 import "./App.css";
-import Table from "./components/Table";
-import { Link } from "react-router-dom";
-import RenderPesajesTable from "./components/RenderPesajesTable";
-import Ganancias from "./components/Ganancias";
+import { Link, Outlet } from "react-router-dom";
+import  Ganancias  from "./components/Ganancias";
 
-
- /*
-function Home() {
+function GananciasDiarias() {
   return (
-    <div>
+    <>
       <nav>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
+        <Link className="tabs" to="/pesajes">Pesajes</Link>
+        <Link className="tabs" to="/codigos">Codigos</Link>
       </nav>
-      <DemoGrid  filterKey=""
-  data={[{Codigo:'101','FechaInicial':Date(),'FechaFinal':Date(),'PesoInicial':220,'PesoFinal':240,'Ganancia':20}]} 
-  columns={['Codigo','FechaInicial','FechaFinal','PesoInicial','PesoFinal','Ganancia']} 
-  headers= {['Codigo','Inicio','Final','Peso(I)','Peso(F)','Ganancia']}
-  headerwidthpct={[18,23,23,18,18]}
-  excludeChar= ""
-  excludeFilter=""
-  sortKey="">
-      </DemoGrid>
-      </div>
+      <Ganancias/>
+    </>
   );
 }
-*/
 
-export function About() {
+export function Pesajes() {
   return (
-    <div>
+    <div > 
       <nav>
-        <Link to="/">Home</Link>
-        <Link to="/contact">Contact</Link>
+        <Link className="tabs" to="/">Ganancias</Link>
+        <Link className="tabs" to="/codigos">Codigos</Link>
       </nav>
-      <h1>About Us</h1>
+      <h1>pesajes Us</h1>
+      <Outlet />
     </div>
   );
 }
 
-export function Contact() {
+export function Codigos() {
   return (
-    <div>
+    <>
       <nav>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
+        <Link className="tabs" to="/">Ganancias</Link>
+        <Link className="tabs" to="/pesajes">Pesajes</Link>
       </nav>
-      <h1>Contact Us</h1>
+      <div className="tab-content">
+              <h1>codigos Us</h1>
     </div>
+    </>
   );
 }
 
 export function App() {
-  return (
-    <div className="table_container">
-      <h1>Reusable sortable table with React</h1>
-      <Ganancias filterKey="220" excludeFilter=""/>
-      <br />
-    </div>
-  );
-};
-
+  return <GananciasDiarias />;
+}
