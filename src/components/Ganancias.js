@@ -115,7 +115,7 @@ const Ganancias = () => {
 
     return (
       <>
-  <div class="container">
+  <div className="container">
       <section>
         <label>Codigo
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
