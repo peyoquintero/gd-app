@@ -1,6 +1,7 @@
 import "./App.css";
-import { Link, Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
+import  Pesajes  from "./components/Pesajes";
 
 function GananciasDiarias() {
   return (
@@ -14,15 +15,14 @@ function GananciasDiarias() {
   );
 }
 
-export function Pesajes() {
+export function HisPesajes() {
   return (
     <div > 
       <nav>
         <Link className="tabs" to="/">Ganancias</Link>
         <Link className="tabs" to="/codigos">Codigos</Link>
       </nav>
-      <h1>pesajes Us</h1>
-      <Outlet />
+      <Pesajes/>
     </div>
   );
 }

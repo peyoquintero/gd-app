@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import TablaGananciasDiarias from "./TablaGananciasDiarias"
+import Table from "./Table"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, transform,validLoteOptions} from "./helpers"
 import axios from "axios";
 const Ganancias = () => {
@@ -113,6 +113,16 @@ const Ganancias = () => {
 
       }
 
+      const columns = [
+        { label: "Codigo", accessor: "Codigo",width:"15%" },
+        { label: "Fecha Inicial", accessor: "FechaInicial",width:"20%" },
+        { label: "Fecha Final", accessor: "FechaFinal",width:"20%" },
+        { label: "Peso Inicial", accessor: "PesoInicial",width:"15%" },
+        { label: "Peso Final", accessor: "PesoFinal",width:"15%" },
+        { label: "Ganancia", accessor: "Ganancia",width:"15%" },
+       ];
+      
+
     return (
       <>
   <div className="container">
@@ -158,7 +168,7 @@ const Ganancias = () => {
       <label>{captions.resultDias}</label> 
       </section>
       <section>
-        <TablaGananciasDiarias gridData={gridData}></TablaGananciasDiarias>
+        <Table data={gridData} columns={columns}></Table>
       </section>
       </div>
     </>

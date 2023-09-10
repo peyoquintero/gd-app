@@ -1,8 +1,8 @@
-export const filteredGData = (filteredData,filterKeyProp,excludeFilterProp) => {
-    let filterKey = filterKeyProp && filterKeyProp.toLowerCase()
+export const filteredGData = (filteredData,filterKeyValue,excludeColumn) => {
+    let filterKey = filterKeyValue && filterKeyValue.toLowerCase()
     if (filterKey) {
         filteredData = filteredData.filter((row) => {
-        return Object.keys(row).filter(w=>w!==excludeFilterProp).some((key) => {
+        return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
           if(!filterKey.includes(";"))
               return String(row[key]).toLowerCase().indexOf(filterKey) > -1
           else
