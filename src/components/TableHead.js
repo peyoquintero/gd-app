@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 
 const TableHead = ({ columns,setSortOrder,sortOrder }) => {
     const onclickHandler = (e) => 
@@ -6,7 +5,6 @@ const TableHead = ({ columns,setSortOrder,sortOrder }) => {
         setSortOrder({accessor:e.currentTarget.getAttribute("data-id"),
                       sortOrder : sortOrder.sortOrder === 'down' ? 'up' : 'down'
         });
-        console.log(e.currentTarget.getAttribute("data-id")) 
     }
     return (
      <thead>

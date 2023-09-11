@@ -1,5 +1,5 @@
 import "./App.css";
-import "./assets/base.css";
+//import "./assets/base.css";
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";

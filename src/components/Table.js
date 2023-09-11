@@ -9,10 +9,11 @@ const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrde
 useEffect(() => { setTableData(data) }, [data]);
 useEffect(() => { 
   let sortKey = sortOrder.accessor;
+  let sortMe = sortOrder.sortOrder === 'down' ? 1 : -1
   let data  = tableData.slice().sort((a, b) => {
       a = a[sortKey]
       b = b[sortKey]
-      return (a === b ? 0 : a > b ? 1 : -1) 
+      return (a === b ? 0 : a > b ? 1*sortMe : -1*sortMe) 
     });
 
   setTableData(data);
