@@ -48,7 +48,7 @@ item{
   color:darkslategrey;
 }
 input{
-  width:100px;
+  
   height:20px;
 }
 label{
@@ -75,7 +75,6 @@ button{
   width:40px;
   height:30px;
   margin-top:20px;
-  margin-left: 10px;
   cursor: pointer;
 }
 table {

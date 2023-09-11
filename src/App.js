@@ -9,6 +9,7 @@ function GananciasDiarias() {
   return (
     <div>
       <nav>
+        <Link to="/">Ganancias</Link>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
       </nav>
