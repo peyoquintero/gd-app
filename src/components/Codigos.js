@@ -128,12 +128,12 @@ const Codigos = (props) => {
   return ( 
     <>
   <div className="container">
-            <section>
+    <section>
       <label>Codigo
-        <input style={{display:'block'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
+        <input style={{display:'block', height:'30px'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
       </label>
       <label>Marca 
-       <input style={{display:'block'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
+       <input style={{display:'block', height:'30px'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
        </label>
        <label style={{display:'block'}}>Revisar
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
@@ -147,12 +147,12 @@ const Codigos = (props) => {
     </section>
     <section className="totals">
       <label >{captions.resultCabezas} </label> 
-    </section>
+      </section>
       <Table
         caption="Pesajes"
         data={gridData}
-        columns={columns}
-      />
+        columns={columns}></Table>
+      
       </div>
     </>
   );

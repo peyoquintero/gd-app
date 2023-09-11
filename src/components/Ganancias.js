@@ -124,54 +124,55 @@ const Ganancias = () => {
       
 
     return (
-      <>
+      
   <div className="container">
       <section>
         <label>Codigo
-          <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
+          <input style={{display:'block', height:'30px'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
         </label>
         <label>Marca 
-          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" onChange={handleFilterChange}/>
+          <input style={{display:'block', height:'30px'}} id="marca" className="freeinputsmall" name="filtroMarca" onChange={handleFilterChange}/>
         </label>
         <label>Rango Peso 
-          <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
+          <input style={{display:'block', height:'30px'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
         </label>
         <label>Lote
-        <select style={{display:'block', width:'120px', height:'30px'}} className="freeinput" name="filtroLote" onChange={handleFilterChange}>
+        <select style={{display:'block', width:'100px', height:'30px'}} className="freeinput" name="filtroLote" onChange={handleFilterChange}>
           {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
         <label style={{marginLeft:'30px'}}>Fecha Inicial
-          <select style={{display:'block', width:'120px', height:'30px'}} name="fechaInicial" onChange={handleFilterChange}>
+          <select style={{display:'block', width:'110px', height:'30px'}} name="fechaInicial" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
             <input style={{marginTop:'25px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
             <label style={{marginTop:'30px'}}>=</label>
         <label>Fecha Final
-        <select style={{display:'block', width:'120px', height:'30px'}} name="fechaFinal" onChange={handleFilterChange}>
+        <select style={{display:'block', width:'110px', height:'30px'}} name="fechaFinal" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-          <input style={{marginTop:'25px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
+          <label><input style={{marginTop:'25px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/></label>
+
           <label style={{marginTop:'25px',marginLeft:'0px'}}>=</label>
-        <label>Solo Ventas
-          <input type="checkbox"  style={{marginTop:'25px'}}  id="checkbox3" name="filtroVentas" onChange={handleCheckboxChange}/>
+        <label>Solo Ventas 
+          <input style={{display:'block'}} type="checkbox"    id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
         </label>
         <button onClick={applyFilters}>Ok</button>
       </section>      
       <section className="totals">
-      <label >{captions.resultCabezas}</label> 
-      <label>{captions.resultGanancia}</label> 
-      <label>{captions.resultMedia}</label>   
-      <label>{captions.resultUltPeso}</label>
-      <label>{captions.resultDias}</label> 
+      <item >{captions.resultCabezas}</item> 
+      <item>{captions.resultGanancia}</item> 
+      <item>{captions.resultMedia}</item>   
+      <item>{captions.resultUltPeso}</item>
+      <item>{captions.resultDias}</item> 
       </section>
-      <section>
+      
         <Table data={gridData} columns={columns}></Table>
-      </section>
+      
       </div>
-    </>
+    
     );
   };
   

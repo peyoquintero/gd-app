@@ -39,18 +39,17 @@ const Pesajes = (props) => {
   }
 
   return (
-    <>
+    <div className="container">
       <section>
         <label for input="query">Search</label>
-        <input style={{height:"30px"}} name="query" onChange={handleFilterChange}/>
-      <button style={{marginTop:"2px"}} onClick={applyFilters}>Ok</button>
-    </section>
+        <input style={{height:"20px"}} name="query" onChange={handleFilterChange}/>
+        <button style={{marginTop:"2px"}} type="submit" onClick={applyFilters}>Ok</button>
+      </section>
       <Table
         caption="Pesajes"
         data={gridData}
-        columns={columns}
-      />
-    </>
+        columns={columns}></Table>
+    </div>
   );
 };
 
