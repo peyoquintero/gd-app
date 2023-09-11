@@ -78,7 +78,7 @@ const Codigos = (props) => {
       let minP = datafilter[0];
       let fechaSalida = datafilter.length > 1 ? datafilter[datafilter.length-1].Fecha : null;
       let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:minP.Lote!=='MUERTO'};
-      {datos.push(objresult)};
+      datos.push(objresult);
     });
 
     return datos
@@ -105,7 +105,7 @@ const Codigos = (props) => {
       var otrasOperaciones = this.hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaVenta);
       hispesajesFiltered =  ventas.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
-        if (element.Codigo == otrasOperaciones[j].Codigo) {
+        if (element.Codigo === otrasOperaciones[j].Codigo) {
           return false;
         }
       }

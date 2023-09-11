@@ -162,11 +162,11 @@ const Ganancias = () => {
         <button onClick={applyFilters}>Ok</button>
       </section>      
       <section className="totals">
-      <item >{captions.resultCabezas}</item> 
-      <item>{captions.resultGanancia}</item> 
-      <item>{captions.resultMedia}</item>   
-      <item>{captions.resultUltPeso}</item>
-      <item>{captions.resultDias}</item> 
+      <label >{captions.resultCabezas}</label> 
+      <label>{captions.resultGanancia}</label> 
+      <label>{captions.resultMedia}</label>   
+      <label>{captions.resultUltPeso}</label>
+      <label>{captions.resultDias}</label> 
       </section>
       
         <Table data={gridData} columns={columns}></Table>
