@@ -6,7 +6,7 @@ const TableHead = ({ columns }) => {
       <tr>
        {columns.map(({ label, accessor, width }) => {
         return (
-         <th key={accessor} style={{witdh:width}} >
+         <th key={accessor} style={{width:width}} >
           {label}
          </th>
         );

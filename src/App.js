@@ -2,6 +2,7 @@ import "./App.css";
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
+import  Codigos  from "./components/Codigos";
 
 function GananciasDiarias() {
   return (
@@ -27,16 +28,14 @@ export function HisPesajes() {
   );
 }
 
-export function Codigos() {
+export function HisCodigos() {
   return (
     <>
       <nav>
         <Link className="tabs" to="/">Ganancias</Link>
         <Link className="tabs" to="/pesajes">Pesajes</Link>
       </nav>
-      <div className="tab-content">
-              <h1>codigos Us</h1>
-    </div>
+      <Codigos/>
     </>
   );
 }

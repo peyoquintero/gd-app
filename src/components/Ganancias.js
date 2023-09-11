@@ -71,18 +71,18 @@ const Ganancias = () => {
 
       const applyFilters = (event) => {
 
-        let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote !== 'MUERTO'); 
+        let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote.toUpperCase() !== 'MUERTO'); 
         if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
         {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca); 
+          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca.trim()); 
         }
         if (filtros.filtroCodigo!=="")
         {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo)); 
+          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())); 
         }
         if (filtros.filtroLote!=="*" && filtros.filtroLote!=="")
         {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote) 
+          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
         }
 
         let gridDataResults = ganancias(hispesajesFiltered,filtros.fechaInicial,filtros.fiExacta,filtros.fechaFinal,filtros.ffExacta,filtros.filtroVentas);
