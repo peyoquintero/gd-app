@@ -15,9 +15,7 @@
   display:flex;
   flex-direction:column;
   justify-content: center;
-  width: 100%;
-  padding-left: 400px;
-  padding-right: 400px;
+  width: 100%; 
 }
 
 section {
@@ -39,16 +37,7 @@ section {
   margin-top:5px;
   background-color:white;
 }
-item{
-  font-size: 11px;
-  font-weight:normal;
-  font-style: oblique;
-  font-weight: bold;
-  font-family: arial;
-  color:darkslategrey;
-}
-input{
-  
+input{ 
   height:20px;
 }
 label{
@@ -66,7 +55,6 @@ label{
   width:50px;
   height:22px;
 }
-
 button{
   border: 2px solid #42b983;
   border-radius: 5px;
@@ -75,6 +63,7 @@ button{
   width:40px;
   height:30px;
   margin-top:20px;
+  margin-left: 25px;
   cursor: pointer;
 }
 table {
@@ -123,16 +112,10 @@ th.active .arrow {
   border-right: 4px solid transparent;
   border-top: 4px solid #fff;
 }
-
 a {
-  text-decoration: none;
+  text-decoration:none;
   transition: 0.4s;
   color:black;
-}
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
 }
 nav {
   font-size: 14px;
@@ -144,7 +127,7 @@ nav a.router-link-exact-active {
   color:hsla(160, 100%, 37%, 1);
 }
 nav a.router-link-exact-active:hover {
-  background-color: transparent;
+  background-color:#61dafb;
 }
 nav a {
   display: inline-block;
@@ -154,5 +137,8 @@ nav a {
 nav a:first-of-type {
   border: 0;
 }
+a:hover{
+  background-color: hsla(160, 100%, 37%, 0.2);
+  }
 
 

@@ -42,7 +42,7 @@ const Pesajes = (props) => {
     <div className="container">
       <section>
         <label for input="query">Search</label>
-        <input style={{height:"20px"}} name="query" onChange={handleFilterChange}/>
+        <input name="query" onChange={handleFilterChange}/>
         <button style={{marginTop:"2px"}} type="submit" onClick={applyFilters}>Ok</button>
       </section>
       <Table

@@ -130,16 +130,16 @@ const Codigos = (props) => {
   <div className="container">
     <section>
       <label>Codigo
-        <input style={{display:'block', height:'30px'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
+        <input style={{display:'block'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
       </label>
       <label>Marca 
-       <input style={{display:'block', height:'30px'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
+       <input style={{display:'block'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
        </label>
        <label style={{display:'block'}}>Revisar
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
        </label>
        <label style={{marginLeft:'30px'}}>Fecha Venta
-          <select style={{display:'block', width:'120px', height:'30px'}} name="fechaVenta" onChange={handleFilterChange}>
+          <select style={{display:'block', width:'120px', height:'25px'}} name="fechaVenta" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>

@@ -1,5 +1,5 @@
 import "./App.css";
-//import "./assets/base.css";
+
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
@@ -9,7 +9,7 @@ function GananciasDiarias() {
   return (
     <div>
       <nav>
-        <Link to="/">Ganancias</Link>
+        <Link style={{background:'#42b983', color:'white'}} to="/">Ganancias</Link>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
       </nav>
@@ -23,6 +23,7 @@ export function HisPesajes() {
     <div > 
       <nav>
         <Link to="/">Ganancias</Link>
+        <Link style={{background:'#42b983', color:'white'}} to="/">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
       </nav>
       <Pesajes/>
@@ -36,6 +37,7 @@ export function HisCodigos() {
       <nav>
         <Link to="/">Ganancias</Link>
         <Link to="/pesajes">Pesajes</Link>
+        <Link style={{background:'#42b983', color:'white'}} to="/">Codigos</Link>
       </nav>
       <Codigos/>
     </div>
