@@ -43,7 +43,7 @@ const Pesajes = (props) => {
       <section>
         <label for input="query">Search</label>
         <input name="query" onChange={handleFilterChange}/>
-        <button style={{marginTop:"2px"}} type="submit" onClick={applyFilters}>Ok</button>
+        <button  style={{marginTop:'4px'}} type="submit" onClick={applyFilters}>Ok</button>
       </section>
       <Table
         caption="Pesajes"

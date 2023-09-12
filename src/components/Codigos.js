@@ -129,7 +129,7 @@ const Codigos = (props) => {
     <>
   <div className="container">
     <section>
-      <label>Codigo
+      <label style={{display:'block'}}>Codigo
         <input style={{display:'block'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
       </label>
       <label>Marca 
@@ -139,7 +139,7 @@ const Codigos = (props) => {
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
        </label>
        <label style={{marginLeft:'30px'}}>Fecha Venta
-          <select style={{display:'block', width:'120px', height:'25px'}} name="fechaVenta" onChange={handleFilterChange}>
+          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>

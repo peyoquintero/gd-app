@@ -1,14 +1,6 @@
-.App {
-  text-align: center;
-}
-
-.Mylabels {
-  font-family:   Arial;
-  color: #121f23;
-}
-
-.App-link {
-  color: #61dafb;
+@media (min-width:993px) and (max-width:1920px) {
+  body{max-width:50%; margin-left: auto; margin-right: auto;}
+  
 }
 
 .container {
@@ -39,10 +31,11 @@ section {
 }
 input{ 
   height:20px;
+  margin-top: 3px;
 }
 label{
   font-family: arial;
-  font-size:11px;
+  font-size:12px;
   font-weight: bold;
   margin: 5px;
   display:block;
@@ -50,43 +43,46 @@ label{
 .freeinput{
   width:80px;
   height:22px;
+  margin-top: 3px;
 }
 .freeinputsmall{
   width:50px;
   height:22px;
+  margin-top: 3px;
 }
 button{
-  border: 2px solid #42b983;
+  border: 2px solid rgb(0, 128, 255);
   border-radius: 5px;
-  background: #42b983;
+  background: rgb(0, 128, 255);
   color:white;
   width:40px;
   height:30px;
-  margin-top:20px;
+  margin-top:15px;
   margin-left: 25px;
+  
   cursor: pointer;
 }
 table {
-  border: 2px solid #42b983;
+  border: 1px solid rgb(0, 128, 255);
   border-radius: 3px;
   background-color: #fff;
 }
 th {
-  background-color: #42b983;
-  color: rgba(255, 255, 255, 0.66);
+  background-color:rgb(0, 128, 255);
+  color: white;
   cursor: pointer;
   user-select: none;
   text-align: center;
-  padding: 5px 10px;
+  height:30px;
   font-family: arial;
-  font-size: 11px;
+  font-size: 14px;
 }
 td {
   background-color: #f9f9f9;
   text-align: center;
   padding: 5px 10px;
   font-family: arial;
-  font-size: 11px;
+  font-size: 12px;
 }
 th.active {
   color: #fff;
@@ -124,21 +120,22 @@ nav {
   font-family: Arial;
 }
 nav a.router-link-exact-active {
-  color:hsla(160, 100%, 37%, 1);
+  color:#61dafb;
 }
 nav a.router-link-exact-active:hover {
-  background-color:#61dafb;
+  color:#61dafb;
 }
 nav a {
   display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+  padding: 0.3rem 1rem;
 }
-nav a:first-of-type {
-  border: 0;
+nav a:nth-of-type(2) {
+  border-right: 1px solid lightgrey;
+  border-left: 1px solid lightgrey;
 }
 a:hover{
-  background-color: hsla(160, 100%, 37%, 0.2);
+  /*background-color: hsla(160, 100%, 37%, 0.2);*/
+  background:#61dafb;
   }
 
 
