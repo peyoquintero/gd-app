@@ -121,7 +121,6 @@ const Ganancias = () => {
         { label: "Peso Final", accessor: "PesoFinal",width:"15%" },
         { label: "Ganancia", accessor: "Ganancia",width:"15%" },
        ];
-      
 
     return (
       

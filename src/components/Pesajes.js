@@ -44,6 +44,7 @@ const Pesajes = (props) => {
         <label for input="query">Search</label>
         <input name="query" onChange={handleFilterChange}/>
         <button  style={{marginTop:'4px'}} type="submit" onClick={applyFilters}>Ok</button>
+        <label style={{marginLeft:'40px'}} > {gridData.length>0?`Total:${gridData.length}`:''}</label>
       </section>
       <Table
         caption="Pesajes"

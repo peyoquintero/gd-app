@@ -34,7 +34,7 @@ const Codigos = (props) => {
         filtroMarca: '*',
         filtroCodigo: '',
         filtroHuerfanos: false,
-        fechaVenta: new Date()
+        fechaVenta: new Date(),
        });
      }
      )
@@ -101,8 +101,9 @@ const Codigos = (props) => {
 
     if (filtros.filtroHuerfanos)
     {
-      var ventas = hispesajesFiltered.filter(pesaje=>pesaje.Operacion === 'VENTA' && pesaje.Fecha === filtros.fechaVenta);
-      var otrasOperaciones = this.hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaVenta);
+      var ventas = [];
+       ventas = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaVenta);
+      var otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaVenta);
       hispesajesFiltered =  ventas.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
         if (element.Codigo === otrasOperaciones[j].Codigo) {
@@ -114,6 +115,11 @@ const Codigos = (props) => {
     }
 
     let gridDataResults = massageData(hispesajesFiltered);
+
+    if (!filtros.filtroHuerfanos)
+    {
+      gridDataResults = gridDataResults.filter(w=> w.FechaFinal===filtros.fechaVenta);      
+    }
 
     gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }));
 
@@ -138,7 +144,7 @@ const Codigos = (props) => {
        <label style={{display:'block'}}>Revisar
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
        </label>
-       <label style={{marginLeft:'30px'}}>Fecha Venta
+       <label style={{marginLeft:'30px'}}>Fecha Salida
           <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
@@ -152,7 +158,6 @@ const Codigos = (props) => {
         caption="Pesajes"
         data={gridData}
         columns={columns}></Table>
-      
       </div>
     </>
   );
