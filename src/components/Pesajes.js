@@ -17,16 +17,19 @@ const Pesajes = (props) => {
    const [gridData,setGridData] = useState([])
    const [hisPesajes,setHispesajes] = useState([])
 
-   const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+//   const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
    useEffect(()=>{
-     axios.get(url)
+/*     axios.get(url)
      .then((response)=>{
        let allPesajes = transform(response.data); 
        setHispesajes(allPesajes);
        setFiltro("");
-     }
-     )
+     })
+     */
+     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+     setHispesajes(allPesajes);
+     setFiltro("");
    },[]);
  
    const handleFilterChange = (event) => {
@@ -41,7 +44,7 @@ const Pesajes = (props) => {
   return (
     <div className="container">
       <section>
-        <label for input="query">Search</label>
+        <label input="query">Search</label>
         <input name="query" onChange={handleFilterChange}/>
         <button  style={{marginTop:'4px'}} type="submit" onClick={applyFilters}>Ok</button>
         <label style={{marginLeft:'40px'}} > {gridData.length>0?`Total:${gridData.length}`:''}</label>

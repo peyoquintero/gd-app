@@ -1,4 +1,6 @@
 const TableBody = ({ tableData, columns }) => {
+    if (!tableData)
+    {return <tbody></tbody>}
     return (
      <tbody>
       {tableData.map((data,index) => {

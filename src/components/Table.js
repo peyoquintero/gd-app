@@ -3,7 +3,6 @@ import TableBody from "./TableBody";
 import TableHead from "./TableHead";
 
 const Table = ({ caption, data, columns }) => {
-// ToDo; Fix sorting
 const [tableData, setTableData] = useState([]);
 const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrder:'down'})
 useEffect(() => { setTableData(data) }, [data]);

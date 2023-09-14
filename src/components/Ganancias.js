@@ -28,29 +28,38 @@ const Ganancias = () => {
          resultDias : "",
         })
 
+      const initializeData = (allPesajes) => {
+        let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
+        setHispesajes(allPesajes);
+        setFechasPesaje(allFechas);
+        setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
+        setFiltros({
+          fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
+          fechaFinal : allFechas[allFechas.length-1] ?? new Date(),
+          filtroCodigo: "",
+          filtroMarca: "",
+          filtroPeso: "",
+          filtroLote: "",
+          fiExacta: false,
+          ffExacta: false,
+          filtroVentas: false,
+            });
+      }  
+
       const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
       useEffect(()=>{
         axios.get(url)
         .then((response)=>{
           let allPesajes = transform(response.data); 
-          let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
-          setHispesajes(allPesajes);
-          setFechasPesaje(allFechas);
-          setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
-          setFiltros({
-            fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
-            fechaFinal : allFechas[allFechas.length-1] ?? new Date(),
-            filtroCodigo: "",
-            filtroMarca: "",
-            filtroPeso: "",
-            filtroLote: "",
-            fiExacta: false,
-            ffExacta: false,
-            filtroVentas: false,
-              });
+          initializeData(allPesajes);
+          localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
         }
-        )
+        ).catch((error)=>{
+          let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+          if (allPesajes && allPesajes.length>0)
+          { initializeData(allPesajes) };
+        })
       },[]);
     
       const handleFilterChange = (event) => {
@@ -148,13 +157,13 @@ const Ganancias = () => {
         <input style={{marginTop:'15px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
         <label style={{marginTop:'20px'}}>=</label>
         <label>Fecha Final
-          <select style={{display:'block', width:'110px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange}>
-            {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
+          <select style={{display:'block', width:'110px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} defaultValue={fechasPesaje[fechasPesaje.length-1]}>
+            {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
           </select>
         </label>
         <input style={{marginTop:'15px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
         <label style={{marginTop:'20px'}}>=</label>
-        <label style={{marginTop:'20px'}}for="checkbox3" >Solo Ventas </label>
+        <label style={{marginTop:'20px'}} id="checkbox3" >Solo Ventas </label>
         <input style={{marginTop:'15px'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
         <button onClick={applyFilters}>Ok</button>
       </section>      

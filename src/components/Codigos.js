@@ -20,24 +20,21 @@ const Codigos = (props) => {
     resultCabezas : "",
    })
 
-
-   const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+   const initializeData = (allPesajes) => {
+    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
+    setFechasPesaje(allFechas);
+    setHispesajes(allPesajes);
+    setFiltros({
+     filtroMarca: '*',
+     filtroCodigo: '',
+     filtroHuerfanos: false,
+     fechaVenta: new Date(),
+    });
+   }
 
    useEffect(()=>{
-     axios.get(url)
-     .then((response)=>{
-       let allPesajes =  transform(response.data) ; 
-       let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
-       setFechasPesaje(allFechas);
-       setHispesajes(allPesajes);
-       setFiltros({
-        filtroMarca: '*',
-        filtroCodigo: '',
-        filtroHuerfanos: false,
-        fechaVenta: new Date(),
-       });
-     }
-     )
+    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    initializeData(allPesajes);
    },[]);
  
    const handleFilterChange = (event) => {
