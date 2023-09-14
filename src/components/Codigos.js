@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Table from "./Table";
 import {captionCabezas,transform} from "./helpers"
 
@@ -28,7 +27,7 @@ const Codigos = (props) => {
      filtroMarca: '*',
      filtroCodigo: '',
      filtroHuerfanos: false,
-     fechaVenta: new Date(),
+     fechaVenta: allFechas[allFechas.length-1] ?? new Date(),
     });
    }
 
@@ -142,7 +141,7 @@ const Codigos = (props) => {
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
        </label>
        <label style={{marginLeft:'30px'}}>Fecha Salida
-          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange}>
+          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange} value={filtros.fechaVenta}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>

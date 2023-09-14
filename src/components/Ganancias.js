@@ -157,7 +157,7 @@ const Ganancias = () => {
         <input style={{marginTop:'15px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
         <label style={{marginTop:'20px'}}>=</label>
         <label>Fecha Final
-          <select style={{display:'block', width:'110px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} defaultValue={filtros.fechaFinal}>
+          <select style={{display:'block', width:'110px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
             {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
           </select>
         </label>
