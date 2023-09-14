@@ -117,7 +117,7 @@ a {
 nav {
   font-size: 14px;
   text-align: center;
-  color: #000000;
+  color: rgb(43,88,124);
   font-family: Arial;
 }
 nav a.router-link-exact-active {

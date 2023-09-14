@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Table from "./Table";
 import {filteredGData,transform} from "./helpers"
 
@@ -17,16 +16,8 @@ const Pesajes = (props) => {
    const [gridData,setGridData] = useState([])
    const [hisPesajes,setHispesajes] = useState([])
 
-//   const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
    useEffect(()=>{
-/*     axios.get(url)
-     .then((response)=>{
-       let allPesajes = transform(response.data); 
-       setHispesajes(allPesajes);
-       setFiltro("");
-     })
-     */
      let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
      setHispesajes(allPesajes);
      setFiltro("");
