@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import {  App,  HisPesajes,  HisCodigos,} from "./App";
 import {  BrowserRouter,  Routes,  Route} from "react-router-dom";
+import { register as registerServiceWorker } from './serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -16,4 +17,7 @@ root.render(
     </Routes>
   </BrowserRouter> 
    </React.StrictMode>
+   
 );
+
+registerServiceWorker();
