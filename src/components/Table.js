@@ -2,7 +2,7 @@ import { useState,useEffect } from "react";
 import TableBody from "./TableBody";
 import TableHead from "./TableHead";
 
-const Table = ({ caption, data, columns }) => {
+const Table = ({ data, columns }) => {
 const [tableData, setTableData] = useState([]);
 const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrder:'down'})
 useEffect(() => { setTableData(data) }, [data]);

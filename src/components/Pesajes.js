@@ -53,14 +53,15 @@ const Pesajes = (props) => {
   return (
     <div className="container">
       <section>
-       <label style={{marginLeft:'30px'}}>Fecha Salida
+       <label style={{marginLeft:'30px'}}>Fecha Control
           <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaControl" onChange={handleFilterChange} value={filtros.fechaControl}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-        <label input="query">Buscar</label>
-        <input name="filtroGeneral" onChange={handleFilterChange}/>
-        <button  style={{marginTop:'4px'}} type="submit" onClick={applyFilters}>Ok</button>
+        <label input="query">Buscar
+        <input style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
+        </label>
+        <button  style={{marginTop:'15px'}} type="submit" onClick={applyFilters}>Ok</button>
         <label style={{marginLeft:'40px'}} > {gridData.length>0?`Total:${gridData.length}`:''}</label>
       </section>
       <Table

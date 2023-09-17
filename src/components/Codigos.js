@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {captionCabezas} from "./helpers"
+import {captionCabezas,validLoteOptions} from "./helpers"
 
 const Codigos = (props) => {
   const columns = [
@@ -14,6 +14,7 @@ const Codigos = (props) => {
    const [gridData,setGridData] = useState([])
    const [fechasPesaje,setFechasPesaje] = useState([])
    const [hisPesajes,setHispesajes] = useState([])
+   const [lotes,setLotes] = useState([])
 
    const [captions,setCaptions] = useState({
     resultCabezas : "",
@@ -23,9 +24,11 @@ const Codigos = (props) => {
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
     setFechasPesaje(allFechas);
     setHispesajes(allPesajes);
+    setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
     setFiltros({
      filtroMarca: '*',
      filtroCodigo: '',
+     filtroLote: '',
      filtroHuerfanos: false,
      fechaVenta: allFechas[allFechas.length-1] ?? new Date(),
     });
@@ -94,6 +97,11 @@ const Codigos = (props) => {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo)); 
     }
 
+    if (filtros.filtroLote!=="*" && filtros.filtroLote!=="")
+    {
+      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
+    }
+
     if (filtros.filtroHuerfanos)
     {
       var ventas = [];
@@ -135,15 +143,20 @@ const Codigos = (props) => {
       <label>Marca 
        <input style={{display:'block'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
        </label>
+       <label>Lote
+        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" value={filtros.filtroLote} onChange={handleFilterChange}>
+          {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
+          </select>
+        </label>
        <label style={{display:'block'}}>Revisar
                <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
        </label>
-       <label style={{marginLeft:'30px'}}>Fecha Salida
+       <label style={{marginLeft:'30px'}}>Fecha Control
           <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange} value={filtros.fechaVenta}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-      <button onClick={applyFilters}>Ok</button>
+      <button onClick={applyFilters} style={{background: filtros.filtroLote? "green": "lightgrey"}} disabled={!filtros.filtroLote}>Ok</button>
     </section>
     <section className="totals">
       <label >{captions.resultCabezas} </label> 
