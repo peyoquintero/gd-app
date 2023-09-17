@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {captionCabezas,transform} from "./helpers"
+import {captionCabezas} from "./helpers"
 
 const Codigos = (props) => {
   const columns = [
@@ -80,7 +80,6 @@ const Codigos = (props) => {
     return datos
   }
 
-
   const applyFilters = (event) => {
 
     let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote.toUpperCase() !== 'MUERTO'); 
@@ -125,7 +124,6 @@ const Codigos = (props) => {
       resultCabezas : captionCabezas(gridDataResults.length,gridDataResults.length),
       })
   }
-
 
   return ( 
     <>
