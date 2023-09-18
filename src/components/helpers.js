@@ -3,14 +3,24 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn) => {
     if (filterKey) {
         filteredData = filteredData.filter((row) => {
         return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
-          if(!filterKey.includes(";"))
+          if(!filterKey.includes(";")&&!filterKey.includes("^"))
               return String(row[key]).toLowerCase().indexOf(filterKey) > -1
           else
           {
-            let included = false;
-            let fkeys = filterKey.split(";").filter(w=>w!=='');
-            fkeys.forEach(element=>{included = included || (String(row[key]).toLowerCase().indexOf(element) > -1)})
-            return included;
+            if(filterKey.includes(";"))
+            { 
+              let included = false;
+              let fkeys = filterKey.split(";").filter(w=>w!=='');
+              fkeys.forEach(element=>{included = included || (String(row[key]).toLowerCase().indexOf(element) > -1)})
+              return included;
+            }
+            else
+            {
+              let count = 0;
+              let fkeys = filterKey.split("^").filter(w=>w!=='');
+              fkeys.forEach(element=>{ count  = count + (String(row[key]).toLowerCase().indexOf(element) > -1 ? 1 : 0)})
+              return count === fkeys.length
+            }
           }
         })
       })

@@ -135,6 +135,7 @@ const Ganancias = () => {
       
   <div className="container">
       <section>
+      <section>
         <label>Codigo
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
         </label>
@@ -149,6 +150,8 @@ const Ganancias = () => {
           {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
+        </section>
+        <section>
         <label style={{marginLeft:'5px'}}>Fecha Inicial
           <select style={{display:'block', width:'100px', height:'25px'}} className="freeinput" name="fechaInicial" onChange={handleFilterChange}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
@@ -167,6 +170,7 @@ const Ganancias = () => {
         <input style={{marginLeft:'20px',display:'block'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
         </label>
         <button style={{ marginTop:'15px', marginLeft: '5px'}} onClick={applyFilters}>Ok</button>
+        </section>
       </section>      
       <section className="totals">
       <label >{captions.resultCabezas}</label> 
