@@ -46,29 +46,55 @@ const Ganancias = () => {
             });
       }  
 
-      const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
       useEffect(()=>{
-        axios.get(url)
-        .then((response)=>{
-          let allPesajes = transform(response.data); 
-          initializeData(allPesajes);
-          localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
-        }
-        ).catch((error)=>{
-          let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-          if (allPesajes && allPesajes.length>0)
-          { initializeData(allPesajes) };
-        })
+        let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+        initializeData(allPesajes)
       },[]);
-    
+       
       const handleFilterChange = (event) => {
         const { name, value } = event.target;
         setFiltros({
           ...filtros,
           [name]: value,
         });
+     };
+
+    const handleFilterLoteChange = (event) => {
+        const { name, value } = event.target;
+        setFiltros({
+          ...filtros,
+          [name]: value,
+        });
+        if (value!=="*" && value.trim()!=="")
+            {
+            let allFechas = [...new Set(hisPesajes.filter(w=>w.Lote===value.trim()).map(obj => obj.Fecha))];
+            setFechasPesaje(allFechas);
+          }
+          else{
+            let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
+            setFechasPesaje(allFechas);
+          }
       };
+
+    const handleFilterMarcaChange = (event) => {
+      const { name, value } = event.target;
+      setFiltros({
+        ...filtros,
+        [name]: value,
+      });
+      if (value!=="*" && value.trim()!=="")
+      {
+      let allFechas = [...new Set(hisPesajes.filter(w=>w.Marca===value.trim()).map(obj => obj.Fecha))];
+      setFechasPesaje(allFechas);
+    }
+    else{
+      let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
+      setFechasPesaje(allFechas);
+    }
+
+    };
+
 
       const handleCheckboxChange = (event) => {
         const { name } = event.target;
@@ -85,10 +111,12 @@ const Ganancias = () => {
         {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca.trim()); 
         }
+
         if (filtros.filtroCodigo!=="")
         {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())); 
         }
+
         if (filtros.filtroLote!=="*" && filtros.filtroLote!=="")
         {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
@@ -108,7 +136,6 @@ const Ganancias = () => {
             gridDataResults = gridDataResults.filter(pesaje=>parseInt(pesaje.PesoInicial)>=parseInt(array[0]) && parseInt(pesaje.PesoInicial)<=parseInt(array[1]));
           } 
         }    
-
 
         let scrubbedData = cleanData(gridDataResults);
         
@@ -140,13 +167,13 @@ const Ganancias = () => {
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
         </label>
         <label>Marca 
-          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" onChange={handleFilterChange}/>
+          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" onChange={handleFilterMarcaChange}/>
         </label>
         <label>Rango Peso 
           <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
         </label>
         <label>Lote
-        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" onChange={handleFilterChange}>
+        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" onChange={handleFilterLoteChange}>
           {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>

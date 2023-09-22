@@ -1,9 +1,12 @@
+import React, {  useEffect } from "react";
 import "./App.css";
 
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
 import  Codigos  from "./components/Codigos";
+import { transform } from "./components/helpers"
+import axios from "axios";
 
 function GananciasDiarias() {
   return (
@@ -45,5 +48,14 @@ export function HisCodigos() {
 }
 
 export function App() {
+  const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+  useEffect(()=>{
+    axios.get(url)
+    .then((response)=>{
+      let allPesajes = transform(response.data); 
+      localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
+    })
+  },[]);
+
   return <GananciasDiarias />;
 }

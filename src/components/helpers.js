@@ -3,6 +3,8 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn) => {
     if (filterKey) {
         filteredData = filteredData.filter((row) => {
         return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
+
+
           if(!filterKey.includes(";")&&!filterKey.includes("^"))
               return String(row[key]).toLowerCase().indexOf(filterKey) > -1
           else
