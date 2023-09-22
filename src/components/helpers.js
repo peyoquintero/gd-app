@@ -1,12 +1,11 @@
-export const filteredGData = (filteredData,filterKeyValue,excludeColumn) => {
+export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroExacto) => {
     let filterKey = filterKeyValue && filterKeyValue.toLowerCase()
     if (filterKey) {
         filteredData = filteredData.filter((row) => {
         return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
-
-
           if(!filterKey.includes(";")&&!filterKey.includes("^"))
-              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+              return ((!filtroExacto && (String(row[key]).toLowerCase().indexOf(filterKey) > -1)) 
+                        || (filtroExacto && String(row[key]).toLowerCase()===filterKey))  
           else
           {
             if(filterKey.includes(";"))

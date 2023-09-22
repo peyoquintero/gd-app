@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, transform,validLoteOptions} from "./helpers"
-import axios from "axios";
 const Ganancias = () => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",
@@ -15,20 +14,20 @@ const Ganancias = () => {
         filtroVentas: false,
       });
 
-      const [gridData,setGridData] = useState([])
-      const [hisPesajes,setHispesajes] = useState([])
-      const [lotes,setLotes] = useState([])
-      const [fechasPesaje,setFechasPesaje] = useState([])
+    const [gridData,setGridData] = useState([])
+    const [hisPesajes,setHispesajes] = useState([])
+    const [lotes,setLotes] = useState([])
+    const [fechasPesaje,setFechasPesaje] = useState([])
 
-      const [captions,setCaptions] = useState({
-         resultCabezas : "",
-         resultGanancia : "",
-         resultMedia : "",
-         resultUltPeso : "",
-         resultDias : "",
-        })
+    const [captions,setCaptions] = useState({
+        resultCabezas : "",
+        resultGanancia : "",
+        resultMedia : "",
+        resultUltPeso : "",
+        resultDias : "",
+      })
 
-      const initializeData = (allPesajes) => {
+   const initializeData = (allPesajes) => {
         let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
@@ -45,7 +44,6 @@ const Ganancias = () => {
           filtroVentas: false,
             });
       }  
-
 
       useEffect(()=>{
         let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
@@ -77,7 +75,7 @@ const Ganancias = () => {
           }
       };
 
-    const handleFilterMarcaChange = (event) => {
+   const handleFilterMarcaChange = (event) => {
       const { name, value } = event.target;
       setFiltros({
         ...filtros,
@@ -92,11 +90,9 @@ const Ganancias = () => {
       let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
       setFechasPesaje(allFechas);
     }
-
     };
 
-
-      const handleCheckboxChange = (event) => {
+    const handleCheckboxChange = (event) => {
         const { name } = event.target;
         setFiltros({
           ...filtros,
@@ -167,13 +163,15 @@ const Ganancias = () => {
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
         </label>
         <label>Marca 
-          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" onChange={handleFilterMarcaChange}/>
+          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" 
+          onChange={handleFilterMarcaChange} value={filtros.filtroMarca}/>
         </label>
         <label>Rango Peso 
           <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
         </label>
         <label>Lote
-        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" onChange={handleFilterLoteChange}>
+        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" 
+                        onChange={handleFilterLoteChange} value={filtros.filtroLote}>
           {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>

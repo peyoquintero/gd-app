@@ -25,6 +25,7 @@ const Pesajes = (props) => {
     setFiltros({
       fechaControl : null,
       filtroGeneral: "",
+      filtroExacto: false
       });
     }  
 
@@ -41,8 +42,16 @@ const Pesajes = (props) => {
     })
   };
 
+  const handleCheckboxChange = (event) => {
+    const { name } = event.target;
+    setFiltros({
+      ...filtros,
+      [name]: event.target.checked,
+    });
+  };
+
   const applyFilters = (event) => {
-    let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso")
+    let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso",filtros.filtroExacto)
     if (filtros.fechaControl)
     {
       filteredData = filteredData.filter(w=>w.Fecha===filtros.fechaControl)    
@@ -58,6 +67,9 @@ const Pesajes = (props) => {
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
+        <label style={{display:'block'}}>Exacto
+               <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} />
+       </label>
         <label input="query">Buscar
         <input style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
         </label>

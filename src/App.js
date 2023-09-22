@@ -8,7 +8,7 @@ import  Codigos  from "./components/Codigos";
 import { transform } from "./components/helpers"
 import axios from "axios";
 
-function GananciasDiarias() {
+function GananciasDiarias(isonline) {
   return (
     <div>
       <nav>
@@ -49,13 +49,17 @@ export function HisCodigos() {
 
 export function App() {
   const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+  let onLine = true;
   useEffect(()=>{
     axios.get(url)
     .then((response)=>{
       let allPesajes = transform(response.data); 
       localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
     })
+    .catch((error) =>  {   
+      onLine = false;
+    })
   },[]);
 
-  return <GananciasDiarias />;
+  return <GananciasDiarias onLine={onLine}/>;
 }
