@@ -20,7 +20,7 @@ useEffect(() => {
 
 return (
     <>
-      <table className="table">
+      <table >
         <TableHead {...{ columns, setSortOrder, sortOrder}} />
         <TableBody {...{ tableData, columns  }} />
       </table>
