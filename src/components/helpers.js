@@ -102,33 +102,43 @@ export const transform= (apiResult) => {
     return rows;
 }
 
+export const duplicates = (pesajes) =>
+{
+  let result = pesajesByCodigo(pesajes);
+  let dups = result.filter(w=>{ let ultimo=w.pesajes[w.pesajes.length-1];
+                                return (ultimo.Operacion.toLowerCase()!=='venta' && w.pesajes && w.pesajes.some(x=>x.Operacion.toLowerCase()==='venta'))});  
+  return dups;
+}
+
+
+const reduceCodigos = (hispesajes,lote) =>
+{
+  return hispesajes.filter(w=>w.Lote.toUpperCase()===lote).reduce(function(h, obj) {
+    h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
+    return h; 
+    }, {});
+}
 // AKA master
 export const pesajesByCodigo = (hispesajes) =>
 {
-  var results = hispesajes.reduce(function(h, obj) {
-    h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
-    return h; 
-  }, {});
 
-  results = Object.keys(results).map(key => {
+  let resultsBov = reduceCodigos(hispesajes,'BOVINOS')
+  let resultsBuf = reduceCodigos(hispesajes,'BUFALOS')
+
+  let results = Object.keys(resultsBov).map(key => {
     return {
         Codigo: key, 
-        pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key).sort(function(a,b){
-                  return new Date(a.Fecha) - new Date(b.Fecha);
-                            })}
-    }
-  );
+        pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key && pesaje.Lote.toUpperCase()==='BOVINOS').sort(function(a,b){
+                  return new Date(a.Fecha) - new Date(b.Fecha);})}
+    }).concat(Object.keys(resultsBuf).map(key => {
+      return {
+          Codigo: key, 
+          pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key  && pesaje.Lote.toUpperCase()==='BUFALOS').sort(function(a,b){
+                    return new Date(a.Fecha) - new Date(b.Fecha);})}
+      })) ;
 
-  var datos = [];
-  results.forEach(result => {
-    let datafilter = result.pesajes;
-    let minP = datafilter[0];
-    let fechaSalida = datafilter.length > 1 ? datafilter[datafilter.length-1].Fecha : null;
-    let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:minP.Lote!=='MUERTO'};
-    datos.push(objresult);
-  });
 
-  return datos
+  return results
 }
 
 export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,filtroVentas) =>

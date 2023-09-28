@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table"
-import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, transform,validLoteOptions} from "./helpers"
+import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, validLoteOptions} from "./helpers"
 const Ganancias = () => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",
