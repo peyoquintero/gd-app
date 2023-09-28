@@ -14,15 +14,15 @@ const Ayuda = (props) => {
       },[]);
 
     return (
-        <div className="container">
+        <div  >
             <section>
-            <label>Version 1.0</label>
+                <label>Version 1.0</label>
+            </section>
+            <section className="title">
+                <label>Codigos Duplicados</label>
             </section>
             <section>
-            <label>Codigos Duplicados</label>
-            </section>
-            <section>
-            <IntegerMatrix nColumns={5} integers={gridData}></IntegerMatrix>
+                <IntegerMatrix nColumns={5} integers={gridData}></IntegerMatrix>
             </section>
         </div>
     )            

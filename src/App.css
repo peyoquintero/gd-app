@@ -66,7 +66,9 @@ table {
   border: 1px solid rgb(18, 81, 100);
   border-radius: 3px;
   background-color: #fff;
+  width: 100%;
 }
+
 th {
   background-color:rgb(43, 88, 124);
   color: white;
@@ -135,8 +137,22 @@ nav a:nth-of-type(2) {
   border-left: 1px solid lightgrey;
 }
 a:hover{
-  /*background-color: hsla(160, 100%, 37%, 0.2);*/
   background:#61dafb;
   }
-
-
+  .title {
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    width: 100%; 
+    background-color:rgb(43, 88, 124);
+    color: white;
+    font-family: arial;
+    font-size: 14px;
+  }
+  td:hover {
+    background-color:#61dafb;
+  }
+  td.tayuda{
+    background-color: red;
+    width:100%
+  }
