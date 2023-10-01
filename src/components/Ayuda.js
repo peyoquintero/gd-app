@@ -31,27 +31,27 @@ const Ayuda = (props) => {
       };
 
     return (
-        <div  >
-            <section>
-                <label>Version 1.03</label>
-            </section>
+        <div >
             <section className="title">
-                <label>Codigos Duplicados
-                <input style={{paddingTop:'100px'}} type="checkbox" id="checkboxDup" name= "filtroDups" onChange={handleCheckboxChange} />
+                <label className="ayudaLabel" >Codigos Duplicados
+                    <input  type="checkbox" id="checkboxDup" name= "filtroDups" onChange={handleCheckboxChange} />
                 </label>
             </section>
-            <section>
+            <section style={{background:'rgb(249, 249, 249)'}}>
                {filtros?.filtroDups ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
             </section>
-            <section className="title">
-                <label>Muertes
-                <input style={{paddingTop:'100px'}} type="checkbox" id="checkboxMuertes" name= "filtroMuertos" onChange={handleCheckboxChange} />
+            <section className="title" >
+                <label className="ayudaLabel" >Muertes
+                <input  type="checkbox" id="checkboxMuertes" name= "filtroMuertos" onChange={handleCheckboxChange} />
                 </label>
             </section>
             <section>
                {filtros?.filtroMuertos ? 
                 <Table data={gridMuertes} columns={columnsMuertes}></Table> :
                  null}
+            </section>
+            <section >
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.04</label>
             </section>
         </div>
     )            
