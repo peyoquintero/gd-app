@@ -3,7 +3,7 @@ import TableBody from "./TableBody";
 import TableHead from "./TableHead";
 
 const Table = ({ data, columns }) => {
-const [tableData, setTableData] = useState([]);
+const [tableData, setTableData] = useState(data);
 const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrder:'down'})
 useEffect(() => { setTableData(data) }, [data]);
 useEffect(() => { 
@@ -20,7 +20,7 @@ useEffect(() => {
 
 return (
     <>
-      <table >
+      <table>
         <TableHead {...{ columns, setSortOrder, sortOrder}} />
         <TableBody {...{ tableData, columns  }} />
       </table>

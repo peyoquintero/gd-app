@@ -5,9 +5,9 @@ import {duplicates} from "./helpers"
 
 const Ayuda = (props) => {
    
-       const [gridDups,setGridDups] = useState([]);
-       const [dups,setDups] = useState({filtroDups:false,filtroMuertos:false});
-       const [gridMuertes,setGridMuertes] = useState([]);
+    const [filtros,setFiltros] = useState({filtroDups:false,filtroMuertos:false});
+    const [gridDups,setGridDups] = useState([]);
+    const [gridMuertes,setGridMuertes] = useState([]);
 
        useEffect(()=>{
         let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
@@ -24,8 +24,8 @@ const Ayuda = (props) => {
 
       const handleCheckboxChange = (event) => {
         const { name } = event.target;
-        setDups({
-          ...dups,
+        setFiltros({
+          ...filtros,
           [name]: event.target.checked,
         });
       };
@@ -41,7 +41,7 @@ const Ayuda = (props) => {
                 </label>
             </section>
             <section>
-               {dups?.filtroDups ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
+               {filtros?.filtroDups ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
             </section>
             <section className="title">
                 <label>Muertes
@@ -49,7 +49,9 @@ const Ayuda = (props) => {
                 </label>
             </section>
             <section>
-               {dups?.filtroMuertos ?  <Table data={gridMuertes} columns={columnsMuertes}></Table> : null}
+               {filtros?.filtroMuertos ? 
+                <Table data={gridMuertes} columns={columnsMuertes}></Table> :
+                 null}
             </section>
         </div>
     )            
