@@ -1,6 +1,6 @@
 import React, {  useEffect } from "react";
 import "./App.css";
-
+import { recursoPorUsuario } from "./components/recursos"
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
@@ -9,7 +9,7 @@ import  Ayuda  from "./components/Ayuda";
 import { transform } from "./components/helpers"
 import axios from "axios";
 
-function GananciasDiarias() {
+export function GananciasDiarias() {
   return (
     <div>
       <nav>
@@ -65,9 +65,8 @@ export function AyudaGD() {
   );
 }
 
-
 export function App() {
-  const url = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+  const url = recursoPorUsuario("PLQ")
   let onLine = true;
   useEffect(()=>{
     axios.get(url)
