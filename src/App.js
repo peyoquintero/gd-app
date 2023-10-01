@@ -15,7 +15,7 @@ export function GananciasDiarias() {
       <nav>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/">Ganancias</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Ganancias/>
@@ -27,9 +27,9 @@ export function HisPesajes() {
   return (
     <div > 
       <nav>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/">Pesajes</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
-        <Link to="/">Ganancias</Link>
+        <Link to="/ganancias">Ganancias</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Pesajes/>
@@ -42,8 +42,8 @@ export function HisCodigos() {
     <div>
       <nav>
         <Link to="/pesajes">Pesajes</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/">Codigos</Link>
-        <Link to="/">Ganancias</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/codigos">Codigos</Link>
+        <Link to="/ganancias">Ganancias</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Codigos/>
@@ -57,8 +57,8 @@ export function AyudaGD() {
       <nav>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
-        <Link to="/">Ganancias</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/">Ayuda</Link>
+        <Link to="/ganancias">Ganancias</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/ayuda">Ayuda</Link>
       </nav>
       <Ayuda/>
     </div>
