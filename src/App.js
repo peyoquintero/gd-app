@@ -9,7 +9,7 @@ import  Ayuda  from "./components/Ayuda";
 import { transform } from "./components/helpers"
 import axios from "axios";
 
-function GananciasDiarias(isonline) {
+function GananciasDiarias() {
   return (
     <div>
       <nav>
@@ -55,9 +55,9 @@ export function AyudaGD() {
   return (
     <div>
       <nav>
-        <Link to="/">Ganancias</Link>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/codigos">Codigos</Link>
+        <Link to="/">Ganancias</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/">Ayuda</Link>
       </nav>
       <Ayuda/>
@@ -80,5 +80,5 @@ export function App() {
     })
   },[]);
 
-  return <GananciasDiarias onLine={onLine}/>;
+  return <GananciasDiarias/>;
 }
