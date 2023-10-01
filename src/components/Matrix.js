@@ -15,6 +15,7 @@ const IntegerMatrix = ({ integers, nColumns }) => {
       </tr>
     );
   }
+
   const columns = [
     { label: "Codigo", accessor: "Codigo" },
     { label: "Fecha", accessor: "Fecha" },
@@ -24,7 +25,7 @@ const IntegerMatrix = ({ integers, nColumns }) => {
     { label: "Operacion", accessor: "Operacion" },
    ];
 
-   let details = open.gridData.length ?       
+   let details = open.gridData.length>0 ?       
    <Table
    data={open.gridData}
    columns={columns}>
@@ -35,7 +36,9 @@ const IntegerMatrix = ({ integers, nColumns }) => {
     <div>
     <section >
     <table >        
+      <tbody>
         {rows}
+       </tbody>
     </table>
     </section>
     <section>

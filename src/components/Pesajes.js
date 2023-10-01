@@ -19,8 +19,8 @@ const Pesajes = (props) => {
 
    const initializeData = (allPesajes) => {
     setHispesajes(allPesajes);
-    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
-    allFechas.unshift(null)    
+    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))];
+    allFechas.unshift(null);    
     setFechasPesaje(allFechas);
     setFiltros({
       fechaControl : null,

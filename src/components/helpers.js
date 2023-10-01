@@ -1,31 +1,29 @@
 export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroExacto) => {
   let filterKey = filterKeyValue && filterKeyValue.toLowerCase()
 
+  const matchCodigo = (w,filterKey)=>{return (filterKey.includes("*") && String(w).toLowerCase().startsWith(filterKey.toLowerCase())) || String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1 };
   if (filterKey && !filterKey.includes("^")) {
       filteredData = filteredData.filter((row) => {
       return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
         if(!filterKey.includes(";"))
-            return ((!filtroExacto && (String(row[key]).toLowerCase().indexOf(filterKey) > -1)) 
+            return ((!filtroExacto && matchCodigo(row[key],filterKey)) 
                       || (filtroExacto && String(row[key]).toLowerCase()===filterKey))  
         else
         {
           if(filterKey.includes(";"))
           { 
             let fkeys = filterKey.split(";").filter(w=>w!=='');
-            return fkeys.some(element => String(row[key]).toLowerCase().indexOf(element) > -1);            }
-        }
-      })
+            return fkeys.some(element =>  matchCodigo(row[key],element));
+         }
+       }
     })
-  }
+  })}
 
   const containsAll = (array1, array2) => array2.every((element) => array1.includes(element.toLowerCase()));
   if (filterKey&&filterKey.includes("^")) {
        let fkeys = filterKey.split("^").filter(w=>w!=='');
-       console.log(fkeys)
        filteredData = filteredData.filter((row) => { 
-        let vals = Object.values(row).map(w=>w.toLowerCase())
-        console.log(vals)
-        return containsAll(vals,fkeys); 
+       return containsAll(Object.values(row).map(w=>w.toLowerCase()),fkeys); 
       })        
    }
 
