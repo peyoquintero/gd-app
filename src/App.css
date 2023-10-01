@@ -39,6 +39,7 @@ label{
   font-weight: bold;
   margin: 5px;
   display:block;
+  text-align: center;
 }
 .freeinput{
   width:60px;
@@ -139,18 +140,22 @@ nav a:nth-of-type(2) {
 a:hover{
   background:#61dafb;
   }
-  .title {
-    display:flex;
-    flex-direction:column;
-    justify-content: center;
-    width: 100%; 
-    background-color:rgb(43, 88, 124);
-    color: white;
-    font-family: arial;
-    font-size: 14px;
+.title1 {
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  width: 100%; 
+  background-color: lightgray;
+  color: black;
+  font-family: arial;
+  font-size: 14px;
+}
+td:hover {
+  background-color:#61dafb;
+ 
   }
-  td:hover {
-    background-color:#61dafb;
-    
+  .ayudaLabel{
+    display:flex; 
+    align-items:center;
+    margin:0;
   }
-  
