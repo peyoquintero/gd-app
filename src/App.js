@@ -80,5 +80,5 @@ export function App() {
     })
   },[]);
 
-  return <GananciasDiarias/>;
+  return <HisPesajes/>;
 }

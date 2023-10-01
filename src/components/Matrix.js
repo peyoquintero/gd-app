@@ -1,36 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import  Table  from "./Table";
 
 const IntegerMatrix = ({ integers, nColumns }) => {
-  const rows = [];
-  const [open, setOpen] = useState({isOpen:false,gridData:[]});
+const rows = [];
+const [gridData, setGridData] = useState([]);
 
   for (let i = 0; i < integers.length; i += nColumns) {
     const row = integers.slice(i, i + nColumns);
     rows.push(
       <tr key={i}>
         {row.map((integer) => (
-          <td key={integer.Codigo} onClick={() => setOpen({isOpen:true,gridData:integer.pesajes})} style={{ backgroundColor: 'rgb(173, 195, 218)' }}>{integer.Codigo}</td>
+          <td key={integer.Codigo} onClick={() => setGridData(integer.pesajes)} style={{ backgroundColor: 'rgb(173, 195, 218)' }}>{integer.Codigo}</td>
         ))}
       </tr>
     );
   }
 
-  const columns = [
-    { label: "Codigo", accessor: "Codigo" },
-    { label: "Fecha", accessor: "Fecha" },
-    { label: "Peso", accessor: "Peso" },
-    { label: "Marca", accessor: "Marca" },
-    { label: "Lote", accessor: "Lote"},
-    { label: "Operacion", accessor: "Operacion" },
-   ];
+  useEffect(()=>{
+    setGridData(integers[0]?.pesajes);
+  },[]);
 
-   let details = open.gridData.length>0 ?       
-   <Table
-   data={open.gridData}
-   columns={columns}>
-   </Table>
-: null;
+  const columns = [
+    { label: "Codigo", accessor: "Codigo" },  { label: "Fecha", accessor: "Fecha" },  { label: "Peso", accessor: "Peso" },
+    { label: "Marca", accessor: "Marca" },    { label: "Lote", accessor: "Lote"},     { label: "Operacion", accessor: "Operacion" },
+   ];
 
   return (
     <div>
@@ -42,10 +35,14 @@ const IntegerMatrix = ({ integers, nColumns }) => {
     </table>
     </section>
     <section>
-      {details}
+    {gridData.length>0 ?       
+      <Table
+      data={gridData}
+      columns={columns}>
+      </Table>
+   : null}
     </section>
     </div>
-
   )
 };
 
