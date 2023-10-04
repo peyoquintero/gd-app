@@ -11,9 +11,12 @@ const Ayuda = (props) => {
 
        useEffect(()=>{
         let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-        setGridDups(duplicates(allPesajes)) ;
-        let muertes = allPesajes.filter(w=>w.Lote.toUpperCase()==='MUERTO');
-        setGridMuertes(muertes);
+        if (allPesajes?.length)
+        {
+          setGridDups(duplicates(allPesajes)) ;
+          let muertes = allPesajes.filter(w=>w.Lote.toUpperCase()==='MUERTO');
+          setGridMuertes(muertes);
+        }
       },[]);
 
       const columnsMuertes = [

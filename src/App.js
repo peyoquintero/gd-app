@@ -1,4 +1,4 @@
-import React, {  useEffect } from "react";
+import React, {  useEffect, useState } from "react";
 import "./App.css";
 import { recursoPorUsuario } from "./components/recursos"
 import { Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import  Pesajes  from "./components/Pesajes";
 import  Codigos  from "./components/Codigos";
 import  Ayuda  from "./components/Ayuda";
 import { transform } from "./components/helpers"
+import PopupScreen from "./components/PopupScreen";
 import axios from "axios";
 
 export function GananciasDiarias() {
@@ -66,8 +67,22 @@ export function AyudaGD() {
 }
 
 export function App() {
-  const url = recursoPorUsuario("PLQ")
-  let onLine = true;
+  const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
+  let url = '';
+
+  const handlePopupClose = (result) => {
+    setPopupResult(result);
+    if (result?.length>0)
+    {
+      localStorage.setItem("usuario", result.toLowerCase());
+    }
+  };
+
+  if (popupUsuario?.length>0)
+  {
+    url = recursoPorUsuario(popupUsuario)
+  }
+
   useEffect(()=>{
     axios.get(url)
     .then((response)=>{
@@ -75,9 +90,10 @@ export function App() {
       localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
     })
     .catch((error) =>  {   
-      onLine = false;
+      console.log("error getting spreadsheet")
     })
-  },[]);
-
-  return <HisPesajes/>;
+  },[url]);
+  return  (popupUsuario?.length>0) ?
+   <HisPesajes/> :
+      <PopupScreen onClose={handlePopupClose} />
 }
