@@ -36,12 +36,12 @@ const Ayuda = (props) => {
     return (
         <div >
             <section className="title">
-                <label className="ayudaLabel" >Codigos Duplicados
+                <label className="ayudaLabel" >Inconsistencias
                     <input  type="checkbox" id="checkboxDup" name= "filtroDups" onChange={handleCheckboxChange} />
                 </label>
             </section>
             <section style={{background:'rgb(249, 249, 249)'}}>
-               {filtros?.filtroDups ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
+               {(filtros?.filtroDups &&gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
             </section>
             <section className="title" >
                 <label className="ayudaLabel" >Muertes
