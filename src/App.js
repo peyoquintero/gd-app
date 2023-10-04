@@ -77,7 +77,7 @@ export function App() {
       localStorage.setItem("usuario", result.toLowerCase());
     }
   };
-
+ 
   if (popupUsuario?.length>0)
   {
     url = recursoPorUsuario(popupUsuario)
