@@ -16,6 +16,7 @@ const Pesajes = (props) => {
    const [gridData,setGridData] = useState([])
    const [hisPesajes,setHispesajes] = useState([])
    const [fechasPesaje,setFechasPesaje] = useState([])
+   const [captions, setCaptions] = useState("");
 
    const initializeData = (allPesajes) => {
     setHispesajes(allPesajes);
@@ -27,7 +28,9 @@ const Pesajes = (props) => {
       filtroGeneral: "",
       filtroExacto: true
       });
-      setGridData(allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE')); 
+      let pesajes = allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE') 
+      setGridData(pesajes.slice(0,100));
+      setCaptions(pesajes.length>0?`Ultimos 100 - Total:${pesajes.length} `:'No hay datos disponibles') 
     }  
 
    useEffect(()=>{
@@ -58,6 +61,7 @@ const Pesajes = (props) => {
       filteredData = filteredData.filter(w=>w.Fecha===filtros.fechaControl)    
     }
     setGridData(filteredData);  
+    setCaptions(`Total: ${filteredData.length}`);
   }
 
   return (
@@ -75,7 +79,7 @@ const Pesajes = (props) => {
                <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} defaultChecked={true}/>
        </label>
         <button  style={{marginTop:'15px'}} type="submit" onClick={applyFilters}>Ok</button>
-        <label style={{marginLeft:'40px'}} > {gridData.length>0?`Total:${gridData.length}`:''}</label>
+        <label style={{marginLeft:'40px'}} >{captions}</label>
       </section>
       <Table
         caption="Pesajes"
