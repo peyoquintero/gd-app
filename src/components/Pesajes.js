@@ -25,8 +25,9 @@ const Pesajes = (props) => {
     setFiltros({
       fechaControl : null,
       filtroGeneral: "",
-      filtroExacto: false
+      filtroExacto: true
       });
+      setGridData(allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE')); 
     }  
 
    useEffect(()=>{
@@ -67,12 +68,12 @@ const Pesajes = (props) => {
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-        <label style={{display:'block'}}>Exacto
-               <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} />
-       </label>
         <label input="query">Buscar
-        <input style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
+        <input className="freeinput" style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
         </label>
+        <label style={{display:'block'}}>Exacto
+               <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} defaultChecked={true}/>
+       </label>
         <button  style={{marginTop:'15px'}} type="submit" onClick={applyFilters}>Ok</button>
         <label style={{marginLeft:'40px'}} > {gridData.length>0?`Total:${gridData.length}`:''}</label>
       </section>

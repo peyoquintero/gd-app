@@ -76,7 +76,7 @@ const Codigos = (props) => {
       let datafilter = result.pesajes;
       let minP = datafilter[0];
       let fechaSalida = datafilter.length > 1 ? datafilter[datafilter.length-1].Fecha : null;
-      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:minP.Lote!=='MUERTO'};
+      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:minP.Operacion.toUpperCase()!=='MUERTE'};
       datos.push(objresult);
     });
 
@@ -85,7 +85,7 @@ const Codigos = (props) => {
 
   const applyFilters = (event) => {
 
-    let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote.toUpperCase() !== 'MUERTO'); 
+    let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE'); 
 
     if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
     {

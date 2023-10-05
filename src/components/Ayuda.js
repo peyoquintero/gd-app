@@ -14,7 +14,7 @@ const Ayuda = (props) => {
         if (allPesajes?.length)
         {
           setGridDups(duplicates(allPesajes)) ;
-          let muertes = allPesajes.filter(w=>w.Lote.toUpperCase()==='MUERTO');
+          let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE');
           setGridMuertes(muertes);
         }
       },[]);
@@ -36,12 +36,12 @@ const Ayuda = (props) => {
     return (
         <div >
             <section className="title">
-                <label className="ayudaLabel" >Codigos Duplicados
+                <label className="ayudaLabel" >Inconsistencias
                     <input  type="checkbox" id="checkboxDup" name= "filtroDups" onChange={handleCheckboxChange} />
                 </label>
             </section>
             <section style={{background:'rgb(249, 249, 249)'}}>
-               {filtros?.filtroDups ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
+               {(filtros?.filtroDups &&gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
             </section>
             <section className="title" >
                 <label className="ayudaLabel" >Muertes
@@ -54,7 +54,7 @@ const Ayuda = (props) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.05</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.06</label>
             </section>
         </div>
     )            

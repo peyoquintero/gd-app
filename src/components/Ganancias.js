@@ -102,7 +102,7 @@ const Ganancias = () => {
 
       const applyFilters = (event) => {
 
-        let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Lote.toUpperCase() !== 'MUERTO'); 
+        let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE'); 
         if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
         {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca.trim()); 

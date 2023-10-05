@@ -15,8 +15,8 @@ export function GananciasDiarias() {
     <div>
       <nav>
         <Link to="/pesajes">Pesajes</Link>
-        <Link to="/codigos">Codigos</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
+        <Link to="/codigos">Codigos</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Ganancias/>
@@ -29,8 +29,8 @@ export function HisPesajes() {
     <div > 
       <nav>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/pesajes">Pesajes</Link>
-        <Link to="/codigos">Codigos</Link>
         <Link to="/ganancias">Ganancias</Link>
+        <Link to="/codigos">Codigos</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Pesajes/>
@@ -43,8 +43,8 @@ export function HisCodigos() {
     <div>
       <nav>
         <Link to="/pesajes">Pesajes</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/codigos">Codigos</Link>
         <Link to="/ganancias">Ganancias</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/codigos">Codigos</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Codigos/>
