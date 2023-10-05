@@ -27,7 +27,7 @@ const Pesajes = (props) => {
       filtroGeneral: "",
       filtroExacto: true
       });
-      setGridData(allPesajes.filter(w=>w.Lote.toLowerCase!='muerto')); 
+      setGridData(allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE')); 
     }  
 
    useEffect(()=>{

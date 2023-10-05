@@ -14,7 +14,7 @@ const Ayuda = (props) => {
         if (allPesajes?.length)
         {
           setGridDups(duplicates(allPesajes)) ;
-          let muertes = allPesajes.filter(w=>w.Lote.toUpperCase()==='MUERTO');
+          let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE');
           setGridMuertes(muertes);
         }
       },[]);

@@ -85,7 +85,7 @@ return ultpeso;
 export const validLoteOptions= (lotes) =>
 {
 lotes.push('*');
-return lotes.filter(w=>(w!=='NULL' && w!=='MUERTO'))
+return lotes.filter(w=>(w!=='NULL'))
 }
 
 export const transform= (apiResult) => {
