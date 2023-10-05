@@ -54,7 +54,7 @@ const Ayuda = (props) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.06</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.07</label>
             </section>
         </div>
     )            
