@@ -8,7 +8,7 @@ const TableBody = ({ tableData, columns }) => {
         <tr key={index}>
          {columns.map(({ accessor }) => {
           const tData = data[accessor] ? data[accessor] : "——";
-          return <td key={accessor}>{tData}</td>;
+          return <td key={data[accessor]}>{tData}</td>;
          })}
         </tr>
        );

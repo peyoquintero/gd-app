@@ -4,7 +4,7 @@ import { recursoPorUsuario } from "./components/recursos"
 import { Link } from "react-router-dom";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
-import  Codigos  from "./components/Codigos";
+import  Inventario  from "./components/Inventario";
 import  Ayuda  from "./components/Ayuda";
 import { transform } from "./components/helpers"
 import PopupScreen from "./components/PopupScreen";
@@ -16,7 +16,7 @@ export function GananciasDiarias() {
       <nav>
         <Link to="/pesajes">Pesajes</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
-        <Link to="/codigos">Codigos</Link>
+        <Link to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Ganancias/>
@@ -30,7 +30,7 @@ export function HisPesajes() {
       <nav>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
-        <Link to="/codigos">Codigos</Link>
+        <Link to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
       <Pesajes/>
@@ -38,16 +38,17 @@ export function HisPesajes() {
   );
 }
 
-export function HisCodigos() {
+
+export function Inventarios() {
   return (
     <div>
       <nav>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/codigos">Codigos</Link>
+        <Link style={{color:'rgb(0, 106, 255)'}} to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
       </nav>
-      <Codigos/>
+      <Inventario/>
     </div>
   );
 }
@@ -57,7 +58,7 @@ export function AyudaGD() {
     <div>
       <nav>
         <Link to="/pesajes">Pesajes</Link>
-        <Link to="/codigos">Codigos</Link>
+        <Link to="/inventario">Inventario</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ayuda">Ayuda</Link>
       </nav>

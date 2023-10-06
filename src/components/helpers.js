@@ -203,4 +203,27 @@ const  gananciaDiariaPesajes = (results, fechaInicial, fechaFinal, fiExacta, ffE
   return minmaxPesajes;
 }
 
+export const compareNumAlphas = (str1, str2) =>
+ {
+    // Check if either string starts with numbers.
+    const regex = /^\d+/;
+    const match1 = str1.match(regex);
+    const match2 = str2.match(regex);
+  
+    if (!match1 && !match2) {
+      return str1.localeCompare(str2);
+    }
+  
+    if (match1 && match2) {
+      const num1 = parseInt(match1);
+      const num2 = parseInt(match2);
+      return num1 < num2 ? -1 : 1;
+    }
+  
+    // If only one string starts with numbers, return that string first.
+    return match1 ? -1 : 1;
+  }  
+
+
+
 

@@ -2,6 +2,7 @@ import React, { useState,useEffect } from "react";
 import IntegerMatrix from "./Matrix"
 import Table from "./Table";
 import {duplicates} from "./helpers"
+import  Codigos  from "./Codigos";
 
 const Ayuda = (props) => {
    
@@ -14,7 +15,8 @@ const Ayuda = (props) => {
         if (allPesajes?.length)
         {
           setGridDups(duplicates(allPesajes)) ;
-          let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE');
+          let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE')
+                        .sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha);})
           setGridMuertes(muertes);
         }
       },[]);
@@ -43,6 +45,16 @@ const Ayuda = (props) => {
             <section style={{background:'rgb(249, 249, 249)'}}>
                {(filtros?.filtroDups &&gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
             </section>
+            <section className="title">
+                <label className="ayudaLabel" >Codigos -  Revision
+                    <input  type="checkbox" id="checkboxCodigos" name= "filtroCodigos" onChange={handleCheckboxChange} />
+                </label>
+            </section>
+            <section>
+            {filtros?.filtroCodigos ? 
+              <Codigos/> :
+              null}
+            </section>
             <section className="title" >
                 <label className="ayudaLabel" >Muertes
                 <input  type="checkbox" id="checkboxMuertes" name= "filtroMuertos" onChange={handleCheckboxChange} />
@@ -54,7 +66,7 @@ const Ayuda = (props) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.07</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.08</label>
             </section>
         </div>
     )            
