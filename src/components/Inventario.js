@@ -5,11 +5,65 @@ const Inventario = () => {
   const columns = [
     { label: "Fecha", accessor: "Fecha",width:"30%" },
     { label: "Operacion", accessor: "Operacion",width:"30%" },
-    { label: "Marca", accessor: "Marca",width:"30%" },
+    { label: "Marca", accessor: "Marca",width:"20%" },
     { label: "Total", accessor: "Total",width:"10%" },
+    { label: "Vendidos", accessor: "Vendidos",width:"10%" },
    ];
 
+
+   const [selectedOption, setSelectedOption] = useState("movimientos");
+
+  const handleChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+
    const [gridData,setGridData] = useState([])
+   const [gridInventario,setGridInventario] = useState([])
+
+   const columnsInventario = [
+    { label: "Codigo", accessor: "Codigo",width:"20%" },
+    { label: "Marca", accessor: "Marca",width:"10%" },
+    { label: "Fecha Compra", accessor: "FechaCompra",width:"20%" },
+    { label: "Peso Inicial", accessor: "PesoInicial",width:"10%" },
+    { label: "Ultimo Control", accessor: "FechaUltimoControl",width:"20%" },
+    { label: "Ultimo Peso", accessor: "PesoFinal",width:"10%" },
+   ];
+
+   function getInventario(data) {
+    data.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
+    data.sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha); })
+    const groupedData = data.reduce((acc, item) => {
+      const key = `${item.Codigo}`;
+      if (!acc[key]) {
+        acc[key] = {
+          Codigo: item.Codigo,
+          Marca: item.Marca,
+          Pesajes: [],
+        };
+      }
+      acc[key].Pesajes.push(item)
+      return acc;
+    }, {});
+
+    var result = Object.values(groupedData);
+
+    let codigosVendidos = data.filter(w=>['VENTA','MUERTE'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
+    result = result.filter(x => !codigosVendidos.includes(x.Codigo));
+
+    result = result.map(w=> {return {
+      Codigo: w.Codigo,
+      Marca: w.Marca,
+      FechaCompra: w.Pesajes[0]?.Fecha,      
+      PesoInicial: w.Pesajes[0]?.Peso,
+      FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,
+      PesoFinal: w.Pesajes[w.Pesajes.length-1]?.Peso
+                           }});
+    return result;
+  }
+
+   function intersectCount (comprados,vendidos){
+    return comprados.filter(w=>vendidos.includes(w)).length;
+   }
 
    function groupByFechaOperacion(data) {
     const groupedData = data.reduce((acc, item) => {
@@ -20,30 +74,59 @@ const Inventario = () => {
           Operacion: item.Operacion,
           Marca: item.Marca,
           Total: 0,
+          Codigos: [],
+          Vendidos: 0
         };
       }
       acc[key].Total++;
+      acc[key].Codigos.push(item.Codigo)
       return acc;
     }, {});
-  
-    // Return the grouped data.
-    return Object.values(groupedData);
+
+    var result = Object.values(groupedData);
+    let codigosVendidos = data.filter(w=>w?.Operacion?.toUpperCase()==='VENTA').map(x=>x.Codigo);
+
+    result = result.map(w=>{w.Vendidos= w?.Operacion?.toUpperCase()!=='COMPRA'? 0 : intersectCount(w.Codigos??[],codigosVendidos??[]);
+                            return w;    
+                           });
+    return result;
   }
 
    useEffect(()=>{
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
     let movimientos =  allPesajes.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
                                  .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
-    let movimientosByFecha = groupByFechaOperacion(movimientos);
+    if (movimientos?.length)                             
+    {let movimientosByFecha = groupByFechaOperacion(movimientos);
     setGridData(movimientosByFecha); 
+    setGridInventario(getInventario(allPesajes));
+    }
   },[]);
 
   return (
+    <>
+    <section>
+    <div onChange={handleChange}>
+      <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} /> Movimientos
+      <input type="radio" name="details" value="cabezas" checked={selectedOption === "cabezas"} /> Inventario Actual
+    </div>
+    <h3>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</h3>
+    </section>
+    <section>
+    {selectedOption === "movimientos" ?  
     <div className="container">
       <Table
         data={gridData}
         columns={columns}></Table>
-    </div>
+    </div> :
+    <div className="container">
+    <Table
+      data={gridInventario}
+      columns={columnsInventario}></Table>
+  </div>}    
+    </section>
+  </>
+
   );
 }
 

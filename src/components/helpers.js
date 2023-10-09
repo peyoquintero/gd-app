@@ -151,9 +151,10 @@ var results = hispesajes.reduce(function(h, obj) {
 results = Object.keys(results).map(key => {
   return {
       Codigo: key, 
-      pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key).sort(function(a,b){
-                return new Date(a.Fecha) - new Date(b.Fecha);
-                          })}
+      pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key)
+                          .sort(function(a,b){
+                                  return new Date(a.Fecha) - new Date(b.Fecha);
+                                })}
   }
 );
 
