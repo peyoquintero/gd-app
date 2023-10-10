@@ -3,11 +3,11 @@ import Table from "./Table";
 
 const Inventario = () => {
   const columns = [
-    { label: "Fecha", accessor: "Fecha",width:"30%" },
-    { label: "Operacion", accessor: "Operacion",width:"30%" },
+    { label: "Fecha", accessor: "Fecha",width:"25%" },
+    { label: "Operacion", accessor: "Operacion",width:"25%" },
     { label: "Marca", accessor: "Marca",width:"20%" },
-    { label: "Total", accessor: "Total",width:"10%" },
-    { label: "Vendidos", accessor: "Vendidos",width:"10%" },
+    { label: "Total", accessor: "Total",width:"15%" },
+    { label: "Vendidos", accessor: "Vendidos",width:"15%" },
    ];
 
 
@@ -105,13 +105,16 @@ const Inventario = () => {
 
   return (
     <>
-    <section>
-    <div onChange={handleChange}>
-      <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} /> Movimientos
+    <div>
+    <section  >
+    <div className="radio-container" onChange={handleChange}>
+      <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} />Movimientos
       <input type="radio" name="details" value="cabezas" checked={selectedOption === "cabezas"} /> Inventario Actual
+      <span>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</span>
     </div>
-    <h3>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</h3>
+    
     </section>
+  
     <section>
     {selectedOption === "movimientos" ?  
     <div className="container">
@@ -125,6 +128,7 @@ const Inventario = () => {
       columns={columnsInventario}></Table>
   </div>}    
     </section>
+    </div>
   </>
 
   );

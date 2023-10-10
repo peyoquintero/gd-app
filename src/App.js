@@ -14,10 +14,13 @@ export function GananciasDiarias() {
   return (
     <div>
       <nav>
+        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
         <Link to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
+        
+        
       </nav>
       <Ganancias/>
     </div>
@@ -28,6 +31,7 @@ export function HisPesajes() {
   return (
     <div > 
       <nav>
+        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link to="/inventario">Inventario</Link>
@@ -43,6 +47,7 @@ export function Inventarios() {
   return (
     <div>
       <nav>
+        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/inventario">Inventario</Link>
@@ -57,6 +62,7 @@ export function AyudaGD() {
   return (
     <div>
       <nav>
+        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/inventario">Inventario</Link>
         <Link to="/ganancias">Ganancias</Link>
@@ -98,3 +104,4 @@ export function App() {
    <HisPesajes/> :
       <PopupScreen onClose={handlePopupClose} />
 }
+
