@@ -10,32 +10,31 @@ import { transform } from "./components/helpers"
 import PopupScreen from "./components/PopupScreen";
 import axios from "axios";
 
-export function GananciasDiarias() {
+export function GananciasDiarias(isOnline) {
   return (
     <div>
       <nav>
-        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
         <Link to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
-        
-        
+        <button className= {isOnline?"refresh-button":"refresh-button-offline"} onclick="location.reload()">&#x21bb; </button>
       </nav>
+      
       <Ganancias/>
     </div>
   );
 }
 
-export function HisPesajes() {
+export function HisPesajes(isOnline) {
   return (
     <div > 
       <nav>
-        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
+        <button className={isOnline?"refresh-button":"refresh-button-offline"} onclick="location.reload()">&#x21bb; </button>
       </nav>
       <Pesajes/>
     </div>
@@ -43,30 +42,30 @@ export function HisPesajes() {
 }
 
 
-export function Inventarios() {
+export function Inventarios(isOnline) {
   return (
     <div>
       <nav>
-        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/inventario">Inventario</Link>
         <Link to="/ayuda">Ayuda</Link>
+        <button className={isOnline?"refresh-button":"refresh-button-offline"} onclick="location.reload()">&#x21bb; </button>
       </nav>
       <Inventario/>
     </div>
   );
 }
 
-export function AyudaGD() {
+export function AyudaGD(isOnline) {
   return (
     <div>
       <nav>
-        <button className="refresh-button" onclick="location.reload()">&#x21bb; </button>
         <Link to="/pesajes">Pesajes</Link>
         <Link to="/inventario">Inventario</Link>
         <Link to="/ganancias">Ganancias</Link>
         <Link style={{color:'rgb(0, 106, 255)'}} to="/ayuda">Ayuda</Link>
+        <button className={isOnline?"refresh-button":"refresh-button-offline"} onclick="location.reload()">&#x21bb; </button>
       </nav>
       <Ayuda/>
     </div>
@@ -75,6 +74,7 @@ export function AyudaGD() {
 
 export function App() {
   const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   let url = '';
 
   const handlePopupClose = (result) => {
@@ -98,10 +98,17 @@ export function App() {
     })
     .catch((error) =>  {   
       console.log("error getting spreadsheet")
-    })
-  },[url]);
+    });
+    window.addEventListener('online', () => setIsOnline(true));
+    window.addEventListener('offline', () => setIsOnline(false));
+
+    return () => {
+      window.removeEventListener('online', () => setIsOnline(true));
+      window.removeEventListener('offline', () => setIsOnline(false));
+    };
+  },[url,isOnline]);
   return  (popupUsuario?.length>0) ?
-   <HisPesajes/> :
+   <HisPesajes isOnline={isOnline}/> :
       <PopupScreen onClose={handlePopupClose} />
 }
 
