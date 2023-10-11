@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {captionCabezas,validLoteOptions} from "./helpers"
+import {captionCabezas,validLoteOptions} from "./Helpers"
 
 const Codigos = (props) => {
   const columns = [

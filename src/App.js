@@ -6,7 +6,7 @@ import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
 import  Inventario  from "./components/Inventario";
 import  Ayuda  from "./components/Ayuda";
-import { transform } from "./components/helpers"
+import { transform } from "./components/Helpers"
 import PopupScreen from "./components/PopupScreen";
 import axios from "axios";
 

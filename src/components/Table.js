@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import TableBody from "./TableBody";
 import TableHead from "./TableHead";
-import { compareNumAlphas } from "./helpers"
+import { compareNumAlphas } from "./Helpers"
 
 
 const Table = ({ data, columns }) => {

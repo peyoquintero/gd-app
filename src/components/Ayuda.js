@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from "react";
 import IntegerMatrix from "./Matrix"
 import Table from "./Table";
-import {duplicates} from "./helpers"
+import {duplicates} from "./Helpers"
 import  Codigos  from "./Codigos";
 
 const Ayuda = (props) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {filteredGData} from "./helpers"
+import {filteredGData} from "./Helpers"
 
 const Pesajes = (props) => {
   const columns = [
