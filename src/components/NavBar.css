@@ -1,80 +1,47 @@
 .mid {
-	background-color: rgb(160, 228, 255);
+	background-color:darkgrey;
 	display: inline-block;
 	width: 63%;
-	margin: auto;
+	margin-left:80px;
 }
-
 .navbar{
- 
-	display:inline-block;
+ 	display:inline-block;
+  	font-family: Arial;
 }
-
 .navbar li{
-
-list-style: none;
-display:inline-block;
-
-margin:auto;
+	list-style: none;
+	display:inline-block;
+	border-right: 1px solid #ccc;
 }
-
+.navbar li:last-child {
+	border-right: none;
+  }
 .navbar li a{
-text-decoration: none;
-color:rgb(29, 25, 231);
-font-size: 18px;
-padding:8px 20px;
+	text-decoration: none;
+	font-size: 14px;
+	padding: 0.3rem 1rem;
 }
-
 .navbar li a:hover{
-color:rgb(151, 7, 247);
-border: darkmagenta;
-border-radius: 2px;
-font-size: 20px;
+	border-radius: 2px;
+	background:#61dafb;
 }
-
-.navbar li a:active{
-background-color: deepskyblue;
-border-radius: 5px;
-}
+.navbar li a.active {
+	color:rgb(0, 106, 255);
+	border-radius: 5px;
+  }
+  
 .right {
-	background-color: rgb(160, 228, 255);
-display: inline-block;
-width: 8%;
-
-font-size: 18px;
-padding: 18px 26px;
-color: #1d19e7;
+	background-color:darkgray;
+	display: inline-block;
+	width: 8%;
 }
-
-.right {
-	background-color:rgb(160, 228, 255);
-display: inline-block;
-width: 8%;
-
-font-size: 18px;
-padding: 18px 26px;
-color: #1d19e7;
-}
-	.right a{
-text-decoration:none;
-}
-.right:hover{
-font-weight:bolder;
-}
-
 .left {
-	background-color: rgb(160, 228, 255);
-display: inline-block;
-width: 17%;
-font-size: 18px;
-padding: 18px 17px;
-color: #1d19e7;
+	background-color: darkgray;
+	display: inline-block;
+	width: 17%;
+	margin-left: 10px;
+}
 
 
-}
-.left a{
-text-decoration:none;
-}
-.left:hover{
-font-weight:bolder;
-}
+
+  

@@ -12,23 +12,6 @@ import { transform } from "./components/Helpers"
 import {  BrowserRouter,  Routes,  Route} from "react-router-dom";
 import axios from "axios";
 
-export function GananciasDiarias() {
-  return (
-    <div>
-      <nav>
-        <Link to="/pesajes">Pesajes</Link>
-        <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
-        <Link to="/inventario">Inventario</Link>
-        <Link to="/ayuda">Ayuda</Link>
-        <button className= {true?"refresh-button":"refresh-button-offline"} >&#x21bb; </button>
-      </nav>
-      
-      <Ganancias/>
-    </div>
-  );
-}
-
-
 export function App() {
   const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
   let url = '';
@@ -46,6 +29,18 @@ export function App() {
     url = recursoPorUsuario(popupUsuario)
   }
 
+  const networkState = useNetwork();
+  const {
+    online,
+    since,
+    downLink,
+    downLinkMax,
+    effectiveType,
+    rtt,
+    saveData,
+    type,
+  } = networkState;
+
   useEffect(()=>{
     axios.get(url)
     .then((response)=>{
@@ -58,6 +53,8 @@ export function App() {
   },[url]);
   return( 
    <BrowserRouter>
+  
+
    <NavBar/>
     <Routes>
       <Route path="/pesajes" element={<Pesajes />}/>
@@ -72,5 +69,7 @@ export function App() {
      <HisPesajes/> </>:
       <PopupScreen onClose={handlePopupClose} />
       */
+
+/* <label>{online?"ON":"OFF"}</label>*/
 )}
 

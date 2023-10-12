@@ -1,4 +1,4 @@
-import {ganancias} from './components/Helpers';
+import {ganancias} from './Helpers';
 
 test('ganancias: vacio', () => {
   //

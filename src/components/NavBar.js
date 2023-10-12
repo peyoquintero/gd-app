@@ -1,29 +1,29 @@
 import React from 'react';
-import {  Link } from "react-router-dom";
+import {  Link, NavLink } from "react-router-dom";
 import "./NavBar.css"
 const NavBar= () =>{
   return (
-    <header class="header">
-    <div class="left">
+    <header className="header">
+    <div className="left">
         <a href="#">...</a>
     </div>
-    <div class="mid">
-		<ul class="navbar">        
+    <div className="mid">
+		<ul className="navbar">        
             <li>
-            <Link to="/pesajes">Pesajes</Link>
+            <NavLink to="/pesajes" activeClassName="active">Pesajes</NavLink>
             </li>
             <li>
-            <Link style={{color:'rgb(0, 106, 255)'}} to="/ganancias">Ganancias</Link>
+            <NavLink  to="/ganancias" activeClassName="active">Ganancias</NavLink>
             </li>
             <li>
-            <Link to="/inventario">Inventario</Link>
+            <NavLink to="/inventario" activeClassName="active">Inventario</NavLink>
             </li>
             <li>
-            <Link to="/ayuda">Ayuda</Link>
+            <NavLink to="/ayuda" activeClassName="active">Ayuda</NavLink>
             </li>
          </ul>
     </div>
-	<div class="right">
+	<div className="right">
     <button className= {true?"refresh-button":"refresh-button-offline"} >&#x21bb; </button>
     </div>
   </header>
