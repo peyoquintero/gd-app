@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import {captionCabezas,validLoteOptions} from "./Helpers"
+import {getPesajesByCodigo} from "./HelperInventario"
 
 const Codigos = (props) => {
   const columns = [
@@ -29,8 +30,9 @@ const Codigos = (props) => {
      filtroMarca: '*',
      filtroCodigo: '',
      filtroLote: '',
-     filtroHuerfanos: false,
-     fechaVenta: allFechas[allFechas.length-1] ?? new Date(),
+     sinEntrada: false,
+     todasLasVentas: false,
+     fechaSalida: allFechas[allFechas.length-1] ?? new Date(),
     });
    }
 
@@ -102,12 +104,12 @@ const Codigos = (props) => {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
     }
 
-    if (filtros.filtroHuerfanos)
+    if (filtros.sinEntrada)
     {
-      var ventas = [];
-       ventas = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaVenta);
-      var otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaVenta);
-      hispesajesFiltered =  ventas.filter(function(element) {
+      var ultimoPesaje = [];
+       ultimoPesaje = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaSalida);
+      var otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaSalida);
+      hispesajesFiltered =  ultimoPesaje.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
         if (element.Codigo === otrasOperaciones[j].Codigo) {
           return false;
@@ -117,11 +119,20 @@ const Codigos = (props) => {
       });
     }
 
+    if (filtros.todasLasVentas)
+    {
+      let codigosVendidos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'VENTA').map(w=>w.Codigo);
+      let codigosMuertos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'MUERTE').map(w=>w.Codigo);
+      let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
+      let codigosEnLimbo = codigosVendidos.filter(x => !codigosComprados.includes(x));
+      hispesajesFiltered = hispesajesFiltered.filter(x => codigosEnLimbo.includes(x));  
+    }
+
     let gridDataResults = massageData(hispesajesFiltered);
 
-    if (!filtros.filtroHuerfanos)
+    if (!filtros.sinEntrada)
     {
-      gridDataResults = gridDataResults.filter(w=> w.FechaFinal===filtros.fechaVenta);      
+      gridDataResults = gridDataResults.filter(w=> w.FechaFinal===filtros.fechaSalida);      
     }
 
     gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }));
@@ -149,13 +160,16 @@ const Codigos = (props) => {
           </select>
         </label>
        <label style={{display:'block'}}>Revisar
-               <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "filtroHuerfanos" onChange={handleCheckboxChange} />
+               <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "sinEntrada" onChange={handleCheckboxChange} />
        </label>
        <label style={{marginLeft:'30px'}}>Fecha Control
-          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaVenta" onChange={handleFilterChange} value={filtros.fechaVenta}>
+          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaSalida" onChange={handleFilterChange} value={filtros.fechaSalida}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
+        <label style={{display:'block'}}>Todas Ventas
+               <input style={{display:'block'}} type="checkbox" id="checkboxVentas" name= "todasLasVentas" onChange={handleCheckboxChange} />
+       </label>
       <button onClick={applyFilters} style={{background: filtros.filtroLote? "green": "lightgrey"}} disabled={!filtros.filtroLote}>Ok</button>
     </section>
     <section className="totals">

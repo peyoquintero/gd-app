@@ -118,7 +118,7 @@ return hispesajes.filter(w=>w.Lote.toUpperCase()===lote).reduce(function(h, obj)
   return h; 
   }, {});
 }
-// AKA master
+
 export const pesajesByCodigo = (hispesajes) =>
 {
 
