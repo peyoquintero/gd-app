@@ -79,8 +79,8 @@ const Pesajes = (props) => {
                <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} defaultChecked={true}/>
        </label>
         <button  style={{marginTop:'15px'}} type="submit" onClick={applyFilters}>Ok</button>
-        <label style={{marginLeft:'40px'}} >{captions}</label>
-      </section>
+         <label style={{marginLeft:'40px', marginTop:'20px'}} >{captions}</label>
+        </section>
       <Table
         caption="Pesajes"
         data={gridData}

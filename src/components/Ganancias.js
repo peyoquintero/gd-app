@@ -182,20 +182,23 @@ const Ganancias = () => {
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-        <input style={{marginTop:'15px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
-        <label style={{marginTop:'20px'}}>=</label>
+        <label className="center-label" style={{fontSize: '14px'}}>=
+          <input style={{marginTop:'2px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
+        </label>
         <label>Fecha Final
           <select style={{display:'block', width:'100px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
             {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
           </select>
         </label>
-        <input style={{marginTop:'15px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
-        <label style={{marginTop:'20px'}}>=</label>
-        <label id="checkbox3Label" >Ventas 
-        <input style={{marginLeft:'20px',display:'block'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
+        <label className="center-label" style={{fontSize: '14px'}}>=
+          <input style={{marginTop:'2px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
         </label>
-        <button style={{ marginTop:'15px', marginLeft: '5px'}} onClick={applyFilters}>Ok</button>
+        <label className="center-label" >Ventas 
+          <input  style={{marginTop:'2px'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
+        </label>
+        
         </section>
+        <button style={{ marginLeft: '5px'}} onClick={applyFilters}>Ok</button>
       </section>      
       <section className="totals">
       <label >{captions.resultCabezas}</label> 
