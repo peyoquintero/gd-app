@@ -30,7 +30,6 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroEx
   return filteredData;
 }
 
-
 const median = (arr) =>  {
   const mid = Math.floor(arr.length / 2),
   nums = [...arr].sort((a, b) => a - b);
@@ -46,7 +45,6 @@ const daysBetweenDates = (fechaInicial,fechaFinal) =>
 
   return diffDays>0?diffDays:0;    
 }
-
 
 export const cleanData= (gridData) =>
 {
@@ -109,7 +107,6 @@ let dups = result.filter(w=>{ let ultimo=w.pesajes[w.pesajes.length-1];
                               return (ultimo.Operacion.toLowerCase()!=='venta' && w.pesajes && w.pesajes.some(x=>x.Operacion.toLowerCase()==='venta'))});  
 return dups;
 }
-
 
 const reduceCodigos = (hispesajes,lote) =>
 {
@@ -208,11 +205,11 @@ export const compareNumAlphas = (str1, str2) =>
  {
     // Check if either string starts with numbers.
     const regex = /^\d+/;
-    const match1 = str1?.match(regex);
-    const match2 = str2?.match(regex);
+    const match1 = str1?.toString().match(regex);
+    const match2 = str2?.toString().match(regex);
   
     if (!match1 && !match2) {
-      return str1.localeCompare(str2);
+      return str1?.toString().localeCompare(str2);
     }
   
     if (match1 && match2) {
@@ -224,7 +221,3 @@ export const compareNumAlphas = (str1, str2) =>
     // If only one string starts with numbers, return that string first.
     return match1 ? -1 : 1;
   }  
-
-
-
-

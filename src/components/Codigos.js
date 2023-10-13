@@ -104,11 +104,6 @@ const Codigos = (props) => {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
     }
 
-    if (!filtros.sinEntrada && !filtros.todasLasVentas)
-    {
-      hispesajesFiltered = hispesajesFiltered.filter(w=> w.FechaFinal===filtros.fechaSalida);      
-    }
-
     if (filtros.sinEntrada && !filtros.todasLasVentas)
     {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE')
@@ -127,6 +122,11 @@ const Codigos = (props) => {
 
     if (filtros.todasLasVentas)
     {
+      setFiltros({
+        ...filtros,
+        fechaSalida: ''
+      });
+  
       let codigosVendidos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'VENTA').map(w=>w.Codigo);
       let codigosMuertos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'MUERTE').map(w=>w.Codigo);
       let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
@@ -137,6 +137,11 @@ const Codigos = (props) => {
     let gridDataResults = massageData(hispesajesFiltered);
 
     gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }));
+
+    if (filtros.fechaSalida != '' && !filtros.sinEntrada)
+    {
+      gridDataResults = gridDataResults.filter(w=> w.FechaFinal === filtros.fechaSalida);      
+    }
 
     setGridData(gridDataResults);  
 
@@ -168,7 +173,7 @@ const Codigos = (props) => {
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
         </label>
-        <label style={{display:'block'}}>Todas Ventas
+        <label style={{display:'block'}}> Ventas
                <input style={{display:'block'}} type="checkbox" id="checkboxVentas" name= "todasLasVentas" onChange={handleCheckboxChange} />
        </label>
       <button onClick={applyFilters} >Ok</button>
