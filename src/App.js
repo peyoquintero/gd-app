@@ -51,11 +51,25 @@ export function App() {
       console.log("error getting spreadsheet")
     });
   },[url]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Function to trigger the refresh action
+  const handleRefresh = () => {
+    // Add the code to refresh the screen here
+    // For example, you can reload the data or re-fetch data from the server
+    setRefreshing(true);
+    // After refreshing, set the refreshing state to false
+    setTimeout(() => setRefreshing(false), 1000); // Simulating a delay for demonstration
+  };
+  const buttonClass = online ? "refresh-button-online" : "refresh-button-offline";
   return( 
    <BrowserRouter>
-  
-
-   <NavBar/>
+   <div className="main-container">
+      <NavBar/>   
+      <button  className={buttonClass} onClick={handleRefresh}> 
+      &#x21bb; </button>
+    </div>
     <Routes>
       <Route path="/pesajes" element={<Pesajes />}/>
       <Route path="/inventario" element={<Inventario />}/>
