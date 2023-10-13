@@ -1,34 +1,18 @@
 @media (min-width:993px) and (max-width:1920px) {
   body{max-width:50%; margin-left: auto; margin-right: auto;background-color:darkgray;}
-  
 }
-
-.App {
-  text-align: center;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.main-container {
+  display:flex;
+  flex-direction:row;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 100%; 
 }
-
-.App-link {
-  color: #61dafb;
-}
-
 .container {
   display:flex;
   flex-direction:column;
   justify-content: center;
   width: 100%; 
 }
-
 section {
   display: flex;
   justify-content: center;
@@ -71,14 +55,14 @@ label{
   margin-top: 3px;
 }
 button{
-  border: 2px solid rgb(18, 81, 100);
+  border: 2px solid rgb(31, 116, 20);
   border-radius: 5px;
   background: rgb(31, 116, 20);
   color:white;
   width:40px;
   height:30px;
-  margin-top:15px;
-  margin-left: 25px;
+  margin-top:8px;
+  margin-right: 10px;
   cursor: pointer;
 }
 button:hover {
@@ -89,7 +73,6 @@ table {
   background-color: #fff;
   width: 100%;
 }
-
 th {
   background-color:rgb(43, 88, 124);
   color: white;
@@ -100,7 +83,6 @@ th {
   font-family: arial;
   font-size: 14px;
 }
-
 td {
   background-color: #f9f9f9;
   text-align: center;
@@ -108,6 +90,9 @@ td {
   font-family: arial;
   font-size: 12px;
 }
+td:hover {
+  background-color:#61dafb;
+  }
 th.active {
   color: #fff;
 }
@@ -137,30 +122,6 @@ a {
   transition: 0.4s;
   color:black;
 }
-nav {
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  text-align: center;
-  color: rgb(43,88,124);
-  font-family: Arial;
-}
-nav a.router-link-exact-active {
-  color:#61dafb;
-}
-nav a.router-link-exact-active:hover {
-  color:#61dafb;
-}
-nav a {
-  display: inline-block;
-  padding: 0.3rem 1rem;
-}
-nav a:nth-of-type(2) {
-  border-right: 1px solid lightgrey;
-  border-left: 1px solid lightgrey;
-}
-
 .title1 {
   display:flex;
   flex-direction:column;
@@ -171,15 +132,11 @@ nav a:nth-of-type(2) {
   font-family: arial;
   font-size: 14px;
 }
-td:hover {
-  background-color:#61dafb;
- 
-  }
-  .ayudaLabel{
-    display:flex; 
-    align-items:center;
-    margin:0;
-  }
+.ayudaLabel{
+  display:flex; 
+  align-items:center;
+  margin:0;
+}
 .containerPp {
     width: 350px;
     margin: 0 auto;
@@ -220,24 +177,67 @@ input[type="text"] {
     font-weight: bold;
    
    }
-   .refresh-button {
-    background-color: #007bff; /* Button background color */
-    color: #fff; /* Button text color */
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
+  .navbar{
+    font-size: 14px;
+    font-family: Arial;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    text-align: center;
+    color: rgb(43,88,124);
+    width:95%;
   }
-   .refresh-button-offline {
-    background-color: #007bff; /* Button background color */
-    color: #fff; /* Button text color */
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
+  .navbar ul{
+    list-style-type: none;
+    padding: 0;
   }
+  .navbar li{
+    display: inline-block;
+        vertical-align: middle;
+    border-right: 1px solid #ccc;
+  }
+  .navbar li:last-child {
+    border-right: none;
+    }
+  .navbar li a{
+    text-decoration: none;
+    font-size: 14px;
+    padding: 0.3rem 1rem;
+  }
+  navbar a {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+  }
+  .navbar li a:hover{
+    border-radius: 2px;
+    background:#61dafb;
+  }
+  .navbar li a.active {
+    color:rgb(0, 106, 255);
+    border-radius: 5px;
+    } 
+    .refresh-button-online {
+      background-color:rgb(74, 204, 57);
+      color: #fff; /* Button text color */
+      font-size: 24px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+     .refresh-button-offline {
+      background-color: rgb(250, 120, 141); /* Button background color */
+      color: #fff; /* Button text color */
+      font-size: 24px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .refresh-button:hover {
+      background-color: #0056b3;
+    }
+   
 
-  .refresh-button:hover {
-    background-color: #0056b3;}
+   
+  

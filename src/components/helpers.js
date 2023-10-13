@@ -208,8 +208,8 @@ export const compareNumAlphas = (str1, str2) =>
  {
     // Check if either string starts with numbers.
     const regex = /^\d+/;
-    const match1 = str1.match(regex);
-    const match2 = str2.match(regex);
+    const match1 = str1?.match(regex);
+    const match2 = str2?.match(regex);
   
     if (!match1 && !match2) {
       return str1.localeCompare(str2);
