@@ -2,12 +2,12 @@ import React, {  useEffect, useState } from "react";
 import { useNetwork } from "./hooks/useNetwork";
 import "./App.css";
 import { recursoPorUsuario } from "./components/recursos"
-import { Link } from "react-router-dom";
 import  NavBar  from "./components/NavBar";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
 import  Inventario  from "./components/Inventario";
 import  Ayuda  from "./components/Ayuda";
+import  PopupScreen  from "./components/PopupScreen";
 import { transform } from "./components/Helpers"
 import {  BrowserRouter,  Routes,  Route} from "react-router-dom";
 import axios from "axios";
@@ -52,23 +52,14 @@ export function App() {
     });
   },[url]);
 
-  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = () => {}
 
-  // Function to trigger the refresh action
-  const handleRefresh = () => {
-    // Add the code to refresh the screen here
-    // For example, you can reload the data or re-fetch data from the server
-    setRefreshing(true);
-    // After refreshing, set the refreshing state to false
-    setTimeout(() => setRefreshing(false), 1000); // Simulating a delay for demonstration
-  };
-  const buttonClass = online ? "refresh-button-online" : "refresh-button-offline";
   return( 
+    (popupUsuario?.length!==0) ?
    <BrowserRouter>
    <div className="main-container">
       <NavBar/>   
-      <button  className={buttonClass} onClick={handleRefresh}> 
-      &#x21bb; </button>
+      <button  className={online? "refresh-button-online" : "refresh-button-offline"} onClick={handleRefresh}> &#x21bb; </button>
     </div>
     <Routes>
       <Route path="/pesajes" element={<Pesajes />}/>
@@ -77,13 +68,7 @@ export function App() {
       <Route path="/ayuda" element={<Ayuda />}/>
     </Routes>
   </BrowserRouter> 
-/*
-  return  (popupUsuario?.length!==0) ?
-     <><label>{online?"ON":"OFF"}{since}</label>
-     <HisPesajes/> </>:
-      <PopupScreen onClose={handlePopupClose} />
-      */
-
-/* <label>{online?"ON":"OFF"}</label>*/
+  :
+  <PopupScreen onClose={handlePopupClose} />
 )}
 
