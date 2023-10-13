@@ -87,7 +87,7 @@ const Codigos = (props) => {
 
   const applyFilters = (event) => {
 
-    let hispesajesFiltered = hisPesajes.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE'); 
+    let hispesajesFiltered = hisPesajes; 
 
     if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
     {
@@ -104,11 +104,17 @@ const Codigos = (props) => {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
     }
 
-    if (filtros.sinEntrada)
+    if (!filtros.sinEntrada && !filtros.todasLasVentas)
     {
-      var ultimoPesaje = [];
+      hispesajesFiltered = hispesajesFiltered.filter(w=> w.FechaFinal===filtros.fechaSalida);      
+    }
+
+    if (filtros.sinEntrada && !filtros.todasLasVentas)
+    {
+      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE')
+      let ultimoPesaje = [];
        ultimoPesaje = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaSalida);
-      var otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaSalida);
+      let otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaSalida);
       hispesajesFiltered =  ultimoPesaje.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
         if (element.Codigo === otrasOperaciones[j].Codigo) {
@@ -123,17 +129,12 @@ const Codigos = (props) => {
     {
       let codigosVendidos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'VENTA').map(w=>w.Codigo);
       let codigosMuertos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'MUERTE').map(w=>w.Codigo);
-      let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
+      let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
       let codigosEnLimbo = codigosVendidos.filter(x => !codigosComprados.includes(x));
-      hispesajesFiltered = hispesajesFiltered.filter(x => codigosEnLimbo.includes(x));  
+      hispesajesFiltered = hispesajesFiltered.filter(x => codigosEnLimbo.includes(x.Codigo));  
     }
 
     let gridDataResults = massageData(hispesajesFiltered);
-
-    if (!filtros.sinEntrada)
-    {
-      gridDataResults = gridDataResults.filter(w=> w.FechaFinal===filtros.fechaSalida);      
-    }
 
     gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }));
 
@@ -170,7 +171,7 @@ const Codigos = (props) => {
         <label style={{display:'block'}}>Todas Ventas
                <input style={{display:'block'}} type="checkbox" id="checkboxVentas" name= "todasLasVentas" onChange={handleCheckboxChange} />
        </label>
-      <button onClick={applyFilters} style={{background: filtros.filtroLote? "green": "lightgrey"}} disabled={!filtros.filtroLote}>Ok</button>
+      <button onClick={applyFilters} >Ok</button>
     </section>
     <section className="totals">
       <label >{captions.resultCabezas} </label> 
