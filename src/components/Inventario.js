@@ -50,7 +50,8 @@ const Inventario = () => {
     {
       filteredData = filteredGData(filteredData,filtroBuscar,"Peso",false)
     }
-    setGridInventario(getInventario(filteredData));
+    let inventario = getInventario(filteredData);
+    setGridInventario(inventario);
     }
   },[filtroBuscar]);
 

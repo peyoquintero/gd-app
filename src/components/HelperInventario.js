@@ -18,8 +18,8 @@ export const getPesajesByCodigo = (data)=>{
 
 export const getInventario = (data) => {
     const groupedData = getPesajesByCodigo(data)
-    var result = Object.values(groupedData);
-
+    let result = Object.values(groupedData);
+    result = result.filter(w=>w.Pesajes[0].Operacion.toUpperCase()==='COMPRA'); 
     let codigosVendidos = data.filter(w=>['VENTA','MUERTE'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
     result = result.filter(x => !codigosVendidos.includes(x.Codigo));
 
