@@ -204,34 +204,34 @@ input[type="text"] {
     color:rgb(0, 106, 255);
     border-radius: 5px;
     } 
-    .refresh-button-online {
-      background-color:rgb(74, 204, 57);
-      color: #fff; /* Button text color */
-      font-size: 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer; 
-      transition: background-color 0.4s;
-      width: 33px; /* Set the width to create a square button */
-      height: 33px;
-    }
-     .refresh-button-offline {
-      background-color: rgb(250, 120, 141); /* Button background color */
-      color: #fff; /* Button text color */
-      font-size: 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.4s;
-      width: 33px; /* Set the width to create a square button */
-      height: 33px;
-    }
-    .refresh-button:hover {
-      background-color: rgb(20, 68, 13);
-      transition: background-color 0.4s;
-    }
+    .refresh-button-online,
+  .refresh-button-offline {
+    background-color: rgb(74, 204, 57);
+    color: #fff; /* Button text color */
+    font-size: 24px;
+    border: none;
+    border-radius: 50%; /* Use 50% border-radius to create a circular button */
+    cursor: pointer;
+    transition: background-color 0.4s;
+    width: 33px;
+    height: 33px;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+  }
+
+  .refresh-button-offline {
+    background-color: rgb(250, 120, 141);
+  }
+
+  .refresh-button-online:hover,
+  .refresh-button-offline:hover {
+    background-color: rgb(20, 68, 13);
+  }
    .refresh-symbol{
-    display:block;
-    text-align: center;
+    display: flex;
+    justify-content: center; /* Center the symbol horizontally */
+    align-items: center; /* Center the symbol vertically */
+    text-align: center; /
    }
    
