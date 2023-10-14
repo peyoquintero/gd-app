@@ -70,6 +70,8 @@ export function App() {
       <Route path="/inventario" element={<Inventario />}/>
       <Route path="/ganancias" element={<Ganancias />}/>
       <Route path="/ayuda" element={<Ayuda />}/>
+      <Route path="/*" element={<Pesajes />}>
+      </Route>
     </Routes>
   </BrowserRouter> 
   :
