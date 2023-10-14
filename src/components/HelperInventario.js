@@ -7,6 +7,7 @@ export const getPesajesByCodigo = (data)=>{
           acc[key] = {
             Codigo: item.Codigo,
             Marca: item.Marca,
+            Lote: item.Lote,
             Pesajes: [],
           };
         }
@@ -25,6 +26,7 @@ export const getInventario = (data) => {
     result = result.map(w=> {return {
       Codigo: w.Codigo,
       Marca: w.Marca,
+      Lote: w.Lote,
       FechaCompra: w.Pesajes[0]?.Fecha,      
       PesoInicial: w.Pesajes[0]?.Peso,
       FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,

@@ -210,7 +210,7 @@ input[type="text"] {
     color: #fff; /* Button text color */
     font-size: 24px;
     border: none;
-    border-radius: 50%; /* Use 50% border-radius to create a circular button */
+    border-radius: 5px; /* Use 50% border-radius to create a circular button */
     cursor: pointer;
     transition: background-color 0.4s;
     width: 33px;
@@ -232,6 +232,6 @@ input[type="text"] {
     display: flex;
     justify-content: center; /* Center the symbol horizontally */
     align-items: center; /* Center the symbol vertically */
-    text-align: center; /
+    text-align: center; 
    }
    
