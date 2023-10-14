@@ -71,7 +71,8 @@ button{
   cursor: pointer;
 }
 button:hover {
-  background-color: rgb(20, 68, 13);;}
+  background-color: rgb(20, 68, 13);
+}
 table {
   border: 1px solid rgb(18, 81, 100);
   border-radius: 3px;
@@ -207,27 +208,31 @@ input[type="text"] {
       background-color:rgb(74, 204, 57);
       color: #fff; /* Button text color */
       font-size: 24px;
-      text-align:center;
       border: none;
       border-radius: 5px;
-      margin-bottom: 0px;
       cursor: pointer;
+      text-align:center;
+      vertical-align: middle;
+      transition: background-color 0.4s;
+      width: 33px; /* Set the width to create a square button */
+      height: 33px;
     }
      .refresh-button-offline {
       background-color: rgb(250, 120, 141); /* Button background color */
       color: #fff; /* Button text color */
       font-size: 24px;
-      text-align: center;
       border: none;
       border-radius: 5px;
-      margin-bottom: 0px;
       cursor: pointer;
+      text-align:center;
+      vertical-align: middle;
+      transition: background-color 0.4s;
+      width: 33px; /* Set the width to create a square button */
+      height: 33px;
     }
     .refresh-button:hover {
-      background-color: #0056b3;
+      background-color: rgb(20, 68, 13);
+      transition: background-color 0.4s;
     }
    
-
-    
    
-  
