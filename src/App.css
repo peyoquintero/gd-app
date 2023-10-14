@@ -207,18 +207,20 @@ input[type="text"] {
       background-color:rgb(74, 204, 57);
       color: #fff; /* Button text color */
       font-size: 24px;
+      text-align:center;
       border: none;
       border-radius: 5px;
-      margin-bottom: 0;
+      margin-bottom: 0px;
       cursor: pointer;
     }
      .refresh-button-offline {
       background-color: rgb(250, 120, 141); /* Button background color */
       color: #fff; /* Button text color */
       font-size: 24px;
+      text-align: center;
       border: none;
       border-radius: 5px;
-      margin-bottom: 10px;
+      margin-bottom: 0px;
       cursor: pointer;
     }
     .refresh-button:hover {
@@ -226,5 +228,6 @@ input[type="text"] {
     }
    
 
+    
    
   

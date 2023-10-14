@@ -27,32 +27,36 @@ export function App() {
   if (popupUsuario?.length>0)
   {
     url = recursoPorUsuario(popupUsuario)
+  };
+
+  const retrieveData = (url) => {
+    axios.get(url)
+    .then((response)=>{
+      let allPesajes = transform(response.data); 
+      localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
+      const now = new Date();
+      const localTimeString = now.toLocaleDateString(navigator.language, {
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      localStorage.setItem("lastRefresh", localTimeString);
+    })
+    .catch((error) =>  {   
+      console.log("error getting spreadsheet")
+    });
   }
 
   const networkState = useNetwork();
   const {
     online,
-    since,
-    downLink,
-    downLinkMax,
-    effectiveType,
-    rtt,
-    saveData,
-    type,
+    since
   } = networkState;
 
   useEffect(()=>{
-    axios.get(url)
-    .then((response)=>{
-      let allPesajes = transform(response.data); 
-      localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
-    })
-    .catch((error) =>  {   
-      console.log("error getting spreadsheet")
-    });
+    retrieveData(url);
   },[url]);
 
-  const handleRefresh = () => {}
+  const handleRefresh = () => {
+    retrieveData(url);
+  }
 
   return( 
     (popupUsuario?.length!==0) ?

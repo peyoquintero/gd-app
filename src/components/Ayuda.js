@@ -10,6 +10,7 @@ const Ayuda = (props) => {
     const [gridDups,setGridDups] = useState([]);
     const [gridMuertes,setGridMuertes] = useState([]);
     const [selectedOption, setSelectedOption] = useState("");
+    const lastRefresh =  localStorage.getItem("lastRefresh");
 
     const handleChange = (event) => {
       setSelectedOption(event.target.value);
@@ -61,7 +62,7 @@ const Ayuda = (props) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.08</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.1 - {lastRefresh}</label>
             </section>
         </div>
     )            
