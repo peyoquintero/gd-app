@@ -210,9 +210,7 @@ input[type="text"] {
       font-size: 24px;
       border: none;
       border-radius: 5px;
-      cursor: pointer;
-      text-align:center;
-      vertical-align: middle;
+      cursor: pointer; 
       transition: background-color 0.4s;
       width: 33px; /* Set the width to create a square button */
       height: 33px;
@@ -224,8 +222,6 @@ input[type="text"] {
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      text-align:center;
-      vertical-align: middle;
       transition: background-color 0.4s;
       width: 33px; /* Set the width to create a square button */
       height: 33px;
@@ -234,5 +230,9 @@ input[type="text"] {
       background-color: rgb(20, 68, 13);
       transition: background-color 0.4s;
     }
-   
+   .refresh-symbol{
+    display:flex;
+    text-align:center;
+    vertical-align: middle;
+   }
    

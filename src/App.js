@@ -63,7 +63,7 @@ export function App() {
    <BrowserRouter>
    <div className="main-container">
       <NavBar/>   
-      <button  className={online? "refresh-button-online" : "refresh-button-offline"} onClick={handleRefresh}> `&#x21bb;` </button>
+      <button  className={online? "refresh-button-online" : "refresh-button-offline"} onClick={handleRefresh}> <div className="refresh-symbol">&#8635;</div> </button>
     </div>
     <Routes>
       <Route path="/pesajes" element={<Pesajes />}/>
