@@ -231,8 +231,7 @@ input[type="text"] {
       transition: background-color 0.4s;
     }
    .refresh-symbol{
-    display:flex;
-    text-align:center;
-    vertical-align: middle;
+    display:block;
+    text-align: center;
    }
    
