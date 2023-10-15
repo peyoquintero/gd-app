@@ -39,18 +39,20 @@ const Inventario = () => {
 
    useEffect(()=>{
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    let movimientos =  allPesajes.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
-                                 .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
-    if (movimientos?.length)                             
-    {let movimientosByFecha = groupByFechaOperacion(movimientos);
-    setGridData(movimientosByFecha); 
-
     let filteredData = allPesajes
     if (filtroBuscar.length>1)
     {
       filteredData = filteredGData(filteredData,filtroBuscar,"Peso",false)
     }
-    setGridInventario(getInventario(filteredData));
+
+    let movimientos =  filteredData.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
+                                 .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
+    if (movimientos?.length)                             
+    {let movimientosByFecha = groupByFechaOperacion(movimientos);
+    setGridData(movimientosByFecha); 
+
+    let inventario = getInventario(filteredData);
+    setGridInventario(inventario);
     }
   },[filtroBuscar]);
 
