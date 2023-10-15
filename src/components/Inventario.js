@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {getInventario,groupByFechaOperacion} from "./HelperInventario";
+import {getInventario,groupByFechaLoteOperacion as groupByFechaLoteOperacion} from "./HelperInventario";
 import {filteredGData} from "./Helpers"
 
 const Inventario = () => {
   const columns = [
-    { label: "Fecha", accessor: "Fecha",width:"25%" },
+    { label: "Fecha", accessor: "Fecha",width:"20%" },
     { label: "Operacion", accessor: "Operacion",width:"25%" },
-    { label: "Marca", accessor: "Marca",width:"20%" },
+    { label: "Lote", accessor: "Lote",width:"15%" },
+    { label: "Marca", accessor: "Marca",width:"10%" },
     { label: "Total", accessor: "Total",width:"15%" },
     { label: "Vendidos", accessor: "Vendidos",width:"15%" },
    ];
@@ -48,7 +49,7 @@ const Inventario = () => {
     let movimientos =  filteredData.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
                                  .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
     if (movimientos?.length)                             
-    {let movimientosByFecha = groupByFechaOperacion(movimientos);
+    {let movimientosByFecha = groupByFechaLoteOperacion(movimientos);
     setGridData(movimientosByFecha); 
 
     let inventario = getInventario(filteredData);

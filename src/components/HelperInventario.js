@@ -39,13 +39,14 @@ export const getInventario = (data) => {
     return comprados.filter(w=>vendidos.includes(w)).length;
    }
 
-  export const groupByFechaOperacion = (data) => {
+  export const groupByFechaLoteOperacion = (data) => {
     const groupedData = data.reduce((acc, item) => {
-      const key = `${item.Fecha}-${item.Operacion}-${item.Marca}`;
+      const key = `${item.Fecha}-${item.Operacion}-${item.Lote}-${item.Marca}`;
       if (!acc[key]) {
         acc[key] = {
           Fecha: item.Fecha,
           Operacion: item.Operacion,
+          Lote: item.Lote,
           Marca: item.Marca,
           Total: 0,
           Codigos: [],
