@@ -58,32 +58,32 @@ const Inventario = () => {
 
   return (
     <>
-    <div>
-    <section>
-    <div className="radio-container" onChange={handleChange}>
-      <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} />Movimientos
-      <input type="radio" name="details" value="cabezas" checked={selectedOption === "cabezas"} /> Inventario Actual
-    </div>
-      <label style={{marginLeft:'20px'}}>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</label>
+    <div >
+    <section className="main-container">
+      <div className="radio-container" onChange={handleChange}>
+        <label className="ayudaLabel"> <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} />Movimientos</label>
+        <label className="ayudaLabel"><input type="radio" name="details" value="cabezas" checked={selectedOption === "cabezas"} /> Inventario Actual</label>
+      </div>
       <label input="query">Buscar
-        <input className="freeinput" style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
-    </label>
+        <input className="freeinput" style={{display:'block', marginLeft: '10px'}} name="filtroGeneral" onChange={handleFilterChange}/>
+      </label>
+      <label  style={{marginLeft:'30px', marginTop:'20px'}}>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</label>
     </section>
   
     <section>
-    {selectedOption === "movimientos" ?  
-    <div className="container">
-      <Table
-        data={gridData}
-        columns={columns}></Table>
-    </div> :
-    <div className="container">
-    <Table
-      data={gridInventario}
-      columns={columnsInventario}></Table>
-  </div>}    
+        {selectedOption === "movimientos" ?  
+        <div className="container">
+          <Table
+            data={gridData}
+            columns={columns}></Table>
+          </div> :
+        <div className="container">
+          <Table
+          data={gridInventario}
+          columns={columnsInventario}></Table>
+        </div>}    
     </section>
-    </div>
+  </div>
   </>
 
   );
