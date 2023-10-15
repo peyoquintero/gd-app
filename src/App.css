@@ -71,7 +71,11 @@ button{
   cursor: pointer;
 }
 button:hover {
-  background-color: rgb(20, 68, 13);
+  background-color: rgb(17, 87, 7);
+  transition: background-color 0.2s;
+}
+button:active {
+  transform: translateY(2px);
 }
 table {
   border: 1px solid rgb(18, 81, 100);
@@ -160,11 +164,6 @@ input[type="text"] {
     font-size: 12px;
     height:50px;
    }     
-.radio-container span{
-    margin-left: 100px;
-    font-weight: bold;
-   
-   }
   .navbar{
     font-size: 14px;
     font-family: Arial;
@@ -204,37 +203,37 @@ input[type="text"] {
     color:rgb(0, 106, 255);
     border-radius: 5px;
     } 
-    .refresh-button-online,
+  .refresh-button-online,
   .refresh-button-offline {
     background-color: rgb(74, 204, 57);
     color: #fff; /* Button text color */
-    font-size: 24px;
+    font-size: 22px;
     border: none;
     border-radius: 5px; /* Use 50% border-radius to create a circular button */
     cursor: pointer;
-    transition: background-color 0.4s;
-    width: 33px;
-    height: 33px;
+    transition: background-color 0.2s;
+    width: 30px;
+    height: 30px;
     display: flex;
     justify-content: center; /* Center the content horizontally */
     align-items: center; /* Center the content vertically */
   }
-
   .refresh-button-offline {
     background-color: rgb(250, 120, 141);
   }
-
-  .refresh-button-online:hover,
-  .refresh-button-offline:hover {
-    background-color: rgb(20, 68, 13);
-    transition: background-color 0.4s;
-  }
-   .refresh-symbol{
+  .refresh-symbol{
     display: flex;
     justify-content: center; /* Center the symbol horizontally */
     align-items: center; /* Center the symbol vertically */
     text-align: center; 
-    margin-bottom: 5px;
-    
+    margin-bottom: 2px;
    }
-   
+  .refresh-button-online:active{
+    transform: translateY(2px);
+  }
+  .refresh-button-online:hover{
+    background-color:rgb(75, 133, 68);
+  }
+  .refresh-button-offline:hover{
+    background-color:rgb(170, 83, 97);
+  }

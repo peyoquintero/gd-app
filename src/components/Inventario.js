@@ -57,15 +57,15 @@ const Inventario = () => {
   return (
     <>
     <div>
-    <section  >
-    <label input="query">Buscar
-        <input className="freeinput" style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
-        </label>
+    <section>
     <div className="radio-container" onChange={handleChange}>
       <input type="radio" name="details" value="movimientos" checked={selectedOption === "movimientos"} />Movimientos
       <input type="radio" name="details" value="cabezas" checked={selectedOption === "cabezas"} /> Inventario Actual
     </div>
       <label style={{marginLeft:'20px'}}>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</label>
+      <label input="query">Buscar
+        <input className="freeinput" style={{display:'block'}} name="filtroGeneral" onChange={handleFilterChange}/>
+    </label>
     </section>
   
     <section>

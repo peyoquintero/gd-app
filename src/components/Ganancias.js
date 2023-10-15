@@ -191,10 +191,10 @@ const Ganancias = () => {
           </select>
         </label>
         <label className="center-label" style={{fontSize: '14px'}}>=
-          <input style={{marginTop:'2px'}} type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
+          <input  type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
         </label>
         <label className="center-label" >Ventas 
-          <input  style={{marginTop:'2px'}} type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
+          <input   type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
         </label>
         
         </section>
