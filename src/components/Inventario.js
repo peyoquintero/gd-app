@@ -13,8 +13,9 @@ const Inventario = () => {
     { label: "Vendidos", accessor: "Vendidos",width:"15%" },
    ];
 
-   const [selectedOption, setSelectedOption] = useState("movimientos");
+   const [selectedOption, setSelectedOption] = useState("cabezas");
    const [filtroBuscar, setFiltroBuscar] = useState("");
+   const [filtroExacto, setFiltroExacto] = useState(true);
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
@@ -24,6 +25,9 @@ const Inventario = () => {
     setFiltroBuscar(event.target.value);
   };
 
+  const handleCheckboxChange = (event) => {
+    setFiltroExacto(event.target.checked);
+  };
 
    const [gridData,setGridData] = useState([])
    const [gridInventario,setGridInventario] = useState([])
@@ -43,7 +47,7 @@ const Inventario = () => {
     let filteredData = allPesajes
     if (filtroBuscar.length>1)
     {
-      filteredData = filteredGData(filteredData,filtroBuscar,"Peso",false)
+      filteredData = filteredGData(filteredData,filtroBuscar,"Peso",filtroExacto)
     }
 
     let movimientos =  filteredData.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
@@ -55,7 +59,7 @@ const Inventario = () => {
     let inventario = getInventario(filteredData);
     setGridInventario(inventario);
     }
-  },[filtroBuscar]);
+  },[filtroBuscar,filtroExacto]);
 
   return (
     <>
@@ -68,7 +72,10 @@ const Inventario = () => {
       <label input="query">Buscar
         <input className="freeinput" style={{display:'block', marginLeft: '10px'}} name="filtroGeneral" onChange={handleFilterChange}/>
       </label>
-      <label  style={{marginLeft:'30px', marginTop:'20px'}}>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</label>
+      <label style={{display:'block'}}>Exacto
+               <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} defaultChecked={true}/>
+       </label>
+       <label  style={{marginLeft:'30px', marginTop:'20px'}}>{selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}</label>
     </section>
   
     <section>

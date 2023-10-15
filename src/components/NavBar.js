@@ -6,13 +6,13 @@ const NavBar= () =>{
     <div className="navbar">
 		    <ul >        
             <li>
+              <NavLink to="/inventario" activeClassName="active">Inventario</NavLink>
+            </li>
+            <li>
               <NavLink to="/pesajes" activeClassName="active">Pesajes</NavLink>
             </li>
             <li>
               <NavLink  to="/ganancias" activeClassName="active">Ganancias</NavLink>
-            </li>
-            <li>
-              <NavLink to="/inventario" activeClassName="active">Inventario</NavLink>
             </li>
             <li>
               <NavLink to="/ayuda" activeClassName="active">Ayuda</NavLink>

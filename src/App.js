@@ -30,28 +30,29 @@ export function App() {
   };
 
   const retrieveData = (url) => {
-    axios.get(url)
-    .then((response)=>{
-      let allPesajes = transform(response.data); 
-      localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
-      const now = new Date();
-      const localTimeString = now.toLocaleDateString(navigator.language, {
-      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-      localStorage.setItem("lastRefresh", localTimeString);
-    })
-    .catch((error) =>  {   
-      console.log("error getting spreadsheet")
-    });
+    if(online)
+    {
+      axios.get(url)
+      .then((response)=>{
+        let allPesajes = transform(response.data); 
+        localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
+        const now = new Date();
+        const localTimeString = now.toLocaleDateString(navigator.language, {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem("lastRefresh", localTimeString);
+      })
+      .catch((error) =>  {   
+        console.log("error getting spreadsheet")
+      });
+   }
   }
 
   const networkState = useNetwork();
-  const {
-    online,
-    since
-  } = networkState;
+  const { online } = networkState;
 
   useEffect(()=>{
     retrieveData(url);
+    setPopupResult(localStorage.getItem("usuario")??'');
   },[url]);
 
   const handleRefresh = () => {
@@ -68,11 +69,11 @@ export function App() {
       </button>
     </div>
     <Routes>
-      <Route path="/pesajes" element={<Pesajes />}/>
       <Route path="/inventario" element={<Inventario />}/>
+      <Route path="/pesajes" element={<Pesajes />}/>
       <Route path="/ganancias" element={<Ganancias />}/>
       <Route path="/ayuda" element={<Ayuda />}/>
-      <Route path="*" element={<Pesajes />}>
+      <Route path="*" element={<Inventario />}>
       </Route>
     </Routes>
   </BrowserRouter> 
