@@ -1,0 +1,20 @@
+{
+    "routes": [
+        {
+            "route": "/inventario",
+            "redirect": "/"
+          },    
+          {
+            "route": "/pesajes",
+            "redirect": "/"
+          },    
+          {
+            "route": "/ganancias",
+            "redirect": "/"
+          },    
+          {
+            "route": "/ayuda",
+            "redirect": "/"
+          }    
+        ]
+}  
