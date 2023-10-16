@@ -30,7 +30,7 @@ const Pesajes = (props) => {
       });
       let pesajes = allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE') 
       setGridData(pesajes.slice(0,100));
-      setCaptions(pesajes.length>0?`Ultimos 100 - Total:${pesajes.length} `:'No hay datos disponibles') 
+      setCaptions(pesajes.length>0?`Ultimos 100 - Total: ${pesajes.length} `:'No hay datos disponibles') 
     }  
 
    useEffect(()=>{
@@ -66,8 +66,8 @@ const Pesajes = (props) => {
 
   return (
     <div className="container">
-      <section>
-       <label style={{marginLeft:'30px'}}>Fecha Control
+      <section className="main-container">
+       <label>Fecha Control
           <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaControl" onChange={handleFilterChange} value={filtros.fechaControl}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
           </select>
@@ -79,8 +79,8 @@ const Pesajes = (props) => {
                <input style={{display:'block'}} type="checkbox" id="checkboxFE" name= "filtroExacto" onChange={handleCheckboxChange} defaultChecked={true}/>
        </label>
         <button  style={{marginTop:'15px'}} type="submit" onClick={applyFilters}>Ok</button>
-         <label style={{marginLeft:'40px', marginTop:'20px'}} >{captions}</label>
-        </section>
+         <label style={{ marginTop:'20px'}} >{captions}</label>
+      </section>
       <Table
         caption="Pesajes"
         data={gridData}
