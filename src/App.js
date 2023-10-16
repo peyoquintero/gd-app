@@ -14,8 +14,7 @@ import axios from "axios";
 
 export function App() {
   const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
-  let url = '';
-
+  let dataUrl = ''
   const handlePopupClose = (result) => {
     setPopupResult(result);
     if (result?.length>0)
@@ -26,13 +25,13 @@ export function App() {
  
   if (popupUsuario?.length>0)
   {
-    url = recursoPorUsuario(popupUsuario)
+    dataUrl = recursoPorUsuario(popupUsuario)
   };
 
-  const retrieveData = (url) => {
+  const retrieveData = (dataUrl) => {
     if(online)
     {
-      axios.get(url)
+      axios.get(dataUrl)
       .then((response)=>{
         let allPesajes = transform(response.data); 
         localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
@@ -51,12 +50,18 @@ export function App() {
   const { online } = networkState;
 
   useEffect(()=>{
-    retrieveData(url);
+    retrieveData(dataUrl);
     setPopupResult(localStorage.getItem("usuario")??'');
-  },[url]);
+    },[dataUrl]);
+
+  useEffect(()=>{
+        window.onbeforeunload = (event) => {
+        event.preventDefault();
+      };
+  },[]);
 
   const handleRefresh = () => {
-    retrieveData(url);
+    retrieveData(dataUrl);
   }
  
   return( 
@@ -69,11 +74,12 @@ export function App() {
       </button>
     </div>
     <Routes>
+      <Route exact path="/" element={<Inventario />}/>
       <Route path="/inventario" element={<Inventario />}/>
       <Route path="/pesajes" element={<Pesajes />}/>
       <Route path="/ganancias" element={<Ganancias />}/>
       <Route path="/ayuda" element={<Ayuda />}/>
-      <Route path="*" element={<Inventario />}>
+      <Route path="*" element={<Inventario />}>0
       </Route>
     </Routes>
   </BrowserRouter> 
