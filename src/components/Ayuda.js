@@ -46,6 +46,7 @@ const Ayuda = (props) => {
             <section className="radio-container" onChange={handleChange}>
               <label className="ayudaLabel"><input type="radio" name="details1" value="optionInconsistencias" checked={selectedOption === "optionInconsistencias"} />Inconsistencias</label>
               <label className="ayudaLabel"><input type="radio" name="details2" value="optionRevisionCodigos" checked={selectedOption === "optionRevisionCodigos"} /> Revision Codigos</label>
+              <label className="ayudaLabel"><input type="radio" name="details3" value="optionDuplicados" checked={selectedOption === "optionDuplicados"} />  Duplicados </label>
             </section>
             <section style={{background:'rgb(249, 249, 249)'}}>
                {((selectedOption === "optionInconsistencias") && gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}

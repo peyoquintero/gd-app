@@ -233,7 +233,7 @@ export const compareNumAlphas = (str1, str2) =>
     if (match1 && match2) {
       const num1 = parseInt(match1);
       const num2 = parseInt(match2);
-      return num1 < num2 ? -1 : 1;
+      return (num1 === num2) ? str1?.toString().localeCompare(str2) :  (num1 < num2 ? -1 : 1);
     }
   
     // If only one string starts with numbers, return that string first.
