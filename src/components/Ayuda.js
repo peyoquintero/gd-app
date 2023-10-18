@@ -2,6 +2,7 @@ import React, { useState,useEffect } from "react";
 import IntegerMatrix from "./Matrix"
 import Table from "./Table";
 import {duplicates} from "./Helpers"
+import Duplicados from "./Duplicados"
 import  Codigos  from "./Codigos";
 
 const Ayuda = (props) => {
@@ -51,6 +52,7 @@ const Ayuda = (props) => {
             <section style={{background:'rgb(249, 249, 249)'}}>
                {((selectedOption === "optionInconsistencias") && gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
                {(selectedOption === "optionRevisionCodigos")?  <Codigos/> : null}
+               {(selectedOption === "optionDuplicados")?  <Duplicados/> : null}
             </section>
             <section className="title" >
                 <label className="ayudaLabel" >Muertes
@@ -63,7 +65,7 @@ const Ayuda = (props) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.14 - {lastRefresh}</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.15 - {lastRefresh}</label>
             </section>
         </div>
     )            

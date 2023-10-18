@@ -102,22 +102,6 @@ export const transform= (apiResult) => {
   return rows;
 }
 
-const dobleCompraoVenta = (data) => 
-{
-  data = data.filter(w=>['VENTA','COMPRA'].includes(w.Operacion.toUpperCase()))
-  const groupedData = data.reduce((acc, obj) => {
-    const key = [obj.Codigo, obj.Operacion];
-    acc[key] = acc[key] || [];
-    acc[key].push(obj);
-    return acc;
-  }, {});
-  
-  // Filter the data to only include groups with more than one object.
-  const filteredData = Object.values(groupedData).filter((group) => group.length > 1);
-  const distinctCodigos = [...new Set(filteredData.map((group) => group[0].Codigo))];
-  return distinctCodigos 
-  }
-
 export const duplicates = (pesajes) =>
 {
 let result = pesajesByCodigo(pesajes);

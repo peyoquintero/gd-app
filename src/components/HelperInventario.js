@@ -66,3 +66,20 @@ export const getInventario = (data) => {
                            });
     return result;
   }
+
+  export const dobleCompraoVenta = (data) => 
+  {
+    data = data.filter(w=>['VENTA','COMPRA'].includes(w.Operacion.toUpperCase()))
+    const groupedData = data.reduce((acc, obj) => {
+      const key = [obj.Codigo, obj.Operacion];
+      acc[key] = acc[key] || [];
+      acc[key].push(obj);
+      return acc;
+    }, {});
+    
+    const filteredData = Object.values(groupedData).filter((group) => group.length > 1);
+    console.log(filteredData)
+    return filteredData.map((group) => {return {Codigo: group[0].Codigo,Operacion: group[0].Operacion}})
+  
+    }
+  
