@@ -7,7 +7,7 @@ import { compareNumAlphas } from "./Helpers"
 const Table = ({ data, columns }) => {
 const [tableData, setTableData] = useState(data);
 const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrder:'down'})
-const isDate = (string) => /^\d{4}-\d{2}-\d{2}$/.test(string.trim());
+const isDate = (par) => par && /^\d{4}-\d{2}-\d{2}$/.test(par??"");
 const compareDate = (a,b) => {return (new Date(a) - new Date(b)) > 0 ? 1 : -1; }
 
 useEffect(() => { setTableData(data) }, [data]);
@@ -17,7 +17,6 @@ useEffect(() => {
   let data  = tableData.slice().sort((a, b) => {
       a = a[sortKey]
       b = b[sortKey]
-
       let x = isDate(a)? compareDate(a,b) : compareNumAlphas(a,b)
       return (a === b ? 0 :  x * sortDescending) 
     });

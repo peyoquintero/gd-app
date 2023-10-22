@@ -60,7 +60,7 @@ const Pesajes = (props) => {
     let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso",filtros.filtroExacto)
     if (filtros.filtroCodigo.trim()!=="")
     {
-      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo===filtros.filtroCodigo.trim()) || (matchCodigo(w.Codigo,filtros.filtroCodigo.trim())) )
+      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo.toUpperCase()===filtros.filtroCodigo.trim().toUpperCase()) || (matchCodigo(w.Codigo,filtros.filtroCodigo.trim())) )
     }
     if (filtros.fechaControl)
     {

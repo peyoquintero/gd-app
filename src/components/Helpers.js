@@ -3,7 +3,7 @@ export const matchCodigo = (w,filterKey)=>{
        ((!filterKey.includes("*") && String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1)) };
 
 export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroExacto) => {
-  let filterKey = filterKeyValue && filterKeyValue.toLowerCase()
+  let filterKey = filterKeyValue && filterKeyValue.toLowerCase().trim()
   if (filterKey && !filterKey.includes("^")) {
       filteredData = filteredData.filter((row) => {
       return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
