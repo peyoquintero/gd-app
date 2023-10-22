@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {filteredGData} from "./Helpers"
+import {filteredGData,matchCodigo} from "./Helpers"
 
 const Pesajes = (props) => {
   const columns = [
@@ -26,6 +26,7 @@ const Pesajes = (props) => {
     setFiltros({
       fechaControl : null,
       filtroGeneral: "",
+      filtroCodigo: "",
       filtroExacto: true
       });
       let pesajes = allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE') 
@@ -55,7 +56,12 @@ const Pesajes = (props) => {
   };
 
   const applyFilters = (event) => {
+
     let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso",filtros.filtroExacto)
+    if (filtros.filtroCodigo.trim()!=="")
+    {
+      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo===filtros.filtroCodigo.trim()) || (matchCodigo(w.Codigo,filtros.filtroCodigo.trim())) )
+    }
     if (filtros.fechaControl)
     {
       filteredData = filteredData.filter(w=>w.Fecha===filtros.fechaControl)    
@@ -67,6 +73,9 @@ const Pesajes = (props) => {
   return (
     <div className="container">
       <section className="main-container">
+      <label input="codigo">Codigo
+        <input className="freeinput" style={{display:'block'}} name="filtroCodigo" onChange={handleFilterChange}/>
+        </label>
        <label>Fecha Control
           <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaControl" onChange={handleFilterChange} value={filtros.fechaControl}>
           {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}

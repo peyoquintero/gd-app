@@ -1,9 +1,9 @@
+export const matchCodigo = (w,filterKey)=>{
+       return (filterKey.includes("*") && String(w).toLowerCase().startsWith(filterKey.toLowerCase().replace("*", ""))) || 
+       ((!filterKey.includes("*") && String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1)) };
+
 export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroExacto) => {
   let filterKey = filterKeyValue && filterKeyValue.toLowerCase()
-
-  const matchCodigo = (w,filterKey)=>{
-    return (filterKey.includes("*") && String(w).toLowerCase().startsWith(filterKey.toLowerCase().replace("*", ""))) || 
-            ((!filterKey.includes("*") && String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1)) };
   if (filterKey && !filterKey.includes("^")) {
       filteredData = filteredData.filter((row) => {
       return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
