@@ -21,6 +21,7 @@ const Pesajes = (props) => {
    const initializeData = (allPesajes) => {
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))];
+    allFechas.sort(function(a,b){return new Date(b) - new Date(a);})
     allFechas.unshift(null);    
     setFechasPesaje(allFechas);
     setFiltros({

@@ -18,6 +18,7 @@ const Ganancias = () => {
     const [hisPesajes,setHispesajes] = useState([])
     const [lotes,setLotes] = useState([])
     const [fechasPesaje,setFechasPesaje] = useState([])
+    const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
 
     const [captions,setCaptions] = useState({
         resultCabezas : "",
@@ -31,10 +32,13 @@ const Ganancias = () => {
         let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
+        let fechasPesajeDes = Array.from(allFechas).sort(function(a,b){return new Date(b) - new Date(a);})
+        setFechasPesajeDesc(fechasPesajeDes);
+
         setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
         setFiltros({
           fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
-          fechaFinal : allFechas[allFechas.length-1] ?? new Date(),
+          fechaFinal : fechasPesajeDes[0] ?? new Date(),
           filtroCodigo: "",
           filtroMarca: "",
           filtroPeso: "",
@@ -187,7 +191,7 @@ const Ganancias = () => {
         </label>
         <label>Fecha Final
           <select style={{display:'block', width:'100px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
-            {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
+            {fechasPesajeDesc.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
           </select>
         </label>
         <label className="center-label" style={{fontSize: '14px'}}>=

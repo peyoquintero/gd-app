@@ -7,7 +7,7 @@ export const getPesajesByCodigo = (data)=>{
           acc[key] = {
             Codigo: item.Codigo,
             Marca: item.Marca,
-            Lote: item.Lote,
+            Lote: item.Lote,            
             Pesajes: [],
           };
         }

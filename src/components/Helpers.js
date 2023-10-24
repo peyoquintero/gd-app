@@ -1,3 +1,4 @@
+import { getPesajesByCodigo } from './HelperInventario'
 export const matchCodigo = (w,filterKey)=>{
        return (filterKey.includes("*") && String(w).toLowerCase().startsWith(filterKey.toLowerCase().replace("*", ""))) || 
        ((!filterKey.includes("*") && String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1)) };
@@ -104,40 +105,10 @@ export const transform= (apiResult) => {
 
 export const duplicates = (pesajes) =>
 {
-let result = pesajesByCodigo(pesajes);
-let dups = result.filter(w=>{ let ultimo=w.pesajes[w.pesajes.length-1];
-                              return (ultimo.Operacion.toLowerCase()!=='venta' && w.pesajes && w.pesajes.some(x=>x.Operacion.toLowerCase()==='venta'))});  
+let result = Object.values(getPesajesByCodigo(pesajes));
+let dups = result.filter(w=>{ let ultimo= w.pesajes && w.pesajes[w.pesajes.length-1];
+                              return (ultimo && ultimo.Operacion.toLowerCase()!=='venta' && w.pesajes && w.pesajes.some(x=>x.Operacion.toLowerCase()==='venta'))});  
 return dups;
-}
-
-const reduceCodigos = (hispesajes,lote) =>
-{
-return hispesajes.filter(w=>w.Lote.toUpperCase()===lote).reduce(function(h, obj) {
-  h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
-  return h; 
-  }, {});
-}
-
-export const pesajesByCodigo = (hispesajes) =>
-{
-
-let resultsBov = reduceCodigos(hispesajes,'BOVINOS')
-let resultsBuf = reduceCodigos(hispesajes,'BUFALOS')
-
-let results = Object.keys(resultsBov).map(key => {
-  return {
-      Codigo: key, 
-      pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key && pesaje.Lote.toUpperCase()==='BOVINOS').sort(function(a,b){
-                return new Date(a.Fecha) - new Date(b.Fecha);})}
-  }).concat(Object.keys(resultsBuf).map(key => {
-    return {
-        Codigo: key, 
-        pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key  && pesaje.Lote.toUpperCase()==='BUFALOS').sort(function(a,b){
-                  return new Date(a.Fecha) - new Date(b.Fecha);})}
-    })) ;
-
-
-return results
 }
 
 export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,filtroVentas) =>
