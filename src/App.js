@@ -8,7 +8,7 @@ import  Pesajes  from "./components/Pesajes";
 import  Inventario  from "./components/Inventario";
 import  Ayuda  from "./components/Ayuda";
 import  PopupScreen  from "./components/PopupScreen";
-import { transform } from "./components/Helpers"
+import { mapApiDataToPesajes } from "./components/Helpers"
 import {  BrowserRouter,  Routes,  Route} from "react-router-dom";
 import axios from "axios";
 
@@ -33,7 +33,7 @@ export function App() {
     {
       axios.get(dataUrl)
       .then((response)=>{
-        let allPesajes = transform(response.data); 
+        let allPesajes = mapApiDataToPesajes(response.data); 
         localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
         const now = new Date();
         const localTimeString = now.toLocaleDateString(navigator.language, {

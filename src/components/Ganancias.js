@@ -137,7 +137,7 @@ const Ganancias = () => {
           } 
         }    
 
-        let scrubbedData = cleanData(gridDataResults);
+        let scrubbedData = cleanData(gridDataResults,-1000,2000);
         
         setCaptions({
         resultGanancia : captionGanancia(scrubbedData),

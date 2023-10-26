@@ -23,6 +23,7 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroEx
   })}
 
   const containsAll = (array1, array2) => array2.every((element) => array1.includes(element.toLowerCase()));
+
   if (filterKey&&filterKey.includes("^")) {
        let fkeys = filterKey.split("^").filter(w=>w!=='');
        filteredData = filteredData.filter((row) => { 
@@ -49,9 +50,9 @@ const daysBetweenDates = (fechaInicial,fechaFinal) =>
   return diffDays>0?diffDays:0;    
 }
 
-export const cleanData= (gridData) =>
+export const cleanData= (gridData,min,max) =>
 {
-return gridData.filter(w=>(w.Ganancia>-1000 && w.Ganancia<2000 && w.PesoInicial>0 && w.PesoFinal>0)) ;
+return gridData.filter(w=>(w.Ganancia>min && w.Ganancia<max && w.PesoInicial>0 && w.PesoFinal>0)) ;
 }
 
 export const  captionCabezas = (cleanDataCount,gridDataCount) =>
@@ -59,28 +60,28 @@ export const  captionCabezas = (cleanDataCount,gridDataCount) =>
 return cabezas;
 }
 
-export const captionGanancia = (cleanData) =>
+export const captionGanancia = (data) =>
 {
-let totalDias = cleanData.reduce((ac,a) => daysBetweenDates(a.FechaInicial,a.FechaFinal) + ac,0);
-let avgGd = Math.round(cleanData.reduce((ac,a) => (a.Ganancia*daysBetweenDates(a.FechaInicial,a.FechaFinal)) + ac,0)/totalDias);
-var ganancia = cleanData.length>0 ? `Ganancia(grs):  ${avgGd}`:"";
+let totalDias = data.reduce((ac,a) => daysBetweenDates(a.FechaInicial,a.FechaFinal) + ac,0);
+let avgGd = Math.round(data.reduce((ac,a) => (a.Ganancia*daysBetweenDates(a.FechaInicial,a.FechaFinal)) + ac,0)/totalDias);
+var ganancia = data.length>0 ? `Ganancia(grs):  ${avgGd}`:"";
 return ganancia;
 }
 
-export const captionMedia = (cleanData) =>
-{ let media =  median(cleanData.map(function(element){return element.Ganancia}));
-var mediana = cleanData.length>0 ? `Media: ${media??""} `: "";
+export const captionMedia = (data) =>
+{ let media =  median(data.map(function(element){return element.Ganancia}));
+var mediana = data.length>0 ? `Media: ${media??""} `: "";
 return mediana;
 }
-export const captionDias = (cleanData) =>
-{ let avgDias = Math.round(cleanData.reduce((ac,a) => a.Dias + ac,0)/cleanData.length);
-var dias = cleanData.length>0 ? `Dias:  ${avgDias}`: "";
+export const captionDias = (data) =>
+{ let avgDias = Math.round(data.reduce((ac,a) => a.Dias + ac,0)/data.length);
+var dias = data.length>0 ? `Dias:  ${avgDias}`: "";
 return dias;
 }
-export const captionUltPeso= (cleanData) =>
-{ let promUltPeso = median(cleanData.map(function(element){return element.PesoFinal}));
+export const captionUltPeso= (data) =>
+{ let promUltPeso = median(data.map(function(element){return element.PesoFinal}));
 let labelPromUltPeso = promUltPeso>500? '' : `Prom. Ultimo Peso:  ${promUltPeso}`
-var ultpeso = cleanData.length>0 ? `${labelPromUltPeso}`: ""; 
+var ultpeso = data.length>0 ? `${labelPromUltPeso}`: ""; 
 return ultpeso;
 }
 export const validLoteOptions= (lotes) =>
@@ -89,7 +90,7 @@ lotes.push('*');
 return lotes.filter(w=>(w!=='NULL'))
 }
 
-export const transform= (apiResult) => {
+export const mapApiDataToPesajes= (apiResult) => {
   const rows = [];
   const rawRows = apiResult.values || [];
   const headers = rawRows.shift();
@@ -103,45 +104,12 @@ export const transform= (apiResult) => {
   return rows;
 }
 
-export const duplicates = (pesajes) =>
+export const resurrect = (pesajes) =>
 {
 let result = Object.values(getPesajesByCodigo(pesajes));
 let dups = result.filter(w=>{ let ultimo= w.pesajes && w.pesajes[w.pesajes.length-1];
-                              return (ultimo && ultimo.Operacion.toLowerCase()!=='venta' && w.pesajes && w.pesajes.some(x=>x.Operacion.toLowerCase()==='venta'))});  
+                              return (ultimo && ['VENTA','MUERTE'].includes (ultimo.Operacion.toUpperCase()) && w.pesajes && w.pesajes.some(x=>['VENTA','MUERTE'].includes (x.Operacion.toUpperCase())))});  
 return dups;
-}
-
-export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,filtroVentas) =>
-{
-var results = hispesajes.reduce(function(h, obj) {
-  h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
-  return h; 
-}, {});
-
-results = Object.keys(results).map(key => {
-  return {
-      Codigo: key, 
-      pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key)
-                          .sort(function(a,b){
-                                  return new Date(a.Fecha) - new Date(b.Fecha);
-                                })}
-  }
-);
-
-results = results.filter(result=>result.pesajes.length>1) // Excluir semovientes con un solo pesaje
-
-let minmaxPesajes = gananciaDiariaPesajes(results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas);
-
-var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
-"FechaInicial":w.pi.Fecha,
-"FechaFinal":w.pf.Fecha,
-"PesoInicial":w.pi.Peso,
-"PesoFinal":w.pf.Peso,
-"Ganancia": gananciaDiaria(w.pi,w.pf),
-"Dias": Math.round((new Date(w.pf.Fecha)-new Date(w.pi.Fecha))/86400000)
-}});
-
-return datos
 }
 
 const gananciaDiaria = (pesoInicial,pesoFinal) =>
@@ -172,6 +140,40 @@ const  gananciaDiariaPesajes = (results, fechaInicial, fechaFinal, fiExacta, ffE
     if((minP!==undefined)&&(maxP!==undefined)&&(maxP.Fecha>minP.Fecha)) { minmaxPesajes.push(objresult); };
   });
   return minmaxPesajes;
+}
+
+
+export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,filtroVentas) =>
+{
+    var results = hispesajes.reduce(function(h, obj) {
+      h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
+      return h; 
+    }, {});
+
+    results = Object.keys(results).map(key => {
+              return {
+                Codigo: key, 
+                pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key)
+                                    .sort(function(a,b){
+                                            return new Date(a.Fecha) - new Date(b.Fecha);
+                                          })}
+              }
+            );
+
+    results = results.filter(result=>result.pesajes.length>1) // Excluir semovientes con un solo pesaje
+
+    let minmaxPesajes = gananciaDiariaPesajes(results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas);
+
+    var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
+    "FechaInicial":w.pi.Fecha,
+    "FechaFinal":w.pf.Fecha,
+    "PesoInicial":w.pi.Peso,
+    "PesoFinal":w.pf.Peso,
+    "Ganancia": gananciaDiaria(w.pi,w.pf),
+    "Dias": Math.round((new Date(w.pf.Fecha)-new Date(w.pi.Fecha))/86400000)
+    }});
+
+    return datos
 }
 
 export const compareNumAlphas = (str1, str2) =>
