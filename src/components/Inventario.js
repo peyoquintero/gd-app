@@ -3,7 +3,7 @@ import Table from "./Table";
 import {getInventario,groupByFechaLoteOperacion} from "./HelperInventario";
 import {filteredGData} from "./Helpers"
 
-const Inventario = () => {
+const Inventario = ({ eventEmitter }) => {
   const columns = [
     { label: "Fecha", accessor: "Fecha",width:"20%" },
     { label: "Operacion", accessor: "Operacion",width:"25%" },
@@ -42,8 +42,7 @@ const Inventario = () => {
     { label: "Ultimo Peso", accessor: "PesoFinal",width:"10%" },
    ];
 
-   useEffect(()=>{
-    setTimeout(() => {}, 1000);
+   const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
     let filteredData = allPesajes
     if (filtroBuscar.length>1)
@@ -60,7 +59,22 @@ const Inventario = () => {
     let inventario = getInventario(filteredData);
     setGridInventario(inventario);
     }
+   }
+
+   useEffect(()=>{
+    setTimeout(() => {}, 1000);
+    initializeData();
   },[filtroBuscar,filtroExacto]);
+
+  useEffect(() => {
+    eventEmitter.on('refresh', () => {
+      initializeData();
+    });
+
+    return () => {
+      eventEmitter.off('refresh');
+    };
+  }, [eventEmitter]);
 
   return (
     <>

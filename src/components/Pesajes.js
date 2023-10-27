@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import {filteredGData} from "./Helpers"
 
-const Pesajes = (props) => {
+const Pesajes = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo",width:"15%" },
     { label: "Fecha", accessor: "Fecha",width:"20%" },
@@ -18,7 +18,8 @@ const Pesajes = (props) => {
    const [fechasPesaje,setFechasPesaje] = useState([])
    const [captions, setCaptions] = useState("");
 
-   const initializeData = (allPesajes) => {
+   const initializeData = () => {
+    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))];
     allFechas.sort(function(a,b){return new Date(b) - new Date(a);})
@@ -36,9 +37,18 @@ const Pesajes = (props) => {
     }  
 
    useEffect(()=>{
-     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-     initializeData(allPesajes)
+     initializeData();
    },[]);
+
+   useEffect(() => {
+    eventEmitter.on('refresh', () => {
+      initializeData();
+    });
+
+    return () => {
+      eventEmitter.off('refresh');
+    };
+  }, [eventEmitter]);
  
    const handleFilterChange = (event) => {
     const { name, value } = event.target;

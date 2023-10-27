@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, validLoteOptions} from "./Helpers"
-const Ganancias = () => {
+const Ganancias = ({ eventEmitter }) => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",
         filtroMarca: "",
@@ -28,8 +28,9 @@ const Ganancias = () => {
         resultDias : "",
       })
 
-   const initializeData = (allPesajes) => {
-        let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
+   const initializeData = () => {
+    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
         let fechasPesajeDes = Array.from(allFechas).sort(function(a,b){return new Date(b) - new Date(a);})
@@ -50,9 +51,19 @@ const Ganancias = () => {
       }  
 
       useEffect(()=>{
-        let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-        initializeData(allPesajes)
+        initializeData();
       },[]);
+
+      useEffect(() => {
+        eventEmitter.on('refresh', () => {
+          initializeData();
+        });
+    
+        return () => {
+          eventEmitter.off('refresh');
+        };
+      }, [eventEmitter]);
+    
        
       const handleFilterChange = (event) => {
         const { name, value } = event.target;

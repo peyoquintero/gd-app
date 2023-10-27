@@ -1,4 +1,5 @@
 import React, {  useEffect, useState } from "react";
+import EventEmitter from 'eventemitter3';
 import { useNetwork } from "./hooks/useNetwork";
 import "./App.css";
 import { recursoPorUsuario } from "./components/recursos"
@@ -14,6 +15,8 @@ import axios from "axios";
 
 export function App() {
   const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
+  const eventEmitter = new EventEmitter();
+
   let dataUrl = ''
   const handlePopupClose = (result) => {
     setPopupResult(result);
@@ -62,6 +65,7 @@ export function App() {
 
   const handleRefresh = () => {
     retrieveData(dataUrl);
+    eventEmitter.emit('refresh');
   }
  
   return( 
@@ -74,12 +78,12 @@ export function App() {
       </button>
     </div>
     <Routes>
-      <Route exact path="/" element={<Inventario />}/>
-      <Route path="/inventario" element={<Inventario />}/>
-      <Route path="/pesajes" element={<Pesajes />}/>
-      <Route path="/ganancias" element={<Ganancias />}/>
-      <Route path="/ayuda" element={<Ayuda />}/>
-      <Route path="*" element={<Inventario />}>0
+      <Route exact path="/" element={<Inventario  eventEmitter={eventEmitter} />}/>
+      <Route path="/inventario" element={<Inventario eventEmitter={eventEmitter} />}/>
+      <Route path="/pesajes" element={<Pesajes eventEmitter={eventEmitter} />}/>
+      <Route path="/ganancias" element={<Ganancias eventEmitter={eventEmitter} />}/>
+      <Route path="/ayuda" element={<Ayuda eventEmitter={eventEmitter} />}/>
+      <Route path="*" element={<Inventario eventEmitter={eventEmitter} />}>0
       </Route>
     </Routes>
   </BrowserRouter> 

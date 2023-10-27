@@ -5,7 +5,7 @@ import {resurrect} from "./Helpers"
 import Duplicados from "./Duplicados"
 import  Codigos  from "./Codigos";
 
-const Ayuda = (props) => {
+const Ayuda = ({ eventEmitter }) => {
    
     const [filtros,setFiltros] = useState({filtroDups:false,filtroMuertos:false});
     const [gridDups,setGridDups] = useState([]);
@@ -25,17 +25,31 @@ const Ayuda = (props) => {
       });
     };
 
+    const initializeData = () => {
+      let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+      if (allPesajes?.length)
+      {
+        setGridDups(resurrect(allPesajes)) ;
+        let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE')
+                      .sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha);})
+        setGridMuertes(muertes);
+      }
+   }
+
    useEffect(()=>{
-    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    if (allPesajes?.length)
-    {
-      setGridDups(resurrect(allPesajes)) ;
-      let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE')
-                    .sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha);})
-      setGridMuertes(muertes);
-    }
+      initializeData();
     },[]);
 
+    useEffect(() => {
+      eventEmitter.on('refresh', () => {
+        initializeData();
+      });
+  
+      return () => {
+        eventEmitter.off('refresh');
+      };
+    }, [eventEmitter]);
+  
    const columnsMuertes = [
     { label: "Codigo", accessor: "Codigo", width:"30%" },
     { label: "Fecha", accessor: "Fecha", width:"40%" },

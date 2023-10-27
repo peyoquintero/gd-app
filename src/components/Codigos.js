@@ -4,7 +4,7 @@ import {captionCabezas,validLoteOptions} from "./Helpers"
 import { getPesajesByCodigo } from './HelperInventario'
 
 
-const Codigos = (props) => {
+const Codigos = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo",width:"15%" },
     { label: "Fecha Entrada", accessor: "FechaInicial",width:"20%" },
@@ -22,7 +22,8 @@ const Codigos = (props) => {
     resultCabezas : "",
    })
 
-   const initializeData = (allPesajes) => {
+   const initializeData = () => {
+    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
     setFechasPesaje(allFechas);
     setHispesajes(allPesajes);
@@ -38,9 +39,19 @@ const Codigos = (props) => {
    }
 
    useEffect(()=>{
-    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    initializeData(allPesajes);
+    initializeData();
    },[]);
+
+   useEffect(() => {
+    eventEmitter.on('refresh', () => {
+      initializeData();
+    });
+
+    return () => {
+      eventEmitter.off('refresh');
+    };
+  }, [eventEmitter]);
+
  
    const handleFilterChange = (event) => {
     const { name, value } = event.target;
