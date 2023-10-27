@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {getInventario,groupByFechaLoteOperacion as groupByFechaLoteOperacion} from "./HelperInventario";
+import {getInventario,groupByFechaLoteOperacion} from "./HelperInventario";
 import {filteredGData} from "./Helpers"
 
 const Inventario = () => {
@@ -43,6 +43,7 @@ const Inventario = () => {
    ];
 
    useEffect(()=>{
+    setTimeout(() => {}, 1000);
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
     let filteredData = allPesajes
     if (filtroBuscar.length>1)

@@ -6,7 +6,7 @@ test('ganancias: vacio', () => {
   expect(result).toEqual([]);
 });
 
-/*
+
 test('ganancias: promedio valido', () => {
   //
   let result = ganancias([
@@ -22,4 +22,4 @@ test('ganancias: promedio valido', () => {
 ],'2023-1-1',true,'2023-10-10',true,false);
   expect(result).toEqual([]);
 });
-*/
+

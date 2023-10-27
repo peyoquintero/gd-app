@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {filteredGData,matchCodigo} from "./Helpers"
+import {filteredGData} from "./Helpers"
 
 const Pesajes = (props) => {
   const columns = [
@@ -61,7 +61,7 @@ const Pesajes = (props) => {
     let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso",filtros.filtroExacto)
     if (filtros.filtroCodigo.trim()!=="")
     {
-      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo.toUpperCase()===filtros.filtroCodigo.trim().toUpperCase()) || (matchCodigo(w.Codigo,filtros.filtroCodigo.trim())) )
+      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo.toUpperCase()===filtros.filtroCodigo.trim().toUpperCase()) || (!filtros.filtroExacto&&w.Codigo.startsWith(filtros.filtroCodigo.trim())))
     }
     if (filtros.fechaControl)
     {

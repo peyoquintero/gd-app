@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import {captionCabezas,validLoteOptions} from "./Helpers"
-import {getPesajesByCodigo} from "./HelperInventario"
+import { getPesajesByCodigo } from './HelperInventario'
+
 
 const Codigos = (props) => {
   const columns = [
@@ -59,26 +60,15 @@ const Codigos = (props) => {
 
   const massageData = (hispesajes) =>
   {
-    var results = hispesajes.reduce(function(h, obj) {
-      h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
-      return h; 
-    }, {});
-
-    results = Object.keys(results).map(key => {
-      return {
-          Codigo: key, 
-          pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key).sort(function(a,b){
-                    return new Date(a.Fecha) - new Date(b.Fecha);
-                              })}
-      }
-    );
+    let groupedData = getPesajesByCodigo(hispesajes);
+    let results = Object.values(groupedData);
 
     var datos = [];
     results.forEach(result => {
-      let datafilter = result.pesajes;
+      let datafilter = result.Pesajes;
       let minP = datafilter[0];
       let fechaSalida = datafilter.length > 1 ? datafilter[datafilter.length-1].Fecha : null;
-      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:minP.Operacion.toUpperCase()!=='MUERTE'};
+      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:!['CORRECCION','MUERTE'].includes(minP.Operacion.toUpperCase())};
       datos.push(objresult);
     });
 
@@ -106,10 +96,10 @@ const Codigos = (props) => {
 
     if (filtros.sinEntrada && !filtros.todasLasVentas)
     {
-      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'MUERTE')
+      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>!['VENTA','CORRECCION'].includes(pesaje.Operacion.toUpperCase()))
       let ultimoPesaje = [];
        ultimoPesaje = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaSalida);
-      let otrasOperaciones = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() !== 'VENTA' && pesaje.Fecha < filtros.fechaSalida);
+      let otrasOperaciones = hispesajesFiltered.filter(pesaje=>(!['VENTA','CORRECCION'].includes(pesaje.Operacion.toUpperCase())) && pesaje.Fecha < filtros.fechaSalida);
       hispesajesFiltered =  ultimoPesaje.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
         if (element.Codigo === otrasOperaciones[j].Codigo) {
@@ -138,7 +128,7 @@ const Codigos = (props) => {
 
     gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }));
 
-    if (filtros.fechaSalida != '' && !filtros.sinEntrada)
+    if (filtros.fechaSalida !== '' && !filtros.sinEntrada)
     {
       gridDataResults = gridDataResults.filter(w=> w.FechaFinal === filtros.fechaSalida);      
     }
