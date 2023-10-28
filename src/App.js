@@ -57,12 +57,6 @@ export function App() {
     setPopupResult(localStorage.getItem("usuario")??'');
     },[dataUrl]);
 
-  useEffect(()=>{
-        window.onbeforeunload = (event) => {
-        event.preventDefault();
-      };
-  },[]);
-
   const handleRefresh = () => {
     retrieveData(dataUrl);
     eventEmitter.emit('refresh');
@@ -83,8 +77,6 @@ export function App() {
       <Route path="/pesajes" element={<Pesajes eventEmitter={eventEmitter} />}/>
       <Route path="/ganancias" element={<Ganancias eventEmitter={eventEmitter} />}/>
       <Route path="/ayuda" element={<Ayuda eventEmitter={eventEmitter} />}/>
-      <Route path="*" element={<Inventario eventEmitter={eventEmitter} />}>0
-      </Route>
     </Routes>
   </BrowserRouter> 
   :

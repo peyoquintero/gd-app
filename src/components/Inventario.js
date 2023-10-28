@@ -16,6 +16,8 @@ const Inventario = ({ eventEmitter }) => {
    const [selectedOption, setSelectedOption] = useState("cabezas");
    const [filtroBuscar, setFiltroBuscar] = useState("");
    const [filtroExacto, setFiltroExacto] = useState(true);
+   const [gridMovimientos,setGridMovimientos] = useState([])
+   const [gridInventario,setGridInventario] = useState([])
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
@@ -28,9 +30,6 @@ const Inventario = ({ eventEmitter }) => {
   const handleCheckboxChange = (event) => {
     setFiltroExacto(event.target.checked);
   };
-
-   const [gridData,setGridData] = useState([])
-   const [gridInventario,setGridInventario] = useState([])
 
    const columnsInventario = [
     { label: "Codigo", accessor: "Codigo",width:"20%" },
@@ -55,7 +54,7 @@ const Inventario = ({ eventEmitter }) => {
                                  .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
     if (movimientos?.length)                             
     {let movimientosByFecha = groupByFechaLoteOperacion(movimientos);
-    setGridData(movimientosByFecha); 
+    setGridMovimientos(movimientosByFecha); 
 
     let inventario = getInventario(filteredData);
     setGridInventario(inventario);
@@ -98,7 +97,7 @@ const Inventario = ({ eventEmitter }) => {
         {selectedOption === "movimientos" ?  
         <div className="container">
           <Table
-            data={gridData}
+            data={gridMovimientos}
             columns={columns}></Table>
           </div> :
         <div className="container">
