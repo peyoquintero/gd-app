@@ -7,6 +7,7 @@ const [gridData, setGridData] = useState([]);
 
   useEffect(()=>{
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
     setGridData(dobleCompraoVenta(allPesajes));
   },[]);
 

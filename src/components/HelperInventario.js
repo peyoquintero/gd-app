@@ -19,7 +19,7 @@ export const getPesajesByCodigo = (data)=>{
 export const getInventario = (data) => {
     const groupedData = getPesajesByCodigo(data)
     let result = Object.values(groupedData);
-    result = result.filter(w=>w.Pesajes[0].Operacion.toUpperCase()==='COMPRA'); 
+    result = result.filter(w=>w.Pesajes[0].Operacion?.toUpperCase()==='COMPRA'); 
     let codigosVendidos = data.filter(w=>['VENTA','MUERTE','CORRECCION'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
     result = result.filter(x => !codigosVendidos.includes(x.Codigo));
 
@@ -69,7 +69,7 @@ export const getInventario = (data) => {
 
   export const dobleCompraoVenta = (data) => 
   {
-    data = data.filter(w=>['VENTA','COMPRA'].includes(w.Operacion.toUpperCase()))
+    data = data.filter(w=>['VENTA','COMPRA'].includes(w.Operacion?.toUpperCase()))
     const groupedData = data.reduce((acc, obj) => {
       const key = [obj.Codigo, obj.Operacion];
       acc[key] = acc[key] || [];

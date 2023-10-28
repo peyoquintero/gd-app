@@ -44,13 +44,14 @@ const Inventario = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
     let filteredData = allPesajes
     if (filtroBuscar.length>1)
     {
       filteredData = filteredGData(filteredData,filtroBuscar,"Peso",filtroExacto)
     }
 
-    let movimientos =  filteredData.filter(w=>w.Operacion.toUpperCase() !== "CONTROL")
+    let movimientos =  filteredData.filter(w=>w.Operacion?.toUpperCase() !== "CONTROL")
                                  .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
     if (movimientos?.length)                             
     {let movimientosByFecha = groupByFechaLoteOperacion(movimientos);

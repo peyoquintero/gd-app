@@ -20,6 +20,7 @@ const Pesajes = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))];
     allFechas.sort(function(a,b){return new Date(b) - new Date(a);})
@@ -31,7 +32,7 @@ const Pesajes = ({ eventEmitter }) => {
       filtroCodigo: "",
       filtroExacto: true
       });
-      let pesajes = allPesajes.filter(w=>w.Operacion.toUpperCase()!=='MUERTE') 
+      let pesajes = allPesajes.filter(w=>w.Operacion?.toUpperCase()!=='MUERTE') 
       setGridData(pesajes.slice(0,100));
       setCaptions(pesajes.length>0?`Ultimos 100 - Total: ${pesajes.length} `:'No hay datos disponibles') 
     }  
@@ -71,7 +72,7 @@ const Pesajes = ({ eventEmitter }) => {
     let filteredData = filteredGData(hisPesajes,filtros.filtroGeneral,"Peso",filtros.filtroExacto)
     if (filtros.filtroCodigo.trim()!=="")
     {
-      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo.toUpperCase()===filtros.filtroCodigo.trim().toUpperCase()) || (!filtros.filtroExacto&&w.Codigo.startsWith(filtros.filtroCodigo.trim())))
+      filteredData = filteredData.filter(w=>(filtros.filtroExacto&&w.Codigo?.toUpperCase()===filtros.filtroCodigo?.trim().toUpperCase()) || (!filtros.filtroExacto&&w.Codigo.startsWith(filtros.filtroCodigo?.trim())))
     }
     if (filtros.fechaControl)
     {

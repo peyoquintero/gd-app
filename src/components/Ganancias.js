@@ -30,6 +30,7 @@ const Ganancias = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
@@ -117,7 +118,7 @@ const Ganancias = ({ eventEmitter }) => {
 
       const applyFilters = (event) => {
 
-        let hispesajesFiltered = hisPesajes.filter(pesaje=>!['CORRECCION','MUERTE'].includes(pesaje.Operacion.toUpperCase())); 
+        let hispesajesFiltered = hisPesajes.filter(pesaje=>!['CORRECCION','MUERTE'].includes(pesaje.Operacion?.toUpperCase())); 
         if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
         {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca.trim()); 

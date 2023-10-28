@@ -30,7 +30,7 @@ const Ayuda = ({ eventEmitter }) => {
       if (allPesajes?.length)
       {
         setGridDups(resurrect(allPesajes)) ;
-        let muertes = allPesajes.filter(w=>w.Operacion.toUpperCase().trim()==='MUERTE')
+        let muertes = allPesajes.filter(w=>w.Operacion?.toUpperCase().trim()==='MUERTE')
                       .sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha);})
         setGridMuertes(muertes);
       }
@@ -79,7 +79,7 @@ const Ayuda = ({ eventEmitter }) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.21 - {lastRefresh}</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.22 - {lastRefresh}</label>
             </section>
         </div>
     )            

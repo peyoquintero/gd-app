@@ -108,7 +108,7 @@ export const resurrect = (pesajes) =>
 {
 let result = Object.values(getPesajesByCodigo(pesajes));
 let dups = result.filter(w=>{ let ultimo= w.pesajes && w.pesajes[w.pesajes.length-1];
-                              return (ultimo && ['VENTA','MUERTE','CORRECCION'].includes (ultimo.Operacion.toUpperCase()) && w.pesajes && w.pesajes.some(x=>['VENTA','MUERTE','CORRECCION'].includes (x.Operacion.toUpperCase())))});  
+                              return (ultimo && ['VENTA','MUERTE','CORRECCION'].includes (ultimo.Operacion?.toUpperCase()) && w.pesajes && w.pesajes.some(x=>['VENTA','MUERTE','CORRECCION'].includes (x.Operacion?.toUpperCase())))});  
 return dups;
 }
 

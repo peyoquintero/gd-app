@@ -24,6 +24,7 @@ const Codigos = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
     setFechasPesaje(allFechas);
     setHispesajes(allPesajes);
@@ -79,7 +80,7 @@ const Codigos = ({ eventEmitter }) => {
       let datafilter = result.Pesajes;
       let minP = datafilter[0];
       let fechaSalida = datafilter.length > 1 ? datafilter[datafilter.length-1].Fecha : null;
-      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:!['CORRECCION','MUERTE'].includes(minP.Operacion.toUpperCase())};
+      let objresult = {Codigo: result.Codigo, FechaInicial:minP.Fecha,FechaFinal:fechaSalida,Marca:minP.Marca,Activo:!['CORRECCION','MUERTE'].includes(minP.Operacion?.toUpperCase())};
       datos.push(objresult);
     });
 
@@ -107,10 +108,10 @@ const Codigos = ({ eventEmitter }) => {
 
     if (filtros.sinEntrada && !filtros.todasLasVentas)
     {
-      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>!['VENTA','CORRECCION'].includes(pesaje.Operacion.toUpperCase()))
+      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>!['VENTA','CORRECCION'].includes(pesaje.Operacion?.toUpperCase()))
       let ultimoPesaje = [];
-       ultimoPesaje = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaSalida);
-      let otrasOperaciones = hispesajesFiltered.filter(pesaje=>(!['VENTA','CORRECCION'].includes(pesaje.Operacion.toUpperCase())) && pesaje.Fecha < filtros.fechaSalida);
+       ultimoPesaje = hispesajesFiltered.filter(pesaje=>pesaje.Operacion?.toUpperCase !== 'COMPRA' && pesaje.Fecha === filtros.fechaSalida);
+      let otrasOperaciones = hispesajesFiltered.filter(pesaje=>(!['VENTA','CORRECCION'].includes(pesaje.Operacion?.toUpperCase())) && pesaje.Fecha < filtros.fechaSalida);
       hispesajesFiltered =  ultimoPesaje.filter(function(element) {
       for (var j = 0; j < otrasOperaciones.length; j++) {
         if (element.Codigo === otrasOperaciones[j].Codigo) {
@@ -128,9 +129,9 @@ const Codigos = ({ eventEmitter }) => {
         fechaSalida: ''
       });
   
-      let codigosVendidos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'VENTA').map(w=>w.Codigo);
-      let codigosMuertos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'MUERTE').map(w=>w.Codigo);
-      let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion.toUpperCase() === 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
+      let codigosVendidos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion?.toUpperCase() === 'VENTA').map(w=>w.Codigo);
+      let codigosMuertos = hispesajesFiltered.filter(pesaje=>pesaje.Operacion?.toUpperCase() === 'MUERTE').map(w=>w.Codigo);
+      let codigosComprados = hispesajesFiltered.filter(pesaje=>pesaje.Operacion?.toUpperCase() === 'COMPRA').map(w=>w.Codigo).filter(x => !codigosMuertos.includes(x));
       let codigosEnLimbo = codigosVendidos.filter(x => !codigosComprados.includes(x));
       hispesajesFiltered = hispesajesFiltered.filter(x => codigosEnLimbo.includes(x.Codigo));  
     }
