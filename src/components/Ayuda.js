@@ -65,7 +65,7 @@ const Ayuda = ({ eventEmitter }) => {
             </section>
             <section style={{background:'rgb(249, 249, 249)'}}>
                {((selectedOption === "optionInconsistencias") && gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
-               {(selectedOption === "optionRevisionCodigos")?  <Codigos/> : null}
+               {(selectedOption === "optionRevisionCodigos")?  <Codigos eventEmitter={eventEmitter}/> : null}
                {(selectedOption === "optionDuplicados")?  <Duplicados/> : null}
             </section>
             <section className="title" >
@@ -79,7 +79,7 @@ const Ayuda = ({ eventEmitter }) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.22 - {lastRefresh}</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.23 - {lastRefresh}</label>
             </section>
         </div>
     )            

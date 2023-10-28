@@ -18,6 +18,7 @@ const Inventario = ({ eventEmitter }) => {
    const [filtroExacto, setFiltroExacto] = useState(true);
    const [gridMovimientos,setGridMovimientos] = useState([])
    const [gridInventario,setGridInventario] = useState([])
+   const [hisPesajes,setHisPesajes] = useState([])
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
@@ -41,9 +42,13 @@ const Inventario = ({ eventEmitter }) => {
     { label: "Ultimo Peso", accessor: "PesoFinal",width:"10%" },
    ];
 
-   const initializeData = () => {
-    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
+   const loadFromLocalStorage = () => {
+      let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
+      allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
+      return allPesajes;
+   }
+
+   const refreshData = (allPesajes) => {
     let filteredData = allPesajes
     if (filtroBuscar.length>1)
     {
@@ -62,13 +67,21 @@ const Inventario = ({ eventEmitter }) => {
    }
 
    useEffect(()=>{
+    let x = loadFromLocalStorage();
+    refreshData(x);
+    setHisPesajes(x);
+  },[]);
+
+   useEffect(()=>{
     setTimeout(() => {}, 1000);
-    initializeData();
+    refreshData(hisPesajes);
   },[filtroBuscar,filtroExacto]);
 
   useEffect(() => {
     eventEmitter.on('refresh', () => {
-      initializeData();
+      let x = loadFromLocalStorage();
+      refreshData(x);
+      setHisPesajes(x);
     });
 
     return () => {
