@@ -31,34 +31,40 @@ export function App() {
     dataUrl = recursoPorUsuario(popupUsuario)
   };
 
-  const retrieveData = (dataUrl) => {
+  const retrieveData = async (dataUrl) => {
     if(online)
     {
-      axios.get(dataUrl)
-      .then((response)=>{
-        let allPesajes = mapApiDataToPesajes(response.data); 
+      try{
+        const response = await axios.get(dataUrl);
+        const allPesajes = mapApiDataToPesajes(response.data); 
         localStorage.setItem("spreadsheetData", JSON.stringify(allPesajes));
         const now = new Date();
         const localTimeString = now.toLocaleDateString(navigator.language, {
         year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
         localStorage.setItem("lastRefresh", localTimeString);
-      })
-      .catch((error) =>  {   
+        return () => {}
+        }
+      catch(error) {   
         console.log("error getting spreadsheet")
-      });
+        return () => {}
+      };
    }
   }
 
   const networkState = useNetwork();
   const { online } = networkState;
 
-  useEffect(()=>{
-    retrieveData(dataUrl);
+  const retrieveDataAsync = async (url) => {
+    await retrieveData(url);
+  } 
+
+  useEffect( ()=>{
+    retrieveDataAsync(dataUrl);
     setPopupResult(localStorage.getItem("usuario")??'');
     },[dataUrl]);
 
-  const handleRefresh = () => {
-    retrieveData(dataUrl);
+  const handleRefresh = async () => {
+    await retrieveData(dataUrl);
     eventEmitter.emit('refresh');
   }
  
