@@ -20,7 +20,7 @@ const Pesajes = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && w.Operacion?.toUpperCase()!=='MUERTE')
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))];
     allFechas.sort(function(a,b){return new Date(b) - new Date(a);})
@@ -32,9 +32,8 @@ const Pesajes = ({ eventEmitter }) => {
       filtroCodigo: "",
       filtroExacto: true
       });
-      let pesajes = allPesajes.filter(w=>w.Operacion?.toUpperCase()!=='MUERTE') 
-      setGridData(pesajes.slice(0,100));
-      setCaptions(pesajes.length>0?`Ultimos 100 - Total: ${pesajes.length} `:'No hay datos disponibles') 
+      setGridData(allPesajes.slice(0,100));
+      setCaptions(allPesajes.length>0?`Ultimos 100 - Total: ${allPesajes.length} `:'No hay datos disponibles') 
     }  
 
    useEffect(()=>{
