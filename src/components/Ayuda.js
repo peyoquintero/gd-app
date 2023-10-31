@@ -79,7 +79,7 @@ const Ayuda = ({ eventEmitter }) => {
                  null}
             </section>
             <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.23 - {lastRefresh}</label>
+                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.25 - {lastRefresh}</label>
             </section>
         </div>
     )            

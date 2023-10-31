@@ -78,8 +78,17 @@ const Pesajes = ({ eventEmitter }) => {
     {
       filteredData = filteredData.filter(w=>w.Fecha===filtros.fechaControl)    
     }
+
     setGridData(filteredData);  
-    setCaptions(`Total: ${filteredData.length}`);
+    let comment = `Total: ${filteredData.length}`;
+
+    if (filtros.fechaControl && filteredData.length && filteredData.every(w=>w.Peso>0)) 
+    {  
+      const average = filteredData.reduce((acc, cur) => acc + parseInt(cur.Peso), 0) / filteredData.length;
+      comment = comment +  ` Promedio: ${average.toFixed(2)}`;
+    }
+    
+    setCaptions(comment);
   }
 
   return (

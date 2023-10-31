@@ -84,6 +84,7 @@ let labelPromUltPeso = promUltPeso>500? '' : `Prom. Ultimo Peso:  ${promUltPeso}
 var ultpeso = data.length>0 ? `${labelPromUltPeso}`: ""; 
 return ultpeso;
 }
+
 export const validLoteOptions= (lotes) =>
 {
 lotes.push('*');
