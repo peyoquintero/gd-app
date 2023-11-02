@@ -1,4 +1,5 @@
 import { getPesajesByCodigo } from './HelperInventario'
+
 export const matchCodigo = (w,filterKey)=>{
        return (filterKey.includes("*") && String(w).toLowerCase().startsWith(filterKey.toLowerCase().replace("*", ""))) || 
        ((!filterKey.includes("*") && String(w).toLowerCase().indexOf(filterKey.toLowerCase()) > -1)) };
@@ -180,7 +181,7 @@ export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,f
 export const compareNumAlphas = (str1, str2) =>
  {
     // Check if either string starts with numbers.
-    const regex = /^\d+/;
+    const regex = /^-?\d+/; 
     const match1 = str1?.toString().match(regex);
     const match2 = str2?.toString().match(regex);
   
