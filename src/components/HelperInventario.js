@@ -71,7 +71,7 @@ export const getInventario = (data) => {
   {
     data = data.filter(w=>['VENTA','COMPRA'].includes(w.Operacion?.toUpperCase()))
     const groupedData = data.reduce((acc, obj) => {
-      const key = [obj.Codigo, obj.Operacion];
+      const key = [obj.Codigo.toUpperCase(), obj.Operacion.toUpperCase()];
       acc[key] = acc[key] || [];
       acc[key].push(obj);
       return acc;

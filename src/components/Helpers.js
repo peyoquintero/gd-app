@@ -108,10 +108,21 @@ export const mapApiDataToPesajes= (apiResult) => {
 
 export const resurrect = (pesajes) =>
 {
-let result = Object.values(getPesajesByCodigo(pesajes));
-let dups = result.filter(w=>{ let ultimo= w.pesajes && w.pesajes[w.pesajes.length-1];
-                              return (ultimo && ['VENTA','MUERTE','CORRECCION'].includes (ultimo.Operacion?.toUpperCase()) && w.pesajes && w.pesajes.some(x=>['VENTA','MUERTE','CORRECCION'].includes (x.Operacion?.toUpperCase())))});  
-return dups;
+  try{
+  let result = Object.values(getPesajesByCodigo(pesajes));
+
+  let loners = result.filter(w => w.pesajes?.length===1 && ['VENTA','MUERTE','CORRECCION'].includes(w.Operacion?.toUpperCase())); 
+
+  let dupSalida = result.filter(w=> w.pesajes?.length && ['VENTA','MUERTE','CORRECCION'].includes(w.pesajes[w.pesajes.length-1].Operacion?.toUpperCase()) );
+  dupSalida = dupSalida.filter(w=>{ let otrosPesajes =  w.pesajes.slice(0,w.pesajes.length-1);
+                                    return otrosPesajes.some(x=>['VENTA','MUERTE','CORRECCION'].includes (x.Operacion?.toUpperCase()))
+                                  });  
+
+  return loners.concat(dupSalida);
+                                }
+  catch{
+    return []
+  }
 }
 
 const gananciaDiaria = (pesoInicial,pesoFinal) =>
