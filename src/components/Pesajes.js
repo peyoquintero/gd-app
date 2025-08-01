@@ -26,7 +26,8 @@ const Pesajes = ({ eventEmitter }) => {
         w.Marca &&
         w.Operacion &&
         w.Fecha &&
-        w.Operacion?.toUpperCase() !== "MUERTE"
+        w.Operacion?.toUpperCase() !== "MUERTE" &&
+        !w.Codigo.includes("?") // Exclude codes with '?'
     );
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map((obj) => obj.Fecha.trim()))];
