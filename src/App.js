@@ -2,34 +2,19 @@ import React, {  useEffect, useState } from "react";
 import EventEmitter from 'eventemitter3';
 import { useNetwork } from "./hooks/useNetwork";
 import "./App.css";
-import { recursoPorUsuario } from "./components/recursos"
 import  NavBar  from "./components/NavBar";
 import  Ganancias  from "./components/Ganancias";
 import  Pesajes  from "./components/Pesajes";
 import  Inventario  from "./components/Inventario";
 import  Ayuda  from "./components/Ayuda";
-import  PopupScreen  from "./components/PopupScreen";
 import { mapApiDataToPesajes } from "./components/Helpers"
 import {  BrowserRouter,  Routes,  Route} from "react-router-dom";
 import axios from "axios";
 
 export function App() {
-  const [popupUsuario, setPopupResult] = useState(localStorage.getItem("usuario")??'');
   const eventEmitter = new EventEmitter();
 
-  let dataUrl = ''
-  const handlePopupClose = (result) => {
-    setPopupResult(result);
-    if (result?.length>0)
-    {
-      localStorage.setItem("usuario", result.toLowerCase());
-    }
-  };
- 
-  if (popupUsuario?.length>0)
-  {
-    dataUrl = recursoPorUsuario(popupUsuario)
-  };
+  let dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8"
 
   const retrieveData = async (dataUrl) => {
     if(online)
@@ -60,7 +45,6 @@ export function App() {
 
   useEffect( ()=>{
     retrieveDataAsync(dataUrl);
-    setPopupResult(localStorage.getItem("usuario")??'');
     },[dataUrl]);
 
   const handleRefresh = async () => {
@@ -69,7 +53,6 @@ export function App() {
   }
  
   return( 
-    (popupUsuario?.length!==0) ?
    <BrowserRouter>
    <div className="main-container">
       <NavBar/>  
@@ -85,7 +68,5 @@ export function App() {
       <Route path="/ayuda" element={<Ayuda eventEmitter={eventEmitter} />}/>
     </Routes>
   </BrowserRouter> 
-  :
-  <PopupScreen onClose={handlePopupClose} />
 )}
 
