@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
-import {getInventario,groupByFechaLoteOperacion} from "./HelperInventario";
+import {getInventario,groupByFechaOperacion} from "./HelperInventario";
 import {filteredGData} from "./Helpers"
 
 const Inventario = ({ eventEmitter }) => {
   const columns = [
     { label: "Fecha", accessor: "Fecha",width:"20%" },
     { label: "Operacion", accessor: "Operacion",width:"25%" },
-    { label: "Lote", accessor: "Lote",width:"15%" },
+    { label: "Chapeta", accessor: "Chapeta",width:"15%" },
     { label: "Marca", accessor: "Marca",width:"10%" },
     { label: "Total", accessor: "Total",width:"15%" },
     { label: "Vendidos", accessor: "Vendidos",width:"15%" },
@@ -35,7 +35,7 @@ const Inventario = ({ eventEmitter }) => {
    const columnsInventario = [
     { label: "Codigo", accessor: "Codigo",width:"20%" },
     { label: "Marca", accessor: "Marca",width:"10%" },
-    { label: "Lote", accessor: "Lote",width:"10%" },
+    { label: "Chapeta", accessor: "Chapeta",width:"10%" },
     { label: "Fecha Compra", accessor: "FechaCompra",width:"20%" },
     { label: "Peso Inicial", accessor: "PesoInicial",width:"10%" },
     { label: "Ultimo Control", accessor: "FechaUltimoControl",width:"20%" },
@@ -58,7 +58,7 @@ const Inventario = ({ eventEmitter }) => {
     let movimientos =  filteredData.filter(w=>w.Operacion?.toUpperCase() !== "CONTROL")
                                  .sort(function(a,b){ return new Date(a.Fecha) - new Date(b.Fecha);});
     if (movimientos?.length)                             
-    {let movimientosByFecha = groupByFechaLoteOperacion(movimientos);
+    {let movimientosByFecha = groupByFechaOperacion(movimientos);
     setGridMovimientos(movimientosByFecha); 
 
     let inventario = getInventario(filteredData);

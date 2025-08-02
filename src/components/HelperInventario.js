@@ -7,7 +7,7 @@ export const getPesajesByCodigo = (data)=>{
           acc[key] = {
             Codigo: item.Codigo,
             Marca: item.Marca,
-            Lote: item.Lote,            
+            Chapeta: item.Chapeta,            
             Pesajes: [],
           };
         }
@@ -26,7 +26,7 @@ export const getInventario = (data) => {
     result = result.map(w=> {return {
       Codigo: w.Codigo,
       Marca: w.Marca,
-      Lote: w.Lote,
+      Chapeta: w.Chapeta,
       FechaCompra: w.Pesajes[0]?.Fecha,      
       PesoInicial: w.Pesajes[0]?.Peso,
       FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,
@@ -39,14 +39,14 @@ export const getInventario = (data) => {
     return comprados.filter(w=>vendidos.includes(w)).length;
    }
 
-  export const groupByFechaLoteOperacion = (data) => {
+  export const groupByFechaOperacion = (data) => {
     const groupedData = data.reduce((acc, item) => {
-      const key = `${item.Fecha}-${item.Operacion}-${item.Lote}-${item.Marca}`;
+      const key = `${item.Fecha}-${item.Operacion}-${item.Marca}`;
       if (!acc[key]) {
         acc[key] = {
           Fecha: item.Fecha,
           Operacion: item.Operacion,
-          Lote: item.Lote,
+          Chapeta: item.Chapeta,
           Marca: item.Marca,
           Total: 0,
           Codigos: [],

@@ -16,7 +16,6 @@ const Ganancias = ({ eventEmitter }) => {
 
     const [gridData,setGridData] = useState([])
     const [hisPesajes,setHispesajes] = useState([])
-    const [lotes,setLotes] = useState([])
     const [fechasPesaje,setFechasPesaje] = useState([])
     const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
 
@@ -37,14 +36,13 @@ const Ganancias = ({ eventEmitter }) => {
         let fechasPesajeDes = Array.from(allFechas).sort(function(a,b){return new Date(b) - new Date(a);})
         setFechasPesajeDesc(fechasPesajeDes);
 
-        setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
         setFiltros({
           fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
           fechaFinal : fechasPesajeDes[0] ?? new Date(),
           filtroCodigo: "",
           filtroMarca: "",
           filtroPeso: "",
-          filtroLote: "",
+          filtroChapeta: "",
           fiExacta: false,
           ffExacta: false,
           filtroVentas: false,
@@ -73,23 +71,6 @@ const Ganancias = ({ eventEmitter }) => {
           [name]: value,
         });
      };
-
-    const handleFilterLoteChange = (event) => {
-        const { name, value } = event.target;
-        setFiltros({
-          ...filtros,
-          [name]: value,
-        });
-        if (value!=="*" && value.trim()!=="")
-            {
-            let allFechas = [...new Set(hisPesajes.filter(w=>w.Lote===value.trim()).map(obj => obj.Fecha))];
-            setFechasPesaje(allFechas);
-          }
-          else{
-            let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
-            setFechasPesaje(allFechas);
-          }
-      };
 
    const handleFilterMarcaChange = (event) => {
       const { name, value } = event.target;
@@ -129,9 +110,9 @@ const Ganancias = ({ eventEmitter }) => {
           hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())); 
         }
 
-        if (filtros.filtroLote!=="*" && filtros.filtroLote!=="")
+        if (filtros.filtroChapeta!=="")
         {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
+          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Chapeta.startsWith(filtros.filtroChapeta.trim())); 
         }
 
         let gridDataResults = ganancias(hispesajesFiltered,filtros.fechaInicial,filtros.fiExacta,filtros.fechaFinal,filtros.ffExacta,filtros.filtroVentas);
@@ -162,12 +143,13 @@ const Ganancias = ({ eventEmitter }) => {
       }
 
       const columns = [
-        { label: "Codigo", accessor: "Codigo",width:"15%" },
+        { label: "Codigo", accessor: "Codigo",width:"12%" },
+        { label: "Chapeta", accessor: "Chapeta",width:"12%" },
         { label: "Fecha Inicial", accessor: "FechaInicial",width:"20%" },
         { label: "Fecha Final", accessor: "FechaFinal",width:"20%" },
-        { label: "Peso Inicial", accessor: "PesoInicial",width:"15%" },
-        { label: "Peso Final", accessor: "PesoFinal",width:"15%" },
-        { label: "Ganancia", accessor: "Ganancia",width:"15%" },
+        { label: "Peso Inicial", accessor: "PesoInicial",width:"12%" },
+        { label: "Peso Final", accessor: "PesoFinal",width:"12%" },
+        { label: "Ganancia", accessor: "Ganancia",width:"12%" },
        ];
 
     return (
@@ -178,18 +160,16 @@ const Ganancias = ({ eventEmitter }) => {
         <label>Codigo
           <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
         </label>
+        <label>Chapeta 
+          <input style={{display:'block'}} id="chapeta" className="freeinput" name="filtroChapeta" 
+          onChange={handleFilterChange} value={filtros.filtroChapeta}/>
+        </label>
         <label>Marca 
           <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" 
           onChange={handleFilterMarcaChange} value={filtros.filtroMarca}/>
         </label>
         <label>Rango Peso 
           <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
-        </label>
-        <label>Lote
-        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" 
-                        onChange={handleFilterLoteChange} value={filtros.filtroLote}>
-          {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
-          </select>
         </label>
         </section>
         <section>

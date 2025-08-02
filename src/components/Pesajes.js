@@ -5,10 +5,10 @@ import { filteredGData } from "./Helpers";
 const Pesajes = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo", width: "15%" },
+    { label: "Chapeta", accessor: "Chapeta", width: "15%" },
     { label: "Fecha", accessor: "Fecha", width: "20%" },
     { label: "Peso", accessor: "Peso", width: "15%" },
     { label: "Marca", accessor: "Marca", width: "15%" },
-    { label: "Lote", accessor: "Lote", width: "15%" },
     { label: "Operacion", accessor: "Operacion", width: "20%" },
   ];
 
