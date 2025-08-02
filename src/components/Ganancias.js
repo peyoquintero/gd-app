@@ -30,7 +30,7 @@ const Ganancias = ({ eventEmitter }) => {
 
    const initializeData = () => {
     let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha)
+    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"))
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
