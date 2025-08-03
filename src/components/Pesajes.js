@@ -89,23 +89,43 @@ const Pesajes = ({ eventEmitter }) => {
       filtros.filtroExacto
     );
     if (filtros.filtroCodigo.trim() !== "") {
-      filteredData = filteredData.filter(
-        (w) =>
-          (filtros.filtroExacto &&
-            w.Codigo?.toUpperCase() ===
-              filtros.filtroCodigo?.trim().toUpperCase()) ||
-          (!filtros.filtroExacto &&
-            w.Codigo.startsWith(filtros.filtroCodigo?.trim()))
-      );
+      const codeFilter = filtros.filtroCodigo.trim().toUpperCase();
+      switch (filtros.filtroExacto) {
+        case "starts":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().startsWith(codeFilter)
+          );
+          break;
+        case "ends":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().endsWith(codeFilter)
+          );
+          break;
+        case "contains":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().includes(codeFilter)
+          );
+          break;
+        case "exact":
+        default:
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase() === codeFilter
+          );
+          break;
+      }
     }
     if (filtros.filtroChapeta.trim() !== "") {
       filteredData = filteredData.filter(
         (w) =>
-          (filtros.filtroExacto &&
+          (filtros.filtroExacto === "exact" &&
             w.Chapeta?.toUpperCase() ===
               filtros.filtroChapeta?.trim().toUpperCase()) ||
-          (!filtros.filtroExacto &&
-            w.Chapeta.startsWith(filtros.filtroChapeta?.trim()))
+          (filtros.filtroExacto === "starts" &&
+            w.Chapeta?.toUpperCase().startsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
+          (filtros.filtroExacto === "ends" &&
+            w.Chapeta?.toUpperCase().endsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
+          (filtros.filtroExacto === "contains" &&
+            w.Chapeta?.toUpperCase().includes(filtros.filtroChapeta?.trim().toUpperCase()))
       );
     }
     if (filtros.fechaControl) {
@@ -185,15 +205,18 @@ const Pesajes = ({ eventEmitter }) => {
           />
         </label>
         <label style={{ display: "block" }}>
-          Exacto
-          <input
-            style={{ display: "block" }}
-            type="checkbox"
-            id="checkboxFE"
+          Código/Chapeta
+          <select
+            style={{ display: "block", width: "120px", height: "25px" }}
             name="filtroExacto"
-            onChange={handleCheckboxChange}
-            checked={!!filtros.filtroExacto}
-          />
+            onChange={handleFilterChange}
+            value={filtros.filtroExacto ?? ""}
+          >
+            <option value="exacto">Exacto</option>
+            <option value="starts">Empieza con</option>
+            <option value="ends">Termina con</option>
+            <option value="contains">Contiene</option>
+          </select>
         </label>
         <button style={{ marginTop: "15px" }} type="submit" onClick={applyFilters}>
           Ok
