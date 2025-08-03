@@ -26,8 +26,7 @@ const Pesajes = ({ eventEmitter }) => {
         w.Marca &&
         w.Operacion &&
         w.Fecha &&
-        w.Operacion?.toUpperCase() !== "MUERTE" &&
-        !w.Codigo.includes("?") // Exclude codes with '?'
+        w.Operacion?.toUpperCase() !== "MUERTE" 
     );
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map((obj) => obj.Fecha.trim()))];
@@ -40,6 +39,7 @@ const Pesajes = ({ eventEmitter }) => {
       fechaControl: null,
       filtroGeneral: "",
       filtroCodigo: "",
+      filtroChapeta: "",
       filtroExacto: true,
     });
     setGridData(allPesajes.slice(0, 100));
@@ -52,7 +52,6 @@ const Pesajes = ({ eventEmitter }) => {
 
   useEffect(() => {
     initializeData();
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -99,6 +98,16 @@ const Pesajes = ({ eventEmitter }) => {
             w.Codigo.startsWith(filtros.filtroCodigo?.trim()))
       );
     }
+    if (filtros.filtroChapeta.trim() !== "") {
+      filteredData = filteredData.filter(
+        (w) =>
+          (filtros.filtroExacto &&
+            w.Chapeta?.toUpperCase() ===
+              filtros.filtroChapeta?.trim().toUpperCase()) ||
+          (!filtros.filtroExacto &&
+            w.Chapeta.startsWith(filtros.filtroChapeta?.trim()))
+      );
+    }
     if (filtros.fechaControl) {
       filteredData = filteredData.filter(
         (w) => w.Fecha === filtros.fechaControl
@@ -133,6 +142,16 @@ const Pesajes = ({ eventEmitter }) => {
             name="filtroCodigo"
             onChange={handleFilterChange}
             value={filtros.filtroCodigo ?? ""}
+          />
+        </label>
+        <label input="chapeta">
+         Chapeta
+         <input
+            className="freeinput"
+            style={{ display: "block" }}
+            name="filtroChapeta"
+            onChange={handleFilterChange}
+            value={filtros.filtroChapeta ?? ""}
           />
         </label>
         <label>
