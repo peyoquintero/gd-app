@@ -33,13 +33,14 @@ const Inventario = ({ eventEmitter }) => {
   };
 
    const columnsInventario = [
-    { label: "Codigo", accessor: "Codigo",width:"20%" },
+    { label: "Codigo", accessor: "Codigo",width:"15%" },
     { label: "Marca", accessor: "Marca",width:"10%" },
     { label: "Chapeta", accessor: "Chapeta",width:"10%" },
-    { label: "Fecha Compra", accessor: "FechaCompra",width:"20%" },
+    { label: "F.Compra", accessor: "FechaCompra",width:"18%" },
     { label: "Peso Inicial", accessor: "PesoInicial",width:"10%" },
-    { label: "Ultimo Control", accessor: "FechaUltimoControl",width:"20%" },
+    { label: "Ult. Control", accessor: "FechaUltimoControl",width:"17%" },
     { label: "Ultimo Peso", accessor: "PesoFinal",width:"10%" },
+    { label: "PRY", accessor: "Proyeccion",width:"10%" },
    ];
 
    const loadFromLocalStorage = () => {

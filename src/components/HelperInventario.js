@@ -16,6 +16,18 @@ export const getPesajesByCodigo = (data)=>{
       }, {});
 }
 
+const getProyeccion = (fechaUltimoPeso,ultimoPeso,fechaProyeccion,gananciaDiaria) => {
+  if (!fechaUltimoPeso || !ultimoPeso || !fechaProyeccion || !gananciaDiaria) {
+    return 0;
+  }
+  const fechaUltimo = new Date(fechaUltimoPeso);
+  const fechaProy = new Date(fechaProyeccion);
+  const diasDiferencia = Math.ceil((fechaProy - fechaUltimo) / (60000 * 60 * 24));
+  const pry = Number(ultimoPeso) + (diasDiferencia * Number(gananciaDiaria));
+  return pry.toFixed(0);
+
+}
+
 export const getInventario = (data) => {
     const groupedData = getPesajesByCodigo(data)
     let result = Object.values(groupedData);
@@ -30,11 +42,15 @@ export const getInventario = (data) => {
       FechaCompra: w.Pesajes[0]?.Fecha,      
       PesoInicial: w.Pesajes[0]?.Peso,
       FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,
-      PesoFinal: w.Pesajes[w.Pesajes.length-1]?.Peso
+      PesoFinal: w.Pesajes[w.Pesajes.length-1]?.Peso,
+      Proyeccion: getProyeccion(w.Pesajes[w.Pesajes.length-1]?.Fecha,
+                                w.Pesajes[w.Pesajes.length-1]?.Peso,
+                                Date.now(),350/1000) // Assuming 0.35 as the daily gain
                            }});
     return result;
   }
 
+  
   function intersectCount (comprados,vendidos){
     return comprados.filter(w=>vendidos.includes(w)).length;
    }
