@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table"
-import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, validLoteOptions} from "./Helpers"
+import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias} from "./Helpers"
+import { useNetwork } from "../hooks/useNetwork";
+import { dataService } from "../services/DataService";
+import "../App.css"; // Add this import
+
 const Ganancias = ({ eventEmitter }) => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",
@@ -18,6 +22,8 @@ const Ganancias = ({ eventEmitter }) => {
     const [hisPesajes,setHispesajes] = useState([])
     const [fechasPesaje,setFechasPesaje] = useState([])
     const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
+    const { online } = useNetwork();
 
     const [captions,setCaptions] = useState({
         resultCabezas : "",
@@ -27,43 +33,56 @@ const Ganancias = ({ eventEmitter }) => {
         resultDias : "",
       })
 
-   const initializeData = () => {
-    let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-    allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"))
-    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
+    const initializeData = useCallback(() => {
+        let allPesajes = dataService.getCachedData();
+        if (!allPesajes) return;
+        
+        allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"))
+        let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
         setHispesajes(allPesajes);
         setFechasPesaje(allFechas);
         let fechasPesajeDes = Array.from(allFechas).sort(function(a,b){return new Date(b) - new Date(a);})
         setFechasPesajeDesc(fechasPesajeDes);
 
         setFiltros({
-          fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
-          fechaFinal : fechasPesajeDes[0] ?? new Date(),
-          filtroCodigo: "",
-          filtroMarca: "",
-          filtroPeso: "",
-          filtroChapeta: "",
-          fiExacta: false,
-          ffExacta: false,
-          filtroVentas: false,
-            });
-      }  
-
-      useEffect(()=>{
-        initializeData();
-      },[]);
-
-      useEffect(() => {
-        eventEmitter.on('refresh', () => {
-          initializeData();
+            fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
+            fechaFinal : fechasPesajeDes[0] ?? new Date(),
+            filtroCodigo: "",
+            filtroMarca: "",
+            filtroPeso: "",
+            filtroChapeta: "",
+            fiExacta: false,
+            ffExacta: false,
+            filtroVentas: false,
         });
-    
-        return () => {
-          eventEmitter.off('refresh');
+    }, []);
+
+         const loadData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            initializeData();
+        } catch (error) {
+            console.error("Error loading data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [initializeData]);
+
+          useEffect(() => {
+        loadData();
+    }, [loadData]);
+
+    useEffect(() => {
+        const refreshHandler = () => {
+            loadData();
         };
-      }, [eventEmitter]);
-    
-       
+        eventEmitter.on('refresh', refreshHandler);
+        return () => {
+            eventEmitter.off('refresh', refreshHandler);
+        };
+    }, [eventEmitter, loadData]);
+
+      
       const handleFilterChange = (event) => {
         const { name, value } = event.target;
         setFiltros({
@@ -151,6 +170,10 @@ const Ganancias = ({ eventEmitter }) => {
         { label: "Peso Final", accessor: "PesoFinal",width:"12%" },
         { label: "Ganancia", accessor: "Ganancia",width:"12%" },
        ];
+
+   if (isLoading) {
+        return <div>Cargando...</div>;
+    }
 
     return (
       
