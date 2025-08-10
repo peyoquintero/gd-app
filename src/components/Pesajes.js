@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
 import { filteredGData } from "./Helpers";
+import { dataService } from "../services/DataService";
 
 const Pesajes = ({ eventEmitter }) => {
   const columns = [
@@ -17,9 +18,12 @@ const Pesajes = ({ eventEmitter }) => {
   const [hisPesajes, setHispesajes] = useState([]);
   const [fechasPesaje, setFechasPesaje] = useState([]);
   const [captions, setCaptions] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const initializeData = () => {
-    let allPesajes = JSON.parse(localStorage.getItem("spreadsheetData"));
+  const initializeData = useCallback(() => {
+    let allPesajes = dataService.getCachedData();
+    if (!allPesajes) return;
+
     allPesajes = allPesajes.filter(
       (w) =>
         w.Codigo &&
@@ -48,36 +52,40 @@ const Pesajes = ({ eventEmitter }) => {
         ? `Ultimos 100 - Total: ${allPesajes.length} `
         : "No hay datos disponibles"
     );
-  };
+  }, []);
+
+ const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      initializeData();
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [initializeData]);
+
 
   useEffect(() => {
-    initializeData();
-  }, []);
+    loadData();
+  }, [loadData]);
 
   useEffect(() => {
     const refreshHandler = () => {
-      initializeData();
+      loadData();
     };
     eventEmitter.on("refresh", refreshHandler);
-
     return () => {
       eventEmitter.off("refresh", refreshHandler);
     };
-  }, [eventEmitter]);
+  }, [eventEmitter, loadData]);
+
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
     setFiltros({
       ...filtros,
       [name]: value,
-    });
-  };
-
-  const handleCheckboxChange = (event) => {
-    const { name } = event.target;
-    setFiltros({
-      ...filtros,
-      [name]: event.target.checked,
     });
   };
 
@@ -150,6 +158,10 @@ const Pesajes = ({ eventEmitter }) => {
 
     setCaptions(comment);
   };
+
+    if (isLoading) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <div className="container">

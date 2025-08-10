@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table"
 import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias} from "./Helpers"
-import { useNetwork } from "../hooks/useNetwork";
 import { dataService } from "../services/DataService";
-import "../App.css"; // Add this import
+import "../App.css"; 
 
 const Ganancias = ({ eventEmitter }) => {
     const [filtros, setFiltros] = useState({
@@ -23,7 +22,6 @@ const Ganancias = ({ eventEmitter }) => {
     const [fechasPesaje,setFechasPesaje] = useState([])
     const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
     const [isLoading, setIsLoading] = useState(false);
-    const { online } = useNetwork();
 
     const [captions,setCaptions] = useState({
         resultCabezas : "",
@@ -116,50 +114,70 @@ const Ganancias = ({ eventEmitter }) => {
         });
       };
 
-      const applyFilters = (event) => {
+    const applyFilters = (event) => {
+          // Start with fresh data each time
+          let hispesajesFiltered = [...hisPesajes].filter(pesaje => 
+              !['CORRECCION', 'MUERTE'].includes(pesaje.Operacion?.toUpperCase())
+          );
 
-        let hispesajesFiltered = hisPesajes.filter(pesaje=>!['CORRECCION','MUERTE'].includes(pesaje.Operacion?.toUpperCase())); 
-        if (filtros.filtroMarca!=="*" && filtros.filtroMarca!=="") 
-        {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Marca===filtros.filtroMarca.trim()); 
-        }
+          // Apply marca filter
+          if (filtros.filtroMarca !== "*" && filtros.filtroMarca !== "") {
+              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+                  pesaje.Marca === filtros.filtroMarca.trim()
+              );
+          }
 
-        if (filtros.filtroCodigo!=="")
-        {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())); 
-        }
+          // Apply codigo filter
+          if (filtros.filtroCodigo !== "") {
+              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+                  pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())
+              );
+          }
 
-        if (filtros.filtroChapeta!=="")
-        {
-          hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Chapeta.startsWith(filtros.filtroChapeta.trim())); 
-        }
+          // Apply chapeta filter
+          if (filtros.filtroChapeta !== "") {
+              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+                  pesaje.Chapeta.startsWith(filtros.filtroChapeta.trim())
+              );
+          }
 
-        let gridDataResults = ganancias(hispesajesFiltered,filtros.fechaInicial,filtros.fiExacta,filtros.fechaFinal,filtros.ffExacta,filtros.filtroVentas);
+          // Calculate ganancias with filtered data
+          let gridDataResults = ganancias(
+              hispesajesFiltered,
+              filtros.fechaInicial,
+              filtros.fiExacta,
+              filtros.fechaFinal,
+              filtros.ffExacta,
+              filtros.filtroVentas
+          );
 
-        gridDataResults = gridDataResults.map((obj,index) => ({ ...obj, id: index }))
+          // Add IDs
+          gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
 
-        setGridData(gridDataResults);  
+          // Apply peso filter if needed
+          if (filtros.filtroPeso !== "*" && filtros.filtroPeso.trim() !== "") {
+              const array = filtros.filtroPeso.split("-");
+              if (array.length === 2) {
+                  gridDataResults = gridDataResults.filter(pesaje => 
+                      parseInt(pesaje.PesoInicial) >= parseInt(array[0]) && 
+                      parseInt(pesaje.PesoInicial) <= parseInt(array[1])
+                  );
+              }
+          }
 
-        if (filtros.filtroPeso!=="*" && filtros.filtroPeso.trim()!=="") 
-        {
-          const array=filtros.filtroPeso.split("-");
-          if (array.length===2)
-          { 
-            gridDataResults = gridDataResults.filter(pesaje=>parseInt(pesaje.PesoInicial)>=parseInt(array[0]) && parseInt(pesaje.PesoInicial)<=parseInt(array[1]));
-          } 
-        }    
-
-        let scrubbedData = cleanData(gridDataResults,-1000,2000);
-        
-        setCaptions({
-        resultGanancia : captionGanancia(scrubbedData),
-        resultCabezas : captionCabezas(scrubbedData.length,gridDataResults.length),
-        resultUltPeso : captionUltPeso(scrubbedData),
-        resultDias : captionDias(scrubbedData),
-        resultMedia : captionMedia(scrubbedData)
-        })
-
-      }
+          // Clean data and update state
+          let scrubbedData = cleanData(gridDataResults, -1000, 2000);
+          setGridData(gridDataResults);
+          
+          // Update captions
+          setCaptions({
+              resultGanancia: captionGanancia(scrubbedData),
+              resultCabezas: captionCabezas(scrubbedData.length, gridDataResults.length),
+              resultUltPeso: captionUltPeso(scrubbedData),
+              resultDias: captionDias(scrubbedData),
+              resultMedia: captionMedia(scrubbedData)
+          });
+     };
 
       const columns = [
         { label: "Codigo", accessor: "Codigo",width:"12%" },
@@ -175,7 +193,7 @@ const Ganancias = ({ eventEmitter }) => {
         return <div>Cargando...</div>;
     }
 
-    return (
+ return (
       
   <div className="container">
       <section>
@@ -213,7 +231,7 @@ const Ganancias = ({ eventEmitter }) => {
           <input  type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
         </label>
         <label className="center-label" >Ventas 
-          <input   type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleFilterChange}/>
+          <input   type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleCheckboxChange}/>
         </label>
         
         </section>

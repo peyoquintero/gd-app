@@ -3,7 +3,6 @@ import Table from "./Table";
 import { getInventario, groupByFechaOperacion } from "./HelperInventario";
 import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
-import { useNetwork } from "../hooks/useNetwork";
 import "../App.css"; 
 
 const Inventario = ({ eventEmitter }) => {
@@ -34,8 +33,6 @@ const Inventario = ({ eventEmitter }) => {
   const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const { online } = useNetwork();
 
   const handleChange = useCallback((event) => {
     setSelectedOption(event.target.value);
@@ -154,9 +151,6 @@ const Inventario = ({ eventEmitter }) => {
         <label style={{ marginLeft: "30px", marginTop: "20px" }}>
           {selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}
         </label>
-        <div className="connection-status">
-          {online ? "🟢 En línea" : "🔴 Fuera de línea"}
-        </div>
       </section>
 
       <section>
