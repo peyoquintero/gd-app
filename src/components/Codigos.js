@@ -44,12 +44,14 @@ const Codigos = ({ eventEmitter }) => {
    },[]);
 
    useEffect(() => {
-    eventEmitter.on('refresh', () => {
+    const refreshHandler = () => {
       initializeData();
-    });
+    };
+
+    eventEmitter.on('refresh', refreshHandler);
 
     return () => {
-      eventEmitter.off('refresh');
+      eventEmitter.off('refresh', refreshHandler);
     };
   }, [eventEmitter]);
 

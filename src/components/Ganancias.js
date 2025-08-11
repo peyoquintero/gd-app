@@ -200,7 +200,7 @@ const Ganancias = ({ eventEmitter }) => {
         <div className="filter-group">
           <label>Codigo</label>
           <input 
-            className="freeinput" 
+            className="freeinputsmall" 
             name="filtroCodigo" 
             placeholder="Codigo" 
             onChange={handleFilterChange}
@@ -210,7 +210,7 @@ const Ganancias = ({ eventEmitter }) => {
           <label>Chapeta</label>
           <input 
             id="chapeta" 
-            className="freeinput" 
+            className="freeinputsmall" 
             name="filtroChapeta" 
             onChange={handleFilterChange} 
             value={filtros.filtroChapeta}
@@ -230,7 +230,7 @@ const Ganancias = ({ eventEmitter }) => {
           <label>Rango Peso</label>
           <input 
             id="pesoI" 
-            className="freeinput" 
+            className="freeinputsmall" 
             name="filtroPeso" 
             onChange={handleFilterChange}
           />
@@ -241,7 +241,6 @@ const Ganancias = ({ eventEmitter }) => {
         <div className="filter-group">
           <label>Fecha Inicial</label>
           <select 
-            className="freeinput" 
             name="fechaInicial" 
             onChange={handleFilterChange}
           >
@@ -254,7 +253,6 @@ const Ganancias = ({ eventEmitter }) => {
         <div className="filter-group">
           <label>Fecha Final</label>
           <select 
-            className="freeinput" 
             name="fechaFinal" 
             onChange={handleFilterChange} 
             value={filtros.fechaFinal}

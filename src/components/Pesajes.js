@@ -76,43 +76,74 @@ const Pesajes = ({ eventEmitter }) => {
     }));
   };
 
-  const handleCheckboxChange = (event) => {
-    setFiltros((prev) => ({
-      ...prev,
-      filtroExacto: event.target.checked,
-    }));
-  };
-
-  const applyFilters = () => {
-    let filteredData = [...hisPesajes];
-
+  const applyFilters = (event) => {
+    let filteredData = filteredGData(
+      hisPesajes,
+      filtros.filtroGeneral,
+      "Peso",
+      filtros.filtroExacto
+    );
+    if (filtros.filtroCodigo.trim() !== "") {
+      const codeFilter = filtros.filtroCodigo.trim().toUpperCase();
+      switch (filtros.filtroExacto) {
+        case "starts":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().startsWith(codeFilter)
+          );
+          break;
+        case "ends":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().endsWith(codeFilter)
+          );
+          break;
+        case "contains":
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().includes(codeFilter)
+          );
+          break;
+        case "none":
+        default:
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase() === codeFilter
+          );
+          break;
+      }
+    }
+    if (filtros.filtroChapeta.trim() !== "") {
+      filteredData = filteredData.filter(
+        (w) =>
+          (filtros.filtroExacto === "none" &&
+            w.Chapeta?.toUpperCase() ===
+              filtros.filtroChapeta?.trim().toUpperCase()) ||
+          (filtros.filtroExacto === "starts" &&
+            w.Chapeta?.toUpperCase().startsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
+          (filtros.filtroExacto === "ends" &&
+            w.Chapeta?.toUpperCase().endsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
+          (filtros.filtroExacto === "contains" &&
+            w.Chapeta?.toUpperCase().includes(filtros.filtroChapeta?.trim().toUpperCase()))
+      );
+    }
     if (filtros.fechaControl) {
-      filteredData = filteredData.filter((w) => w.Fecha === filtros.fechaControl);
-    }
-
-    if (filtros.filtroCodigo) {
-      filteredData = filteredData.filter((w) =>
-        w.Codigo.startsWith(filtros.filtroCodigo.trim())
-      );
-    }
-
-    if (filtros.filtroChapeta) {
-      filteredData = filteredData.filter((w) =>
-        w.Chapeta.startsWith(filtros.filtroChapeta.trim())
-      );
-    }
-
-    if (filtros.filtroGeneral.length > 1) {
-      filteredData = filteredGData(
-        filteredData,
-        filtros.filtroGeneral,
-        "Peso",
-        filtros.filtroExacto
+      filteredData = filteredData.filter(
+        (w) => w.Fecha === filtros.fechaControl
       );
     }
 
     setGridData(filteredData);
-    setCaptions(`Total: ${filteredData.length}`);
+    let comment = `Total: ${filteredData.length}`;
+
+    if (
+      filtros.fechaControl &&
+      filteredData.length &&
+      filteredData.every((w) => w.Peso > 0)
+    ) {
+      const average =
+        filteredData.reduce((acc, cur) => acc + parseInt(cur.Peso), 0) /
+        filteredData.length;
+      comment = comment + ` Promedio: ${average.toFixed(2)}`;
+    }
+
+    setCaptions(comment);
   };
 
   if (isLoading) {
@@ -126,7 +157,7 @@ const Pesajes = ({ eventEmitter }) => {
           <div className="filter-group">
             <label>Codigo</label>
             <input
-              className="freeinput"
+              className="freeinputsmall"
               name="filtroCodigo"
               onChange={handleFilterChange}
               value={filtros.filtroCodigo}
@@ -135,7 +166,7 @@ const Pesajes = ({ eventEmitter }) => {
           <div className="filter-group">
             <label>Chapeta</label>
             <input
-              className="freeinput"
+              className="freeinputsmall"
               name="filtroChapeta"
               onChange={handleFilterChange}
               value={filtros.filtroChapeta}
@@ -144,7 +175,7 @@ const Pesajes = ({ eventEmitter }) => {
           <div className="filter-group">
             <label>General</label>
             <input
-              className="freeinput"
+              className="freeinputsmall"
               name="filtroGeneral"
               onChange={handleFilterChange}
               value={filtros.filtroGeneral}
@@ -153,7 +184,6 @@ const Pesajes = ({ eventEmitter }) => {
           <div className="filter-group">
             <label>Fecha</label>
             <select
-              className="freeinput"
               name="fechaControl"
               onChange={handleFilterChange}
               value={filtros.fechaControl || ""}
@@ -165,15 +195,20 @@ const Pesajes = ({ eventEmitter }) => {
               ))}
             </select>
           </div>
-          <label className="center-label">
-            Exacto
-            <input
-              type="checkbox"
-              onChange={handleCheckboxChange}
-              checked={filtros.filtroExacto}
-            />
-          </label>
-          <button onClick={applyFilters}>Ok</button>
+          <div className="filter-group">
+        <label>Comparación</label>
+          <select
+            name="filtroExacto"
+            onChange={handleFilterChange}
+            value={filtros.filtroExacto ?? "none"}
+          >
+            <option value="none">Ninguno</option>
+            <option value="starts">Empieza con</option>
+            <option value="ends">Termina con</option>
+            <option value="contains">Contiene</option>
+          </select>
+        </div>
+         <button onClick={applyFilters}>Ok</button>
         </div>
       </section>
 

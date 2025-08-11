@@ -21,6 +21,7 @@ const Ayuda = ({ eventEmitter }) => {
   });
   const [gridDups, setGridDups] = useState([]);
   const [gridMuertes, setGridMuertes] = useState([]);
+  const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOptionChange = useCallback((event) => {
@@ -38,9 +39,15 @@ const Ayuda = ({ eventEmitter }) => {
     }));
   }, []);
 
-  const refreshData = useCallback((allPesajes) => {
-    if (!allPesajes?.length) return;
+  const initializeData = useCallback(() => {
+    let allPesajes = dataService.getCachedData();
+    if (!allPesajes) return;
 
+    // Filter and clean data similar to Ganancias.js
+    allPesajes = allPesajes.filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"));
+    setHisPesajes(allPesajes);
+
+    // Process data for grids
     setGridDups(resurrect(allPesajes));
     const muertes = allPesajes
       .filter(w => w.Operacion?.toUpperCase().trim() === 'MUERTE')
@@ -51,20 +58,28 @@ const Ayuda = ({ eventEmitter }) => {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = dataService.getCachedData();
-      if (data) {
-        refreshData(data);
-      }
+      initializeData();
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [refreshData]);
+  }, [initializeData]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (hisPesajes.length > 0) {
+      // Refresh processed data when raw data changes
+      setGridDups(resurrect(hisPesajes));
+      const muertes = hisPesajes
+        .filter(w => w.Operacion?.toUpperCase().trim() === 'MUERTE')
+        .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+      setGridMuertes(muertes);
+    }
+  }, [hisPesajes]);
 
   useEffect(() => {
     const refreshHandler = () => {

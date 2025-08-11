@@ -1,80 +1,71 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
-import { getInventario } from "./HelperInventario";
+import { getInventario, groupByFechaOperacion } from "./HelperInventario";
 import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
-import "../App.css";
+import "../App.css"; 
 
 const Inventario = ({ eventEmitter }) => {
   const columns = [
-    { label: "Codigo", accessor: "Codigo", width: "12%" },
-    { label: "Chapeta", accessor: "Chapeta", width: "12%" },
-    { label: "Fecha Inicial", accessor: "FechaInicial", width: "20%" },
-    { label: "Fecha Final", accessor: "FechaFinal", width: "20%" },
-    { label: "Peso Inicial", accessor: "PesoInicial", width: "12%" },
-    { label: "Peso Final", accessor: "PesoFinal", width: "12%" },
-    { label: "Ganancia", accessor: "Ganancia", width: "12%" },
+    { label: "Fecha", accessor: "Fecha", width: "20%" },
+    { label: "Operacion", accessor: "Operacion", width: "25%" },
+    { label: "Chapeta", accessor: "Chapeta", width: "15%" },
+    { label: "Marca", accessor: "Marca", width: "10%" },
+    { label: "Total", accessor: "Total", width: "15%" },
+    { label: "Vendidos", accessor: "Vendidos", width: "15%" },
   ];
 
-  const [filtros, setFiltros] = useState({
-    filtroBuscar: "",
-    filtroExacto: true,
-    selectedOption: "cabezas",
-  });
-  const [gridData, setGridData] = useState([]);
+  const columnsInventario = [
+    { label: "Codigo", accessor: "Codigo", width: "15%" },
+    { label: "Marca", accessor: "Marca", width: "10%" },
+    { label: "Chapeta", accessor: "Chapeta", width: "10%" },
+    { label: "F.Compra", accessor: "FechaCompra", width: "18%" },
+    { label: "Peso Inicial", accessor: "PesoInicial", width: "10%" },
+    { label: "Ult. Control", accessor: "FechaUltimoControl", width: "17%" },
+    { label: "Ultimo Peso", accessor: "PesoFinal", width: "10%" },
+    { label: "PRY", accessor: "Proyeccion", width: "10%" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("cabezas");
+  const [filtroBuscar, setFiltroBuscar] = useState("");
+  const [filtroExacto, setFiltroExacto] = useState(true);
+  const [gridMovimientos, setGridMovimientos] = useState([]);
+  const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFilterChange = useCallback(
-    (event) => {
-      const { name, value } = event.target;
-      setFiltros((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    },
-    []
-  );
+  const handleChange = useCallback((event) => {
+    setSelectedOption(event.target.value);
+  }, []);
 
-  const handleCheckboxChange = useCallback(
-    (event) => {
-      setFiltros((prev) => ({
-        ...prev,
-        filtroExacto: event.target.checked,
-      }));
-    },
-    []
-  );
+  const handleFilterChange = useCallback((event) => {
+    setFiltroBuscar(event.target.value);
+  }, []);
 
-  const handleOptionChange = useCallback(
-    (event) => {
-      setFiltros((prev) => ({
-        ...prev,
-        selectedOption: event.target.value,
-      }));
-    },
-    []
-  );
+  const handleCheckboxChange = useCallback((event) => {
+    setFiltroExacto(event.target.checked);
+  }, []);
 
-  const refreshData = useCallback(
-    (allPesajes) => {
-      if (!allPesajes?.length) return;
+  const refreshData = useCallback((allPesajes) => {
+    if (!allPesajes?.length) return;
 
-      let filteredData = allPesajes;
-      if (filtros.filtroBuscar.length > 1) {
-        filteredData = filteredGData(
-          filteredData,
-          filtros.filtroBuscar,
-          "Peso",
-          filtros.filtroExacto
-        );
-      }
+    let filteredData = allPesajes;
+    if (filtroBuscar.length > 1) {
+      filteredData = filteredGData(filteredData, filtroBuscar, "Peso", filtroExacto);
+    }
 
-      const inventario = getInventario(filteredData);
-      setGridData(inventario);
-    },
-    [filtros]
-  );
+    let movimientos = filteredData
+      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL")
+      .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+
+    if (movimientos?.length) {
+      let movimientosByFecha = groupByFechaOperacion(movimientos);
+      setGridMovimientos(movimientosByFecha);
+
+      let inventario = getInventario(filteredData);
+      setGridInventario(inventario);
+    }
+  }, [filtroBuscar, filtroExacto]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -110,65 +101,71 @@ const Inventario = ({ eventEmitter }) => {
   }, [eventEmitter, loadData]);
 
   if (isLoading) {
-    return <div>Cargando...</div>;
+    return <div className="loading">Cargando...</div>;
   }
 
   return (
     <div>
       <section className="filter-section">
         <div className="filters-row">
-          <div className="radio-container">
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="selectedOption"
-                value="movimientos"
-                checked={filtros.selectedOption === "movimientos"}
-                onChange={handleOptionChange}
-              />
-              Movimientos
-            </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="selectedOption"
-                value="cabezas"
-                checked={filtros.selectedOption === "cabezas"}
-                onChange={handleOptionChange}
-              />
-              Inventario Actual
-            </label>
+          <div className="filter-group">
+            <div className="radio-container" onChange={handleChange}>
+              <label className="ayudaLabel">
+                <input
+                  type="radio"
+                  name="details"
+                  value="cabezas"
+                  checked={selectedOption === "cabezas"}
+                />
+                Inventario Actual
+              </label>
+              <label className="ayudaLabel">
+                <input
+                  type="radio"
+                  name="details"
+                  value="movimientos"
+                  checked={selectedOption === "movimientos"}
+                />
+                Movimientos
+              </label>
+            </div>
           </div>
           <div className="filter-group">
             <label>Buscar</label>
             <input
-              className="freeinput"
-              name="filtroBuscar"
+              className="freeinputsmall"
+              name="filtroGeneral"
               onChange={handleFilterChange}
-              value={filtros.filtroBuscar}
+              value={filtroBuscar}
             />
           </div>
-          <label className="center-label">
-            Exacto
+          <div className="filter-group">
+            <label>Exacto</label>
             <input
               type="checkbox"
+              id="checkboxFE"
+              name="filtroExacto"
               onChange={handleCheckboxChange}
-              checked={filtros.filtroExacto}
+              checked={filtroExacto}
             />
-          </label>
+          </div>
         </div>
       </section>
 
       <section className="totals">
         <label>
-          {filtros.selectedOption === "movimientos"
-            ? ""
-            : `Total: ${gridData.length}`}
+          {selectedOption === "movimientos"
+            ? `Movimientos: ${gridMovimientos.length}`
+            : `Total Inventario: ${gridInventario.length}`}
         </label>
       </section>
 
       <section className="table-container">
-        <Table data={gridData} columns={columns} />
+        {selectedOption === "movimientos" ? (
+          <Table data={gridMovimientos} columns={columns} />
+        ) : (
+          <Table data={gridInventario} columns={columnsInventario} />
+        )}
       </section>
     </div>
   );

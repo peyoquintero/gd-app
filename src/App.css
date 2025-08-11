@@ -44,7 +44,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   width: 100%;
-  max-width: 200px;
+  max-width: 60px;
+  max-height: 12px;
 }
 
 label {
@@ -111,7 +112,7 @@ label {
 /* Refresh button */
 .refresh-button {
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: 2px;
   border: none;
   cursor: pointer;
 }
@@ -151,9 +152,10 @@ section {
   margin-top: 0.5rem;
   background-color: #f8f9fa;
   border-radius: 4px;
+  max-height:12px;
 }
 input{ 
-  height:20px;
+  max-height:12px;
   margin-top: 3px;
 }
 label{
@@ -162,6 +164,7 @@ label{
   font-weight: bold;
   margin: 5px;
   display:block;
+  max-height:12px;
   text-align: center;
 }
 .center-label{
@@ -170,15 +173,9 @@ label{
   gap: 0.25rem;
   margin-bottom: 0.5rem;
 }
-.freeinput{
-  width:120px;
-  height:25px;
-  padding: 2px 5px;
-  margin-top: 3px;
-}
 .freeinputsmall{
-  width:80px;
-  height:25px;
+  width:50px;
+  max-height:12px;
   padding: 2px 5px;
   margin-top: 3px;
 }
