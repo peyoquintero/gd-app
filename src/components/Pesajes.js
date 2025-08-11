@@ -152,7 +152,7 @@ const Pesajes = ({ eventEmitter }) => {
 
   return (
     <div>
-      <section className="filter-section">
+      <section className="filter-section pesajes-filters">
         <div className="filters-row">
           <div className="filter-group">
             <label>Codigo</label>

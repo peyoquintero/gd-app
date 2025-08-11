@@ -106,20 +106,21 @@ const Inventario = ({ eventEmitter }) => {
 
   return (
     <div>
-      <section className="filter-section">
+      <section className="filter-section inventario-filters">
         <div className="filters-row">
-          <div className="filter-group">
-            <div className="radio-container" onChange={handleChange}>
-              <label className="ayudaLabel">
+          <div className="filter-group radio-filter-group">
+            <label>Vista</label>
+            <div className="radio-container-compact" onChange={handleChange}>
+              <label className="radio-label-compact">
                 <input
                   type="radio"
                   name="details"
                   value="cabezas"
                   checked={selectedOption === "cabezas"}
                 />
-                Inventario Actual
+                Inventario
               </label>
-              <label className="ayudaLabel">
+              <label className="radio-label-compact">
                 <input
                   type="radio"
                   name="details"
@@ -139,7 +140,7 @@ const Inventario = ({ eventEmitter }) => {
               value={filtroBuscar}
             />
           </div>
-          <div className="filter-group">
+          <div className="filter-group checkbox-group">
             <label>Exacto</label>
             <input
               type="checkbox"
