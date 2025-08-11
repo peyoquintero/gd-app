@@ -194,60 +194,96 @@ const Ganancias = ({ eventEmitter }) => {
     }
 
  return (
-      
-  <div className="container">
-      <section>
-      <section>
-        <label>Codigo
-          <input style={{display:'block'}}  className="freeinput" name="filtroCodigo" placeholder="Codigo" onChange={handleFilterChange}/>
-        </label>
-        <label>Chapeta 
-          <input style={{display:'block'}} id="chapeta" className="freeinput" name="filtroChapeta" 
-          onChange={handleFilterChange} value={filtros.filtroChapeta}/>
-        </label>
-        <label>Marca 
-          <input style={{display:'block'}} id="marca" className="freeinputsmall" name="filtroMarca" 
-          onChange={handleFilterMarcaChange} value={filtros.filtroMarca}/>
-        </label>
-        <label>Rango Peso 
-          <input style={{display:'block'}} id="pesoI" className="freeinput" name="filtroPeso" onChange={handleFilterChange}/>
-        </label>
-        </section>
-        <section>
-        <label style={{marginLeft:'5px'}}>Fecha Inicial
-          <select style={{display:'block', width:'100px', height:'25px'}} className="freeinput" name="fechaInicial" onChange={handleFilterChange}>
-          {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
+  <div>
+    <section className="filter-section">
+      <div className="filters-row">
+        <div className="filter-group">
+          <label>Codigo</label>
+          <input 
+            className="freeinput" 
+            name="filtroCodigo" 
+            placeholder="Codigo" 
+            onChange={handleFilterChange}
+          />
+        </div>
+        <div className="filter-group">
+          <label>Chapeta</label>
+          <input 
+            id="chapeta" 
+            className="freeinput" 
+            name="filtroChapeta" 
+            onChange={handleFilterChange} 
+            value={filtros.filtroChapeta}
+          />
+        </div>
+        <div className="filter-group">
+          <label>Marca</label>
+          <input 
+            id="marca" 
+            className="freeinputsmall" 
+            name="filtroMarca" 
+            onChange={handleFilterMarcaChange} 
+            value={filtros.filtroMarca}
+          />
+        </div>
+        <div className="filter-group">
+          <label>Rango Peso</label>
+          <input 
+            id="pesoI" 
+            className="freeinput" 
+            name="filtroPeso" 
+            onChange={handleFilterChange}
+          />
+        </div>
+      </div>
+
+      <div className="date-filters">
+        <div className="filter-group">
+          <label>Fecha Inicial</label>
+          <select 
+            className="freeinput" 
+            name="fechaInicial" 
+            onChange={handleFilterChange}
+          >
+            {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
           </select>
+        </div>
+        <label className="center-label">
+          =<input type="checkbox" name="fiExacta" onChange={handleCheckboxChange}/>
         </label>
-        <label className="center-label" style={{fontSize: '14px'}}>=
-          <input style={{marginTop:'2px'}} type="checkbox" id="checkbox1" name="fiExacta" onChange={handleCheckboxChange}/>
-        </label>
-        <label>Fecha Final
-          <select style={{display:'block', width:'100px', height:'25px'}} className="freeinput" name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
-            {fechasPesajeDesc.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)} 
+        <div className="filter-group">
+          <label>Fecha Final</label>
+          <select 
+            className="freeinput" 
+            name="fechaFinal" 
+            onChange={handleFilterChange} 
+            value={filtros.fechaFinal}
+          >
+            {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)} 
           </select>
+        </div>
+        <label className="center-label">
+          =<input type="checkbox" name="ffExacta" onChange={handleCheckboxChange}/>
         </label>
-        <label className="center-label" style={{fontSize: '14px'}}>=
-          <input  type="checkbox" id="checkbox2" name="ffExacta" onChange={handleCheckboxChange}/>
+        <label className="center-label">
+          Ventas<input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
         </label>
-        <label className="center-label" >Ventas 
-          <input   type="checkbox" id="checkbox3" name="filtroVentas" onChange={handleCheckboxChange}/>
-        </label>
-        
-        </section>
-        <button style={{ marginLeft: '5px'}} onClick={applyFilters}>Ok</button>
-      </section>      
-      <section className="totals">
-      <label >{captions.resultCabezas}</label> 
+        <button onClick={applyFilters}>Ok</button>
+      </div>
+    </section>
+
+    <section className="totals">
+      <label>{captions.resultCabezas}</label> 
       <label>{captions.resultGanancia}</label> 
       <label>{captions.resultMedia}</label>   
       <label>{captions.resultUltPeso}</label>
       <label>{captions.resultDias}</label> 
-      </section>
-      
-        <Table data={gridData} columns={columns}></Table>
-      
-      </div>
+    </section>
+
+    <section className="table-container">
+      <Table data={gridData} columns={columns} />
+    </section>
+  </div>
     
     );
   };

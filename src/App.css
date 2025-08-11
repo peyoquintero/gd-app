@@ -1,18 +1,136 @@
 @media (min-width:993px) and (max-width:1920px) {
   body{max-width:50%; margin-left: auto; margin-right: auto;background-color:darkgray;}
 }
+/* Main layout containers */
 .main-container {
-  display:flex;
-  flex-direction:row;
-  justify-content: center;
-  width: 100%; 
+  min-height: 100vh;
+  background-color: #f8f9fa;
 }
-.container {
-  display:flex;
-  flex-direction:column;
-  justify-content: center;
-  width: 100%; 
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+.routes-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Component specific layouts */
+.main-container section {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Controls and filters section */
+.controls-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Form controls */
+.freeinput {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 200px;
+}
+
+label {
+  display: inline-block;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Filter sections in components */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+.date-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+/* Table container */
+.table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+/* Connection status */
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.last-update {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Refresh button */
+.refresh-button {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.refresh-button.online {
+  background-color: #28a745;
+  color: white;
+}
+
+.refresh-button.offline {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Fix for Routes container */
+.main-container > div:nth-child(2) {
+  padding: 1rem;
+}
+
 section {
   display: flex;
   justify-content: center;
@@ -28,9 +146,11 @@ section {
 }
 .totals{
   display:flex;
-  justify-content: space-evenly;
-  margin-top:5px;
-  background-color:white;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
 }
 input{ 
   height:20px;
@@ -45,18 +165,21 @@ label{
   text-align: center;
 }
 .center-label{
-  display:flex;
+  display: flex;
   align-items: center;
-  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 .freeinput{
-  width:60px;
-  height:20px;
+  width:120px;
+  height:25px;
+  padding: 2px 5px;
   margin-top: 3px;
 }
 .freeinputsmall{
-  width:30px;
-  height:20px;
+  width:80px;
+  height:25px;
+  padding: 2px 5px;
   margin-top: 3px;
 }
 button{
@@ -161,12 +284,20 @@ input[type="text"] {
 .radio-container{
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-family: arial;
-    font-size: 12px;
-    height:40px;
-    margin-top: 15px;
-   }     
+    gap: 1.5rem;
+    margin-right: 1rem;
+}     
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.radio-label input[type="radio"] {
+  margin: 0;
+}
   .navbar{
     font-size: 14px;
     font-family: Arial;
@@ -241,3 +372,52 @@ input[type="text"] {
   .refresh-button-offline:hover{
     background-color:rgb(170, 83, 97);
   }
+.status-indicator {
+  position: relative;
+  cursor: help;
+}
+
+.status-tooltip {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-top: 5px;
+}
+
+.status-indicator:hover .status-tooltip {
+  display: block;
+}
+
+/* Add a small triangle pointer to the tooltip */
+.status-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+}
+.content-section {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.version-info {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  color: #666;
+}

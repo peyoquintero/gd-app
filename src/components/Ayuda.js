@@ -1,88 +1,159 @@
-import React, { useState,useEffect } from "react";
-import IntegerMatrix from "./Matrix"
+import React, { useState, useEffect, useCallback } from "react";
+import IntegerMatrix from "./Matrix";
 import Table from "./Table";
-import {resurrect} from "./Helpers"
-import Duplicados from "./Duplicados"
-import  Codigos  from "./Codigos";
+import { resurrect } from "./Helpers";
+import Duplicados from "./Duplicados";
+import Codigos from "./Codigos";
+import { dataService } from "../services/DataService";
+import "../App.css";
 
 const Ayuda = ({ eventEmitter }) => {
-   
-    const [filtros,setFiltros] = useState({filtroDups:false,filtroMuertos:false});
-    const [gridDups,setGridDups] = useState([]);
-    const [gridMuertes,setGridMuertes] = useState([]);
-    const [selectedOption, setSelectedOption] = useState("");
-    const lastRefresh =  localStorage.getItem("lastRefresh");
+  const columnsMuertes = [
+    { label: "Codigo", accessor: "Codigo", width: "30%" },
+    { label: "Fecha", accessor: "Fecha", width: "40%" },
+    { label: "Marca", accessor: "Marca", width: "30%" }
+  ];
 
-    const handleChange = (event) => {
-      setSelectedOption(event.target.value);
-    };
+  const [filtros, setFiltros] = useState({
+    filtroDups: false,
+    filtroMuertos: false,
+    selectedOption: ""
+  });
+  const [gridDups, setGridDups] = useState([]);
+  const [gridMuertes, setGridMuertes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleCheckboxChange = (event) => {
-      const { name } = event.target;
-      setFiltros({
-        ...filtros,
-        [name]: event.target.checked,
-      });
-    };
+  const handleOptionChange = useCallback((event) => {
+    setFiltros(prev => ({
+      ...prev,
+      selectedOption: event.target.value
+    }));
+  }, []);
 
-    const initializeData = () => {
-      let allPesajes =  JSON.parse(localStorage.getItem("spreadsheetData"));
-      if (allPesajes?.length)
-      {
-        setGridDups(resurrect(allPesajes)) ;
-        let muertes = allPesajes.filter(w=>w.Operacion?.toUpperCase().trim()==='MUERTE')
-                      .sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha);})
-        setGridMuertes(muertes);
+  const handleCheckboxChange = useCallback((event) => {
+    const { name } = event.target;
+    setFiltros(prev => ({
+      ...prev,
+      [name]: event.target.checked
+    }));
+  }, []);
+
+  const refreshData = useCallback((allPesajes) => {
+    if (!allPesajes?.length) return;
+
+    setGridDups(resurrect(allPesajes));
+    const muertes = allPesajes
+      .filter(w => w.Operacion?.toUpperCase().trim() === 'MUERTE')
+      .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+    setGridMuertes(muertes);
+  }, []);
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = dataService.getCachedData();
+      if (data) {
+        refreshData(data);
       }
-   }
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshData]);
 
-   useEffect(()=>{
-      initializeData();
-    },[]);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
-    useEffect(() => {
-      eventEmitter.on('refresh', () => {
-        initializeData();
-      });
-  
-      return () => {
-        eventEmitter.off('refresh');
-      };
-    }, [eventEmitter]);
-  
-   const columnsMuertes = [
-    { label: "Codigo", accessor: "Codigo", width:"30%" },
-    { label: "Fecha", accessor: "Fecha", width:"40%" },
-    { label: "Marca", accessor: "Marca", width:"30%" }
-    ];
+  useEffect(() => {
+    const refreshHandler = () => {
+      loadData();
+    };
+    eventEmitter.on("refresh", refreshHandler);
+    return () => {
+      eventEmitter.off("refresh", refreshHandler);
+    };
+  }, [eventEmitter, loadData]);
 
-    return (
-        <div >
-            <section className="radio-container" onChange={handleChange}>
-              <label className="ayudaLabel"><input type="radio" name="details1" value="optionInconsistencias" checked={selectedOption === "optionInconsistencias"} />Inconsistencias</label>
-              <label className="ayudaLabel"><input type="radio" name="details2" value="optionRevisionCodigos" checked={selectedOption === "optionRevisionCodigos"} /> Revision Codigos</label>
-              <label className="ayudaLabel"><input type="radio" name="details3" value="optionDuplicados" checked={selectedOption === "optionDuplicados"} />  Duplicados </label>
-            </section>
-            <section style={{background:'rgb(249, 249, 249)'}}>
-               {((selectedOption === "optionInconsistencias") && gridDups?.length>0 ) ? <IntegerMatrix nColumns={5} integers={gridDups}></IntegerMatrix> : null}
-               {(selectedOption === "optionRevisionCodigos")?  <Codigos eventEmitter={eventEmitter}/> : null}
-               {(selectedOption === "optionDuplicados")?  <Duplicados/> : null}
-            </section>
-            <section className="title" >
-                <label className="ayudaLabel" >Muertes
-                <input  type="checkbox" id="checkboxMuertes" name= "filtroMuertos" onChange={handleCheckboxChange} />
-                </label>
-            </section>
-            <section>
-               {filtros?.filtroMuertos ? 
-                <Table data={gridMuertes} columns={columnsMuertes}></Table> :
-                 null}
-            </section>
-            <section >
-                <label style={{ fontSize:'12px', color:'GrayText'}} >Version 1.0.25 - {lastRefresh}</label>
-            </section>
+  if (isLoading) {
+    return <div className="loading">Cargando...</div>;
+  }
+
+  return (
+    <div>
+      <section className="filter-section">
+        <div className="filters-row">
+          <div className="filter-group radio-group">
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="details"
+                value="optionInconsistencias"
+                checked={filtros.selectedOption === "optionInconsistencias"}
+                onChange={handleOptionChange}
+              />
+              Inconsistencias
+            </label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="details"
+                value="optionRevisionCodigos"
+                checked={filtros.selectedOption === "optionRevisionCodigos"}
+                onChange={handleOptionChange}
+              />
+              Revision Codigos
+            </label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="details"
+                value="optionDuplicados"
+                checked={filtros.selectedOption === "optionDuplicados"}
+                onChange={handleOptionChange}
+              />
+              Duplicados
+            </label>
+          </div>
         </div>
-    )            
-}
+      </section>
+
+      <section className="content-section">
+        {filtros.selectedOption === "optionInconsistencias" && gridDups?.length > 0 && (
+          <IntegerMatrix nColumns={5} integers={gridDups} />
+        )}
+        {filtros.selectedOption === "optionRevisionCodigos" && (
+          <Codigos eventEmitter={eventEmitter} />
+        )}
+        {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
+      </section>
+
+      <section className="filter-section">
+        <div className="filter-group">
+          <label className="center-label">
+            Muertes
+            <input
+              type="checkbox"
+              name="filtroMuertos"
+              onChange={handleCheckboxChange}
+              checked={filtros.filtroMuertos}
+            />
+          </label>
+        </div>
+      </section>
+
+      {filtros.filtroMuertos && (
+        <section className="table-container">
+          <Table data={gridMuertes} columns={columnsMuertes} />
+        </section>
+      )}
+
+      <section className="version-info">
+        <label>Version 1.0.25 - {dataService.getLastUpdate()}</label>
+      </section>
+    </div>
+  );
+};
 
 export default Ayuda;

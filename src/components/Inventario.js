@@ -1,71 +1,80 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
-import { getInventario, groupByFechaOperacion } from "./HelperInventario";
+import { getInventario } from "./HelperInventario";
 import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
-import "../App.css"; 
+import "../App.css";
 
 const Inventario = ({ eventEmitter }) => {
   const columns = [
-    { label: "Fecha", accessor: "Fecha", width: "20%" },
-    { label: "Operacion", accessor: "Operacion", width: "25%" },
-    { label: "Chapeta", accessor: "Chapeta", width: "15%" },
-    { label: "Marca", accessor: "Marca", width: "10%" },
-    { label: "Total", accessor: "Total", width: "15%" },
-    { label: "Vendidos", accessor: "Vendidos", width: "15%" },
+    { label: "Codigo", accessor: "Codigo", width: "12%" },
+    { label: "Chapeta", accessor: "Chapeta", width: "12%" },
+    { label: "Fecha Inicial", accessor: "FechaInicial", width: "20%" },
+    { label: "Fecha Final", accessor: "FechaFinal", width: "20%" },
+    { label: "Peso Inicial", accessor: "PesoInicial", width: "12%" },
+    { label: "Peso Final", accessor: "PesoFinal", width: "12%" },
+    { label: "Ganancia", accessor: "Ganancia", width: "12%" },
   ];
 
-  const columnsInventario = [
-    { label: "Codigo", accessor: "Codigo", width: "15%" },
-    { label: "Marca", accessor: "Marca", width: "10%" },
-    { label: "Chapeta", accessor: "Chapeta", width: "10%" },
-    { label: "F.Compra", accessor: "FechaCompra", width: "18%" },
-    { label: "Peso Inicial", accessor: "PesoInicial", width: "10%" },
-    { label: "Ult. Control", accessor: "FechaUltimoControl", width: "17%" },
-    { label: "Ultimo Peso", accessor: "PesoFinal", width: "10%" },
-    { label: "PRY", accessor: "Proyeccion", width: "10%" },
-  ];
-
-  const [selectedOption, setSelectedOption] = useState("cabezas");
-  const [filtroBuscar, setFiltroBuscar] = useState("");
-  const [filtroExacto, setFiltroExacto] = useState(true);
-  const [gridMovimientos, setGridMovimientos] = useState([]);
-  const [gridInventario, setGridInventario] = useState([]);
+  const [filtros, setFiltros] = useState({
+    filtroBuscar: "",
+    filtroExacto: true,
+    selectedOption: "cabezas",
+  });
+  const [gridData, setGridData] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = useCallback((event) => {
-    setSelectedOption(event.target.value);
-  }, []);
+  const handleFilterChange = useCallback(
+    (event) => {
+      const { name, value } = event.target;
+      setFiltros((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    },
+    []
+  );
 
-  const handleFilterChange = useCallback((event) => {
-    setFiltroBuscar(event.target.value);
-  }, []);
+  const handleCheckboxChange = useCallback(
+    (event) => {
+      setFiltros((prev) => ({
+        ...prev,
+        filtroExacto: event.target.checked,
+      }));
+    },
+    []
+  );
 
-  const handleCheckboxChange = useCallback((event) => {
-    setFiltroExacto(event.target.checked);
-  }, []);
+  const handleOptionChange = useCallback(
+    (event) => {
+      setFiltros((prev) => ({
+        ...prev,
+        selectedOption: event.target.value,
+      }));
+    },
+    []
+  );
 
-  const refreshData = useCallback((allPesajes) => {
-    if (!allPesajes?.length) return;
+  const refreshData = useCallback(
+    (allPesajes) => {
+      if (!allPesajes?.length) return;
 
-    let filteredData = allPesajes;
-    if (filtroBuscar.length > 1) {
-      filteredData = filteredGData(filteredData, filtroBuscar, "Peso", filtroExacto);
-    }
+      let filteredData = allPesajes;
+      if (filtros.filtroBuscar.length > 1) {
+        filteredData = filteredGData(
+          filteredData,
+          filtros.filtroBuscar,
+          "Peso",
+          filtros.filtroExacto
+        );
+      }
 
-    let movimientos = filteredData
-      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL")
-      .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
-
-    if (movimientos?.length) {
-      let movimientosByFecha = groupByFechaOperacion(movimientos);
-      setGridMovimientos(movimientosByFecha);
-
-      let inventario = getInventario(filteredData);
-      setGridInventario(inventario);
-    }
-  }, [filtroBuscar, filtroExacto]);
+      const inventario = getInventario(filteredData);
+      setGridData(inventario);
+    },
+    [filtros]
+  );
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -101,68 +110,65 @@ const Inventario = ({ eventEmitter }) => {
   }, [eventEmitter, loadData]);
 
   if (isLoading) {
-    return <div className="loading">Cargando...</div>;
+    return <div>Cargando...</div>;
   }
 
   return (
     <div>
-      <section className="main-container">
-        <div className="radio-container" onChange={handleChange}>
-          <label className="ayudaLabel">
+      <section className="filter-section">
+        <div className="filters-row">
+          <div className="radio-container">
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="selectedOption"
+                value="movimientos"
+                checked={filtros.selectedOption === "movimientos"}
+                onChange={handleOptionChange}
+              />
+              Movimientos
+            </label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="selectedOption"
+                value="cabezas"
+                checked={filtros.selectedOption === "cabezas"}
+                onChange={handleOptionChange}
+              />
+              Inventario Actual
+            </label>
+          </div>
+          <div className="filter-group">
+            <label>Buscar</label>
             <input
-              type="radio"
-              name="details"
-              value="movimientos"
-              checked={selectedOption === "movimientos"}
+              className="freeinput"
+              name="filtroBuscar"
+              onChange={handleFilterChange}
+              value={filtros.filtroBuscar}
             />
-            Movimientos
-          </label>
-          <label className="ayudaLabel">
+          </div>
+          <label className="center-label">
+            Exacto
             <input
-              type="radio"
-              name="details"
-              value="cabezas"
-              checked={selectedOption === "cabezas"}
+              type="checkbox"
+              onChange={handleCheckboxChange}
+              checked={filtros.filtroExacto}
             />
-            Inventario Actual
           </label>
         </div>
-        <label input="query">
-          Buscar
-          <input
-            className="freeinput"
-            style={{ display: "block", marginLeft: "10px" }}
-            name="filtroGeneral"
-            onChange={handleFilterChange}
-            value={filtroBuscar}
-          />
-        </label>
-        <label style={{ display: "block" }}>
-          Exacto
-          <input
-            style={{ display: "block" }}
-            type="checkbox"
-            id="checkboxFE"
-            name="filtroExacto"
-            onChange={handleCheckboxChange}
-            checked={filtroExacto}
-          />
-        </label>
-        <label style={{ marginLeft: "30px", marginTop: "20px" }}>
-          {selectedOption === "movimientos" ? "" : `Total: ${gridInventario.length}`}
+      </section>
+
+      <section className="totals">
+        <label>
+          {filtros.selectedOption === "movimientos"
+            ? ""
+            : `Total: ${gridData.length}`}
         </label>
       </section>
 
-      <section>
-        {selectedOption === "movimientos" ? (
-          <div className="container">
-            <Table data={gridMovimientos} columns={columns} />
-          </div>
-        ) : (
-          <div className="container">
-            <Table data={gridInventario} columns={columnsInventario} />
-          </div>
-        )}
+      <section className="table-container">
+        <Table data={gridData} columns={columns} />
       </section>
     </div>
   );

@@ -8,10 +8,12 @@ import Inventario from "./components/Inventario";
 import Pesajes from "./components/Pesajes";
 import Ganancias from "./components/Ganancias";
 import Ayuda from "./components/Ayuda";
+import "./App.css";
 
 export function App() {
-  const eventEmitter = useMemo(() => new EventEmitter(), []); // Stable reference
+  const eventEmitter = useMemo(() => new EventEmitter(), []);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(null);
   const { online } = useNetwork();
   
   const dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
@@ -19,12 +21,27 @@ export function App() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (online && !dataService.isCacheValid()) {
-        await dataService.fetchData(dataUrl);
+      if (online) {
+        // Always try to fetch new data when online
+        const data = await dataService.fetchData(dataUrl);
+        if (data) {
+          setLastUpdate(new Date().toLocaleString());
+          eventEmitter.emit('refresh');
+        }
+      } else {
+        // When offline, just emit refresh to use cached data
+        const cachedData = dataService.getCachedData();
+        if (cachedData) {
+          eventEmitter.emit('refresh');
+        }
       }
-      eventEmitter.emit('refresh');
     } catch (error) {
       console.error("Failed to load data:", error);
+      // On error, try to use cached data
+      const cachedData = dataService.getCachedData();
+      if (cachedData) {
+        eventEmitter.emit('refresh');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -37,24 +54,39 @@ export function App() {
   return (
     <BrowserRouter>
       <div className="main-container">
-        <NavBar />
-        <button 
-          className={online ? "refresh-button-online" : "refresh-button-offline"} 
-          onClick={loadData}
-          disabled={isLoading}
-        >
-          <div className="refresh-symbol">
-            {isLoading ? "..." : "⟳"}
+        <div className="header-container">
+          <NavBar />
+          <div className="controls-container">
+            <div className="connection-status">
+              <div className="status-indicator">
+                {online ? "🟢" : "🔴"}
+                <div className="status-tooltip">
+                  {lastUpdate && `Última actualización: ${lastUpdate}`}
+                </div>
+              </div>
+            </div>
+            <button 
+              className={`refresh-button ${online ? "online" : "offline"}`}
+              onClick={loadData}
+              disabled={isLoading}
+            >
+              <div className="refresh-symbol">
+                {isLoading ? "..." : "⟳"}
+              </div>
+            </button>
           </div>
-        </button>
+        </div>
+      <div className="routes-container">
+        <Routes>
+          <Route exact path="/" element={<Inventario eventEmitter={eventEmitter} />}/>
+          <Route path="/inventario" element={<Inventario eventEmitter={eventEmitter} />}/>
+          <Route path="/pesajes" element={<Pesajes eventEmitter={eventEmitter} />}/>
+          <Route path="/ganancias" element={<Ganancias eventEmitter={eventEmitter} />}/>
+          <Route path="/ayuda" element={<Ayuda eventEmitter={eventEmitter} />}/>
+        </Routes>
       </div>
-      <Routes>
-        <Route exact path="/" element={<Inventario eventEmitter={eventEmitter} />}/>
-        <Route path="/inventario" element={<Inventario eventEmitter={eventEmitter} />}/>
-        <Route path="/pesajes" element={<Pesajes eventEmitter={eventEmitter} />}/>
-        <Route path="/ganancias" element={<Ganancias eventEmitter={eventEmitter} />}/>
-        <Route path="/ayuda" element={<Ayuda eventEmitter={eventEmitter} />}/>
-      </Routes>
+      </div>
     </BrowserRouter>
   );
 }
+

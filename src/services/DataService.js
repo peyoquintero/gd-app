@@ -11,7 +11,11 @@ export const dataService = {
       const response = await axios.get(dataUrl);
       const allPesajes = mapApiDataToPesajes(response.data);
       this.updateCache(allPesajes);
-      return allPesajes;
+      if (allPesajes?.length) {
+        this.updateCache(allPesajes);
+        return allPesajes;
+      }
+      return null;
     } catch (error) {
       console.error("Error fetching spreadsheet:", error);
       throw error;
