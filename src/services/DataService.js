@@ -32,6 +32,11 @@ export const dataService = {
     return data ? JSON.parse(data) : null;
   },
 
+  getLastUpdate (){
+    const data = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    return data ?? "NA" 
+  },
+
   isCacheValid() {
     const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
     if (!timestamp) return false;
