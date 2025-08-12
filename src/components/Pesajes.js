@@ -32,7 +32,7 @@ const Pesajes = ({ eventEmitter }) => {
     if (!allPesajes) return;
 
     allPesajes = allPesajes.filter(
-      (w) => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?")
+      (w) => w.Codigo && w.Marca && w.Operacion && w.Fecha 
     );
     setHispesajes(allPesajes);
     let allFechas = [...new Set(allPesajes.map((obj) => obj.Fecha.trim()))];
