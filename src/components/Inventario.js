@@ -16,14 +16,14 @@ const Inventario = ({ eventEmitter }) => {
   ];
 
   const columnsInventario = [
-    { label: "Codigo", accessor: "Codigo", width: "15%" },
-    { label: "Marca", accessor: "Marca", width: "10%" },
+    { label: "Codigo", accessor: "Codigo", width: "18%" },
+    { label: "Marca", accessor: "Marca", width: "8%" },
     { label: "Chapeta", accessor: "Chapeta", width: "10%" },
-    { label: "F.Compra", accessor: "FechaCompra", width: "18%" },
+    { label: "F.Compra", accessor: "FechaCompra", width: "16%" },
     { label: "Peso Inicial", accessor: "PesoInicial", width: "10%" },
-    { label: "Ult. Control", accessor: "FechaUltimoControl", width: "17%" },
+    { label: "Ult. Control", accessor: "FechaUltimoControl", width: "16%" },
     { label: "Ultimo Peso", accessor: "PesoFinal", width: "10%" },
-    { label: "PRY", accessor: "Proyeccion", width: "10%" },
+    { label: "PRY", accessor: "Proyeccion", width: "12%" },
   ];
 
   const [selectedOption, setSelectedOption] = useState("cabezas");

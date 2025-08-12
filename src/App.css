@@ -65,6 +65,25 @@ label {
   border-radius: 4px;
 }
 
+/* Mobile space maximization */
+@media (max-width: 767px) {
+  .filter-section {
+    padding: 0.125rem;
+    gap: 0.125rem;
+    margin: 0.125rem 0;
+  }
+
+  .table-container {
+    margin: 0;
+    padding: 0;
+  }
+
+  .totals {
+    padding: 0.125rem;
+    margin: 0.125rem 0;
+  }
+}
+
 .filters-row {
   display: flex;
   flex-wrap: wrap;
@@ -286,6 +305,84 @@ label {
 
 .inventario-filters .filter-group input[type="text"] {
   text-transform: uppercase;
+}
+
+/* Inventario mobile optimization - maximize space usage */
+@media (max-width: 767px) {
+  .inventario-filters {
+    padding: 0.125rem;
+    margin: 0;
+  }
+
+  .inventario-filters .filters-row {
+    gap: 0.0625rem;
+  }
+
+  .inventario-filters .filter-group {
+    min-width: 50px;
+    max-width: 70px;
+  }
+
+  .inventario-filters .radio-filter-group {
+    min-width: 85px;
+    max-width: 100px;
+  }
+
+  .inventario-filters .filter-group label {
+    font-size: 0.55rem;
+  }
+
+  .inventario-filters .filter-group input {
+    font-size: 0.65rem;
+    padding: 0.0625rem;
+    min-height: 20px;
+  }
+
+  .inventario-filters + .totals {
+    padding: 0.125rem;
+    margin: 0.125rem 0;
+    font-size: 0.65rem;
+  }
+
+  .inventario-filters + .totals + .table-container {
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inventario-filters + .totals + .table-container table {
+    width: 100%;
+    min-width: 100%;
+    font-size: 0.7rem;
+    table-layout: fixed;
+  }
+
+  .inventario-filters + .totals + .table-container table th,
+  .inventario-filters + .totals + .table-container table td {
+    padding: 0.125rem 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Ensure Codigo column is visible and properly sized */
+  .inventario-filters + .totals + .table-container table th:nth-child(1),
+  .inventario-filters + .totals + .table-container table td:nth-child(1) {
+    width: 18% !important;
+    min-width: 80px !important;
+    max-width: none !important;
+    font-weight: bold;
+    display: table-cell !important;
+    visibility: visible !important;
+  }
+
+  /* Force table to show all columns */
+  .inventario-filters + .totals + .table-container table th,
+  .inventario-filters + .totals + .table-container table td {
+    display: table-cell !important;
+    visibility: visible !important;
+  }
 }
 
 .inventario-filters .filter-group label {
