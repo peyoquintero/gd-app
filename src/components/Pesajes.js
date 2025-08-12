@@ -186,7 +186,7 @@ const Pesajes = ({ eventEmitter }) => {
               value={filtros.filtroGeneral}
             />
           </div>
-          <div className="filter-group">
+          <div className="filter-group fecha-control-group">
             <label>Fecha</label>
             <select
               name="fechaControl"

@@ -242,6 +242,15 @@ label {
     padding: 0.375rem 0.75rem;
     min-height: 32px;
   }
+
+  .pesajes-filters .fecha-control-group {
+    min-width: 140px;
+    max-width: 180px;
+  }
+
+  .pesajes-filters .fecha-control-group select {
+    min-width: 140px;
+  }
 }
 
 /* Inventario specific styles for compact radio buttons and single line layout */
@@ -348,6 +357,18 @@ label {
   .radio-label-compact input[type="radio"] {
     transform: scale(0.7);
   }
+}
+
+/* Ayuda specific styles for better separation */
+.ayuda-filters {
+  gap: 1rem;
+}
+
+.ayuda-bottom-filters {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
 }
 
 /* Table container */
@@ -511,6 +532,16 @@ label{
 
 .pesajes-filters .filter-group input[type="text"] {
   text-transform: uppercase;
+}
+
+.pesajes-filters .fecha-control-group {
+  min-width: 120px;
+  max-width: 150px;
+}
+
+.pesajes-filters .fecha-control-group select {
+  width: 100%;
+  min-width: 120px;
 }
 
 .pesajes-filters .filter-group label {

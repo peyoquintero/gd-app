@@ -105,7 +105,7 @@ const Ayuda = ({ eventEmitter }) => {
   }
 
   return (
-    <div>
+    <div className="ayuda-filters">
       <section className="filter-section">
         <div className="filters-row">
           <div className="filter-group radio-group">
@@ -139,6 +139,17 @@ const Ayuda = ({ eventEmitter }) => {
               />
               Duplicados
             </label>
+          <div className="filter-group">
+            <label>Rango Ganancias</label>
+            <input
+              type="text"
+              value={cleanDataRange}
+              onChange={handleCleanDataRangeChange}
+              placeholder="-0200/1750"
+              className="freeinputsmall"
+              style={{ width: '100px' }}
+            />
+          </div>
           </div>
         </div>
       </section>
@@ -153,7 +164,7 @@ const Ayuda = ({ eventEmitter }) => {
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
 
-      <section className="filter-section">
+      <section className="filter-section ayuda-bottom-filters">
         <div className="filters-row">
           <div className="filter-group checkbox-group">
             <label>Muertes</label>
@@ -162,17 +173,6 @@ const Ayuda = ({ eventEmitter }) => {
               name="filtroMuertos"
               onChange={handleCheckboxChange}
               checked={filtros.filtroMuertos}
-            />
-          </div>
-          <div className="filter-group">
-            <label>Rango Limpieza</label>
-            <input
-              type="text"
-              value={cleanDataRange}
-              onChange={handleCleanDataRangeChange}
-              placeholder="-0200/1750"
-              className="freeinputsmall"
-              style={{ width: '80px' }}
             />
           </div>
         </div>
