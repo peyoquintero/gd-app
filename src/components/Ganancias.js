@@ -166,7 +166,7 @@ const Ganancias = ({ eventEmitter }) => {
           }
 
           // Clean data and update state
-          let scrubbedData = cleanData(gridDataResults, -1000, 2000);
+          let scrubbedData = cleanData(gridDataResults, -200, 1750);
           setGridData(gridDataResults);
           
           // Update captions
@@ -247,25 +247,28 @@ const Ganancias = ({ eventEmitter }) => {
             {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
           </select>
         </div>
-        <label className="center-label">
-          =<input type="checkbox" name="fiExacta" onChange={handleCheckboxChange}/>
-        </label>
+        <div className="filter-group checkbox-group">
+          <label>=</label>
+          <input type="checkbox" name="fiExacta" onChange={handleCheckboxChange}/>
+        </div>
         <div className="filter-group">
           <label>Fecha Final</label>
-          <select 
-            name="fechaFinal" 
-            onChange={handleFilterChange} 
+          <select
+            name="fechaFinal"
+            onChange={handleFilterChange}
             value={filtros.fechaFinal}
           >
-            {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)} 
+            {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)}
           </select>
         </div>
-        <label className="center-label">
-          =<input type="checkbox" name="ffExacta" onChange={handleCheckboxChange}/>
-        </label>
-        <label className="center-label">
-          Ventas<input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
-        </label>
+        <div className="filter-group checkbox-group">
+          <label>=</label>
+          <input type="checkbox" name="ffExacta" onChange={handleCheckboxChange}/>
+        </div>
+        <div className="filter-group checkbox-group">
+          <label>Ventas</label>
+          <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
+        </div>
         <button onClick={applyFilters}>Ok</button>
       </div>
     </section>

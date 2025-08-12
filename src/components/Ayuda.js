@@ -145,16 +145,14 @@ const Ayuda = ({ eventEmitter }) => {
       </section>
 
       <section className="filter-section">
-        <div className="filter-group">
-          <label className="center-label">
-            Muertes
-            <input
-              type="checkbox"
-              name="filtroMuertos"
-              onChange={handleCheckboxChange}
-              checked={filtros.filtroMuertos}
-            />
-          </label>
+        <div className="filter-group checkbox-group">
+          <label>Muertes</label>
+          <input
+            type="checkbox"
+            name="filtroMuertos"
+            onChange={handleCheckboxChange}
+            checked={filtros.filtroMuertos}
+          />
         </div>
       </section>
 
