@@ -127,11 +127,19 @@ const Ganancias = ({ eventEmitter }) => {
           );
 
           // Apply marca filter
-          if (filtros.filtroMarca !== "*" && filtros.filtroMarca !== "") {
+          if (filtros.filtroMarca.startsWith("~")) {
               hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-                  pesaje.Marca === filtros.filtroMarca.trim()
+                  pesaje.Marca !== filtros.filtroMarca.trim().substring(1)
               );
           }
+          else {
+            if (filtros.filtroMarca !== "*" && filtros.filtroMarca !== "") {
+                hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+                    pesaje.Marca === filtros.filtroMarca.trim()
+                );
+            }
+          }
+
 
           // Apply codigo filter
           if (filtros.filtroCodigo !== "") {
@@ -172,7 +180,9 @@ const Ganancias = ({ eventEmitter }) => {
           }
 
           // Clean data and update state
-          let scrubbedData = cleanData(gridDataResults, -200, 1750);
+          const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
+          const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
+          let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
           setGridData(gridDataResults);
           
           // Update captions

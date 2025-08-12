@@ -19,6 +19,9 @@ const Ayuda = ({ eventEmitter }) => {
     filtroMuertos: false,
     selectedOption: ""
   });
+  const [cleanDataRange, setCleanDataRange] = useState(() => {
+    return localStorage.getItem('cleanDataRange') || '-0200/1750';
+  });
   const [gridDups, setGridDups] = useState([]);
   const [gridMuertes, setGridMuertes] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
@@ -37,6 +40,12 @@ const Ayuda = ({ eventEmitter }) => {
       ...prev,
       [name]: event.target.checked
     }));
+  }, []);
+
+  const handleCleanDataRangeChange = useCallback((event) => {
+    const value = event.target.value;
+    setCleanDataRange(value);
+    localStorage.setItem('cleanDataRange', value);
   }, []);
 
   const initializeData = useCallback(() => {
@@ -145,14 +154,27 @@ const Ayuda = ({ eventEmitter }) => {
       </section>
 
       <section className="filter-section">
-        <div className="filter-group checkbox-group">
-          <label>Muertes</label>
-          <input
-            type="checkbox"
-            name="filtroMuertos"
-            onChange={handleCheckboxChange}
-            checked={filtros.filtroMuertos}
-          />
+        <div className="filters-row">
+          <div className="filter-group checkbox-group">
+            <label>Muertes</label>
+            <input
+              type="checkbox"
+              name="filtroMuertos"
+              onChange={handleCheckboxChange}
+              checked={filtros.filtroMuertos}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Rango Limpieza</label>
+            <input
+              type="text"
+              value={cleanDataRange}
+              onChange={handleCleanDataRangeChange}
+              placeholder="-0200/1750"
+              className="freeinputsmall"
+              style={{ width: '80px' }}
+            />
+          </div>
         </div>
       </section>
 
