@@ -178,6 +178,7 @@ export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,f
     let minmaxPesajes = gananciaDiariaPesajes(results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas);
 
     var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
+    "Chapeta":w.pi.Chapeta,
     "FechaInicial":w.pi.Fecha,
     "FechaFinal":w.pf.Fecha,
     "PesoInicial":w.pi.Peso,
