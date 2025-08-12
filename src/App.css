@@ -102,6 +102,10 @@ label {
   min-height: 32px;
 }
 
+.filter-group input[type="text"] {
+  text-transform: uppercase;
+}
+
 .checkbox-group {
   align-items: center;
 }
@@ -269,6 +273,10 @@ label {
   border: 1px solid #ccc;
   border-radius: 2px;
   box-sizing: border-box;
+}
+
+.inventario-filters .filter-group input[type="text"] {
+  text-transform: uppercase;
 }
 
 .inventario-filters .filter-group label {
@@ -481,6 +489,7 @@ label{
   margin-top: 3px;
   min-height: 36px;
   box-sizing: border-box;
+  text-transform: uppercase;
 }
 
 /* Pesajes specific styles for more compact inputs */
@@ -498,6 +507,10 @@ label{
   border: 1px solid #ccc;
   border-radius: 3px;
   box-sizing: border-box;
+}
+
+.pesajes-filters .filter-group input[type="text"] {
+  text-transform: uppercase;
 }
 
 .pesajes-filters .filter-group label {

@@ -39,7 +39,7 @@ const Inventario = ({ eventEmitter }) => {
   }, []);
 
   const handleFilterChange = useCallback((event) => {
-    setFiltroBuscar(event.target.value);
+    setFiltroBuscar(event.target.value.toUpperCase());
   }, []);
 
   const handleCheckboxChange = useCallback((event) => {

@@ -70,9 +70,14 @@ const Pesajes = ({ eventEmitter }) => {
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
+    // Convert text inputs to uppercase
+    const upperValue = (event.target.type === 'text' || event.target.tagName === 'INPUT') &&
+                      event.target.type !== 'checkbox' &&
+                      event.target.type !== 'radio' ?
+                      value.toUpperCase() : value;
     setFiltros((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: upperValue,
     }));
   };
 

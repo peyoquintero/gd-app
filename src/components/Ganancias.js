@@ -83,21 +83,27 @@ const Ganancias = ({ eventEmitter }) => {
       
       const handleFilterChange = (event) => {
         const { name, value } = event.target;
+        // Convert text inputs to uppercase
+        const upperValue = (event.target.type === 'text' || event.target.tagName === 'INPUT') &&
+                          event.target.type !== 'checkbox' &&
+                          event.target.type !== 'radio' ?
+                          value.toUpperCase() : value;
         setFiltros({
           ...filtros,
-          [name]: value,
+          [name]: upperValue,
         });
      };
 
    const handleFilterMarcaChange = (event) => {
       const { name, value } = event.target;
+      const upperValue = value.toUpperCase();
       setFiltros({
         ...filtros,
-        [name]: value,
+        [name]: upperValue,
       });
-      if (value!=="*" && value.trim()!=="")
+      if (upperValue!=="*" && upperValue.trim()!=="")
       {
-      let allFechas = [...new Set(hisPesajes.filter(w=>w.Marca===value.trim()).map(obj => obj.Fecha))];
+      let allFechas = [...new Set(hisPesajes.filter(w=>w.Marca===upperValue.trim()).map(obj => obj.Fecha))];
       setFechasPesaje(allFechas);
     }
     else{
