@@ -68,6 +68,17 @@ const Pesajes = ({ eventEmitter }) => {
     };
   }, [eventEmitter, loadData]);
 
+  // Emit table data when gridData changes (for export functionality)
+  useEffect(() => {
+    if (gridData.length > 0) {
+      eventEmitter.emit('tableDataUpdate', {
+        data: gridData,
+        columns: columns,
+        title: 'Pesajes'
+      });
+    }
+  }, [gridData, eventEmitter]);
+
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
     // Convert text inputs to uppercase
