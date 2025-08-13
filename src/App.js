@@ -15,6 +15,11 @@ export function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const { online } = useNetwork();
+
+  // Debug: Log connection status changes
+  useEffect(() => {
+    console.log('Connection status changed:', online ? 'ONLINE' : 'OFFLINE');
+  }, [online]);
   
   const dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
@@ -57,18 +62,11 @@ export function App() {
         <div className="header-container">
           <NavBar />
           <div className="controls-container">
-            <div className="connection-status">
-              <div className="status-indicator">
-                {online ? "🟢" : "🔴"}
-                <div className="status-tooltip">
-                  {lastUpdate && `Última actualización: ${lastUpdate}`}
-                </div>
-              </div>
-            </div>
-            <button 
+            <button
               className={`refresh-button ${online ? "online" : "offline"}`}
               onClick={loadData}
               disabled={isLoading}
+              title={`Status: ${online ? 'Online' : 'Offline'}`}
             >
               <div className="refresh-symbol">
                 {isLoading ? "..." : "⟳"}
