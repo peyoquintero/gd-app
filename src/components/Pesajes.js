@@ -231,7 +231,7 @@ const Pesajes = ({ eventEmitter }) => {
             <option value="contains">Contiene</option>
           </select>
         </div>
-         <button onClick={applyFilters}>Ok</button>
+         <button className="filter-button" onClick={applyFilters}>Ok</button>
         </div>
       </section>
 

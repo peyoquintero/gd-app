@@ -292,7 +292,7 @@ const Ganancias = ({ eventEmitter }) => {
           <label>Ventas</label>
           <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
         </div>
-        <button onClick={applyFilters}>Ok</button>
+        <button className="filter-button" onClick={applyFilters}>Ok</button>
       </div>
     </section>
 
