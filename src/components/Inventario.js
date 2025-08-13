@@ -64,6 +64,21 @@ const Inventario = ({ eventEmitter }) => {
 
       let inventario = getInventario(filteredData);
       setGridInventario(inventario);
+
+      // Emit table data for export functionality based on selected option
+      if (selectedOption === "movimientos") {
+        eventEmitter.emit('tableDataUpdate', {
+          data: movimientosByFecha,
+          columns: columns,
+          title: 'Inventario - Movimientos'
+        });
+      } else {
+        eventEmitter.emit('tableDataUpdate', {
+          data: inventario,
+          columns: columnsInventario,
+          title: 'Inventario - Actual'
+        });
+      }
     }
   }, [filtroBuscar, filtroExacto]);
 
@@ -99,6 +114,23 @@ const Inventario = ({ eventEmitter }) => {
       eventEmitter.off("refresh", refreshHandler);
     };
   }, [eventEmitter, loadData]);
+
+  // Emit table data when selected option changes
+  useEffect(() => {
+    if (selectedOption === "movimientos" && gridMovimientos.length > 0) {
+      eventEmitter.emit('tableDataUpdate', {
+        data: gridMovimientos,
+        columns: columns,
+        title: 'Inventario - Movimientos'
+      });
+    } else if (selectedOption === "cabezas" && gridInventario.length > 0) {
+      eventEmitter.emit('tableDataUpdate', {
+        data: gridInventario,
+        columns: columnsInventario,
+        title: 'Inventario - Actual'
+      });
+    }
+  }, [selectedOption, gridMovimientos, gridInventario, eventEmitter]);
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;

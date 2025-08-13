@@ -137,6 +137,13 @@ const Pesajes = ({ eventEmitter }) => {
     setGridData(filteredData);
     let comment = `Total: ${filteredData.length}`;
 
+    // Emit table data for export functionality
+    eventEmitter.emit('tableDataUpdate', {
+      data: filteredData,
+      columns: columns,
+      title: 'Pesajes'
+    });
+
     if (
       filtros.fechaControl &&
       filteredData.length &&

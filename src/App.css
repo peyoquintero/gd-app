@@ -487,6 +487,13 @@ label {
   color: #666;
 }
 
+/* Header buttons container */
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 /* Refresh button */
 .refresh-button {
   padding: 0.5rem;
@@ -498,6 +505,40 @@ label {
   align-items: center;
   gap: 0.125rem;
   min-width: 50px;
+}
+
+/* Export button */
+.export-button {
+  padding: 0.5rem;
+  border-radius: 2px;
+  border: 2px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 50px;
+  transition: all 0.2s ease;
+}
+
+.export-button:hover:not(:disabled) {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.export-button:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.export-symbol {
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 .connection-status {

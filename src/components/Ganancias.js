@@ -193,6 +193,13 @@ const Ganancias = ({ eventEmitter }) => {
               resultDias: captionDias(scrubbedData),
               resultMedia: captionMedia(scrubbedData)
           });
+
+          // Emit table data for export functionality
+          eventEmitter.emit('tableDataUpdate', {
+            data: scrubbedData,
+            columns: columns,
+            title: 'Ganancias'
+          });
      };
 
       const columns = [

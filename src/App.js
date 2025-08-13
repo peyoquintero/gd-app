@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useNetwork } from "./hooks/useNetwork";
 import { dataService } from "./services/DataService";
+import { exportTableAsHTML } from "./utils/exportUtils";
 import NavBar from "./components/NavBar";
 import Inventario from "./components/Inventario";
 import Pesajes from "./components/Pesajes";
@@ -14,6 +15,7 @@ export function App() {
   const eventEmitter = useMemo(() => new EventEmitter(), []);
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [currentTableData, setCurrentTableData] = useState({ data: [], columns: [], title: '' });
   const { online } = useNetwork();
 
   // Debug: Log connection status changes
@@ -56,22 +58,50 @@ export function App() {
     loadData();
   }, [loadData]);
 
+  // Listen for table data updates from components
+  useEffect(() => {
+    const handleTableDataUpdate = (tableInfo) => {
+      setCurrentTableData(tableInfo);
+    };
+
+    eventEmitter.on('tableDataUpdate', handleTableDataUpdate);
+    return () => {
+      eventEmitter.off('tableDataUpdate', handleTableDataUpdate);
+    };
+  }, [eventEmitter]);
+
+  const handleExportTable = useCallback(() => {
+    exportTableAsHTML(currentTableData);
+  }, [currentTableData]);
+
   return (
     <BrowserRouter>
       <div className="main-container">
         <div className="header-container">
           <NavBar />
           <div className="controls-container">
-            <button
-              className={`refresh-button ${online ? "online" : "offline"}`}
-              onClick={loadData}
-              disabled={isLoading}
-              title={`Status: ${online ? 'Online' : 'Offline'}`}
-            >
-              <div className="refresh-symbol">
-                {isLoading ? "..." : "⟳"}
-              </div>
-            </button>
+            <div className="header-buttons">
+              <button
+                className={`refresh-button ${online ? "online" : "offline"}`}
+                onClick={loadData}
+                disabled={isLoading}
+                title={`Status: ${online ? 'Online' : 'Offline'}`}
+              >
+                <div className="refresh-symbol">
+                  {isLoading ? "..." : "⟳"}
+                </div>
+              </button>
+              <button
+                className="export-button"
+                onClick={handleExportTable}
+                disabled={!currentTableData.data || currentTableData.data.length === 0}
+                title="Exportar tabla como HTML"
+              >
+                <div className="export-symbol">
+                  📄
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       <div className="routes-container">

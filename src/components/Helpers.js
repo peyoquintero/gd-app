@@ -133,19 +133,35 @@ const gananciaDiaria = (pesoInicial,pesoFinal) =>
 const  gananciaDiariaPesajes = (results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas) =>
 {
   var minmaxPesajes = [];
+
+  // Normalize date formats for comparison
+  const normalizeDate = (dateStr) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+  };
+
+  const fechaInicialNorm = normalizeDate(fechaInicial);
+  const fechaFinalNorm = normalizeDate(fechaFinal);
+
   results.forEach(result => {
     let datafilter=result.pesajes;
-    datafilter=datafilter.filter(w => w.Fecha>=fechaInicial&&w.Fecha<=fechaFinal);
+    // Use proper date comparison instead of string comparison
+    datafilter=datafilter.filter(w => {
+      const fechaNorm = normalizeDate(w.Fecha);
+      return fechaNorm >= fechaInicialNorm && fechaNorm <= fechaFinalNorm;
+    });
     let minP=datafilter[0];
     let maxP=datafilter[datafilter.length-1];
     if(fiExacta) {
-      minP=datafilter.find(w => w.Fecha===fechaInicial);
+      minP=datafilter.find(w => normalizeDate(w.Fecha) === fechaInicialNorm);
     }
     if(ffExacta) {
-      maxP=datafilter.find(w => w.Fecha===fechaFinal);
+      maxP=datafilter.find(w => normalizeDate(w.Fecha) === fechaFinalNorm);
     }
     if(filtroVentas) {
-      maxP=datafilter.find(w => w.Operacion.toLowerCase()==="venta"&&(!ffExacta||w.Fecha===fechaFinal));
+      maxP=datafilter.find(w => w.Operacion.toLowerCase()==="venta"&&(!ffExacta||normalizeDate(w.Fecha)===fechaFinalNorm));
     }
 
     let minMaxPesajes=[minP, maxP];
@@ -177,10 +193,18 @@ export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,f
 
     let minmaxPesajes = gananciaDiariaPesajes(results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas);
 
+    // Helper function to ensure consistent date format
+    const formatDate = (dateStr) => {
+      if (!dateStr) return dateStr;
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr; // Return original if invalid date
+      return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+    };
+
     var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
     "Chapeta":w.pi.Chapeta,
-    "FechaInicial":w.pi.Fecha,
-    "FechaFinal":w.pf.Fecha,
+    "FechaInicial":formatDate(w.pi.Fecha),
+    "FechaFinal":formatDate(w.pf.Fecha),
     "PesoInicial":w.pi.Peso,
     "PesoFinal":w.pf.Peso,
     "Ganancia": gananciaDiaria(w.pi,w.pf),
