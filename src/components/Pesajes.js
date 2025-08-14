@@ -8,15 +8,16 @@ const Pesajes = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo", width: "15%" },
     { label: "Chapeta", accessor: "Chapeta", width: "15%" },
+    { label: "Marca", accessor: "Marca", width: "15%" },
     { label: "Fecha", accessor: "Fecha", width: "20%" },
     { label: "Peso", accessor: "Peso", width: "15%" },
-    { label: "Marca", accessor: "Marca", width: "15%" },
     { label: "Operacion", accessor: "Operacion", width: "20%" },
   ];
 
   const [filtros, setFiltros] = useState({
     fechaControl: null,
-    filtroGeneral: "",
+    filtroOperacion: "",
+    filtroMarca: "",
     filtroCodigo: "",
     filtroChapeta: "",
     filtroExacto: true,
@@ -39,8 +40,8 @@ const Pesajes = ({ eventEmitter }) => {
     allFechas.sort((a, b) => new Date(b) - new Date(a));
     allFechas.unshift(null);
     setFechasPesaje(allFechas);
-    setGridData(allPesajes.slice(0, 100));
-    setCaptions(`Ultimos 100 - Total: ${allPesajes.length}`);
+    setGridData(allPesajes.slice(0, 200));
+    setCaptions(`Ultimos 200 - Total: ${allPesajes.length}`);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -95,7 +96,7 @@ const Pesajes = ({ eventEmitter }) => {
   const applyFilters = (event) => {
     let filteredData = filteredGData(
       hisPesajes,
-      filtros.filtroGeneral,
+      filtros.filtroOperacion,
       "Peso",
       filtros.filtroExacto
     );
@@ -139,9 +140,22 @@ const Pesajes = ({ eventEmitter }) => {
             w.Chapeta?.toUpperCase().includes(filtros.filtroChapeta?.trim().toUpperCase()))
       );
     }
+
+    if(filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
+                filteredData = filteredData.filter(pesaje => 
+                    pesaje.Marca.toUpperCase() === filtros.filtroMarca.trim()
+                );
+            }
+
+    if(filtros.filtroOperacion  !== "*" && filtros.filtroOperacion.trim() !== "") {
+                filteredData = filteredData.filter(pesaje => 
+                    pesaje.Operacion.toUpperCase() === filtros.filtroOperacion.trim()
+                );
+            }
+
     if (filtros.fechaControl) {
       filteredData = filteredData.filter(
-        (w) => w.Fecha === filtros.fechaControl
+        (w) => (filtros.fechaControl === "Todas") ||   w.Fecha === filtros.fechaControl
       );
     }
 
@@ -196,12 +210,21 @@ const Pesajes = ({ eventEmitter }) => {
             />
           </div>
           <div className="filter-group">
-            <label>General</label>
+            <label>Marca</label>
             <input
               className="freeinputsmall"
-              name="filtroGeneral"
+              name="filtroMarca"
               onChange={handleFilterChange}
-              value={filtros.filtroGeneral}
+              value={filtros.filtroMarca}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Operacion</label>
+            <input
+              className="freeinputsmall"
+              name="filtroOperacion"
+              onChange={handleFilterChange}
+              value={filtros.filtroOperacion}
             />
           </div>
           <div className="filter-group fecha-control-group">
