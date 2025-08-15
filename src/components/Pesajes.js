@@ -149,7 +149,7 @@ const Pesajes = ({ eventEmitter }) => {
 
     if(filtros.filtroOperacion  !== "*" && filtros.filtroOperacion.trim() !== "") {
                 filteredData = filteredData.filter(pesaje => 
-                    pesaje.Operacion.toUpperCase() === filtros.filtroOperacion.trim()
+                    pesaje.Operacion.toUpperCase() === filtros.filtroOperacion.toUpperCase().trim()
                 );
             }
 
