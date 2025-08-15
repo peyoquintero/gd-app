@@ -248,7 +248,7 @@ const Pesajes = ({ eventEmitter }) => {
             onChange={handleFilterChange}
             value={filtros.filtroExacto ?? "none"}
           >
-            <option value="none">Ninguno</option>
+            <option value="none">Exacto</option>
             <option value="starts">Empieza con</option>
             <option value="ends">Termina con</option>
             <option value="contains">Contiene</option>

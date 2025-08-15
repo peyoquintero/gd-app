@@ -28,6 +28,7 @@ const Inventario = ({ eventEmitter }) => {
 
   const [selectedOption, setSelectedOption] = useState("cabezas");
   const [filtroBuscar, setFiltroBuscar] = useState("");
+  const [filtroCodigo, setFiltroCodigo] = useState("");
   const [filtroExacto, setFiltroExacto] = useState(true);
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
@@ -42,6 +43,11 @@ const Inventario = ({ eventEmitter }) => {
     setFiltroBuscar(event.target.value.toUpperCase());
   }, []);
 
+  const handleFilterCodigoChange = useCallback((event) => {
+    setFiltroCodigo(event.target.value.toUpperCase());
+  }, []);
+
+
   const handleCheckboxChange = useCallback((event) => {
     setFiltroExacto(event.target.checked);
   }, []);
@@ -50,6 +56,9 @@ const Inventario = ({ eventEmitter }) => {
     if (!allPesajes?.length) return;
 
     let filteredData = allPesajes;
+    if (filtroCodigo.length > 0) {
+      filteredData = allPesajes.filter(w => w.Codigo?.toUpperCase().includes(filtroCodigo));
+    }
     if (filtroBuscar.length > 1) {
       filteredData = filteredGData(filteredData, filtroBuscar, "Peso", filtroExacto);
     }
@@ -80,7 +89,7 @@ const Inventario = ({ eventEmitter }) => {
         });
       }
     }
-  }, [filtroBuscar, filtroExacto]);
+  }, [filtroBuscar, filtroExacto, filtroCodigo]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -164,7 +173,16 @@ const Inventario = ({ eventEmitter }) => {
             </div>
           </div>
           <div className="filter-group">
-            <label>Buscar</label>
+            <label>Codigo</label>
+            <input
+              className="freeinputsmall"
+              name="filtroCodigo"
+              onChange={handleFilterCodigoChange}
+              value={filtroCodigo}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Otros</label>
             <input
               className="freeinputsmall"
               name="filtroGeneral"
