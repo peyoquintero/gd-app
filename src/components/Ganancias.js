@@ -246,6 +246,7 @@ const Ganancias = ({ eventEmitter }) => {
             name="filtroCodigo" 
             placeholder="Codigo" 
             onChange={handleFilterChange}
+            maxLength={10}
           />
         </div>
         <div className="filter-group">
@@ -256,16 +257,18 @@ const Ganancias = ({ eventEmitter }) => {
             name="filtroChapeta" 
             onChange={handleFilterChange} 
             value={filtros.filtroChapeta}
+            maxLength={10}
           />
         </div>
         <div className="filter-group">
           <label>Marca</label>
           <input 
             id="marca" 
-            className="freeinputsmall" 
+            className="freeinputtiny" 
             name="filtroMarca" 
             onChange={handleFilterMarcaChange} 
             value={filtros.filtroMarca}
+            maxLength={4}
           />
         </div>
         <div className="filter-group">

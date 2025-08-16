@@ -724,9 +724,37 @@ label{
   text-transform: uppercase;
 }
 
+/* Tiny input (up to 4 chars) */
+.freeinputtiny {
+  width: 6ch;            /* fits ~4 chars + a bit of padding */
+  min-width: 24px;       /* sensible minimum */
+  height: 25px;
+  padding: 2px 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Make tiny inputs truly tiny inside filter groups (override generic width:100%) */
+.filter-section .filter-group input.freeinputtiny {
+  width: 6ch;
+  max-width: 6ch;
+  min-width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 2px 4px;
+  box-sizing: border-box;
+}
+
+/* Optional: shrink the container for tiny fields */
+.filter-section .filter-group.tiny {
+  min-width: 60px;
+  max-width: 80px;
+}
+
 /* Pesajes specific styles for more compact inputs */
 .pesajes-filters .filter-group {
-  min-width: 60px;
+  min-width: 40px;
   max-width: 80px;
 }
 
@@ -1002,4 +1030,53 @@ input[type="text"] {
   padding: 0.5rem;
   font-size: 0.75rem;
   color: #666;
+}
+
+/* --- Unified compact control sizing (match freeinputtiny = 24px) --- */
+.filter-section .filter-group input:not([type="checkbox"]),
+.filter-section .filter-group select,
+.filter-section .filter-button,
+.filter-section button:not(.refresh-button):not(.export-button) {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+  box-sizing: border-box;
+}
+
+/* Date filters */
+.date-filters .filter-group select,
+.date-filters button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Pesajes and Inventario compact controls */
+.pesajes-filters .filter-group input,
+.pesajes-filters .filter-group select,
+.pesajes-filters .filter-button,
+.inventario-filters .filter-group input,
+.inventario-filters .filter-group select {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Align small utility classes too */
+.freeinputsmall {
+  min-height: 24px !important;
+  height: 24px !important;
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Make small inputs fit ~10 characters */
+.filter-section .filter-group input.freeinputsmall,
+.filter-section .filter-group select.freeinputsmall {
+  width: 12ch;
+  max-width: 12ch;
+  min-width: 10ch;
 }
