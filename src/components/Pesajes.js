@@ -4,6 +4,25 @@ import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
 import "../App.css";
 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  try {
+    let date;
+    if (dateString.includes('\\') || dateString.includes('/')) {
+      // Handle MM\DD\YYYY or MM/DD/YYYY format
+      const [month, day, year] = dateString.split(/[\\/]/);
+      date = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+    } else {
+      date = new Date(dateString);
+    }
+    
+    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    return date.toISOString().split('T')[0];
+  } catch {
+    return dateString; // Return original if parsing fails
+  }
+};
+
 const Pesajes = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo", width: "15%" },
@@ -32,16 +51,26 @@ const Pesajes = ({ eventEmitter }) => {
     let allPesajes = dataService.getCachedData();
     if (!allPesajes) return;
 
-    allPesajes = allPesajes.filter(
-      (w) => w.Codigo && w.Marca && w.Operacion && w.Fecha 
-    );
+    allPesajes = allPesajes
+      .filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha)
+      .map(pesaje => ({
+        ...pesaje,
+        Fecha: formatDate(pesaje.Fecha)
+      }));
+
     setHispesajes(allPesajes);
-    let allFechas = [...new Set(allPesajes.map((obj) => obj.Fecha.trim()))];
-    allFechas.sort((a, b) => new Date(b) - new Date(a));
+    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))]
+      .filter(Boolean)
+      .sort((a, b) => new Date(b) - new Date(a));
+    
     allFechas.unshift(null);
     setFechasPesaje(allFechas);
     setGridData(allPesajes.slice(0, 200));
-    setCaptions(`Ultimos 200 - Total: ${allPesajes.length}`);
+    setCaptions(
+      allPesajes.length > 0
+        ? `Ultimos 200 - Total: ${allPesajes.length}`
+        : "No hay datos disponibles"
+    );
   }, []);
 
   const loadData = useCallback(async () => {
@@ -170,7 +199,6 @@ const Pesajes = ({ eventEmitter }) => {
     });
 
     if (
-      filtros.fechaControl &&
       filteredData.length &&
       filteredData.every((w) => w.Peso > 0)
     ) {

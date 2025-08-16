@@ -4,6 +4,25 @@ import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,ca
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  try {
+    let date;
+    if (dateString.includes('\\') || dateString.includes('/')) {
+      // Handle MM\DD\YYYY or MM/DD/YYYY format
+      const [month, day, year] = dateString.split(/[\\/]/);
+      date = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+    } else {
+      date = new Date(dateString);
+    }
+    
+    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    return date.toISOString().split('T')[0];
+  } catch {
+    return dateString; // Return original if parsing fails
+  }
+};
+
 const Ganancias = ({ eventEmitter }) => {
     const [filtros, setFiltros] = useState({
         filtroCodigo: "",

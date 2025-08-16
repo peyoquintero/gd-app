@@ -99,7 +99,7 @@ export const mapApiDataToPesajes= (apiResult) => {
     rawRows.forEach((row) => {
     const rowData = {};
     row.forEach((item, index) => {
-    rowData[headers[index]] = item;
+    rowData[headers[index]] = item.toUpperCase();
   });
   rows.push(rowData);
   });

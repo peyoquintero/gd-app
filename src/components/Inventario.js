@@ -5,6 +5,17 @@ import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    return date.toISOString().split('T')[0];
+  } catch {
+    return dateString; // Return original if parsing fails
+  }
+};
+
 const Inventario = ({ eventEmitter }) => {
   const columns = [
     { label: "Fecha", accessor: "Fecha", width: "20%" },
@@ -55,16 +66,22 @@ const Inventario = ({ eventEmitter }) => {
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
 
-    let filteredData = allPesajes;
+    let filteredData = allPesajes.map(pesaje => ({
+      ...pesaje,
+      Fecha: formatDate(pesaje.Fecha),
+      FechaCompra: formatDate(pesaje.FechaCompra),
+      FechaUltimoControl: formatDate(pesaje.FechaUltimoControl)
+    }));
+
     if (filtroCodigo.length > 0) {
-      filteredData = allPesajes.filter(w => w.Codigo?.toUpperCase().includes(filtroCodigo));
+      filteredData = filteredData.filter(w => w.Codigo?.toUpperCase().includes(filtroCodigo));
     }
     if (filtroBuscar.length > 1) {
       filteredData = filteredGData(filteredData, filtroBuscar, "Peso", filtroExacto);
     }
 
     let movimientos = filteredData
-      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL")
+      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" && w.Operacion?.toUpperCase() !== "CORRECCION" )
       .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
 
     if (movimientos?.length) {
