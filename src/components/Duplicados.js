@@ -14,6 +14,7 @@ const [gridData, setGridData] = useState([]);
   const columns = [
     { label: "Codigo", accessor: "Codigo" },  
     { label: "Operacion", accessor: "Operacion" },
+    { label: "Marcas", accessor: "Marcas" },
    ];
 
   return (

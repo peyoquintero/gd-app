@@ -94,8 +94,7 @@ export const getInventario = (data) => {
     }, {});
     
     const filteredData = Object.values(groupedData).filter((group) => group.length > 1);
-    console.log(filteredData)
-    return filteredData.map((group) => {return {Codigo: group[0].Codigo,Operacion: group[0].Operacion}})
+    return filteredData.map((group) => {return {Codigo: group[0].Codigo,Operacion: group[0].Operacion,Marcas:group[0].Marca+','+group[1].Marca}})
   
     }
   
