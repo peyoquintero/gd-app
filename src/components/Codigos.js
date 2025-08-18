@@ -16,8 +16,6 @@ const Codigos = ({ eventEmitter }) => {
    const [gridData,setGridData] = useState([])
    const [fechasPesaje,setFechasPesaje] = useState([])
    const [hisPesajes,setHispesajes] = useState([])
-   const [lotes,setLotes] = useState([])
-
    const [captions,setCaptions] = useState({
     resultCabezas : "",
    })
@@ -28,11 +26,9 @@ const Codigos = ({ eventEmitter }) => {
     let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
     setFechasPesaje(allFechas);
     setHispesajes(allPesajes);
-    setLotes(validLoteOptions([...new Set( allPesajes.map(obj => obj.Lote))]));
     setFiltros({
      filtroMarca: '*',
      filtroCodigo: '',
-     filtroLote: '',
      sinEntrada: false,
      todasLasVentas: false,
      fechaSalida: allFechas[allFechas.length-1] ?? new Date(),
@@ -108,11 +104,6 @@ const Codigos = ({ eventEmitter }) => {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Codigo.startsWith(filtros.filtroCodigo)); 
     }
 
-    if (filtros.filtroLote!=="*" && filtros.filtroLote!=="")
-    {
-      hispesajesFiltered = hispesajesFiltered.filter(pesaje=>pesaje.Lote===filtros.filtroLote.trim()) 
-    }
-
     if (filtros.sinEntrada && !filtros.todasLasVentas)
     {
       hispesajesFiltered = hispesajesFiltered.filter(pesaje=>!['VENTA','CORRECCION'].includes(pesaje.Operacion?.toUpperCase()))
@@ -160,42 +151,74 @@ const Codigos = ({ eventEmitter }) => {
   }
 
   return ( 
-    <>
-  <div className="container">
-    <section>
-      <label style={{display:'block'}}>Codigo
-        <input style={{display:'block'}} name="filtroCodigo" className="freeinput"  placeholder="Codigo" onChange={handleFilterChange}/>
-      </label>
-      <label>Marca 
-       <input style={{display:'block'}} id="filtroMarca" className="freeinputsmall" name="filtroMarca"  onChange={handleFilterChange}/>
-       </label>
-       <label>Lote
-        <select style={{display:'block', width:'80px', height:'25px'}} className="freeinput" name="filtroLote" value={filtros.filtroLote} onChange={handleFilterChange}>
-          {lotes.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
-          </select>
-        </label>
-       <label style={{display:'block'}}>Revisar
-               <input style={{display:'block'}} type="checkbox" id="checkboxVx" name= "sinEntrada" onChange={handleCheckboxChange} />
-       </label>
-       <label style={{marginLeft:'30px'}}>Fecha Control
-          <select style={{display:'block', width:'120px', height:'25px'}} className="freeinput" name="fechaSalida" onChange={handleFilterChange} value={filtros.fechaSalida}>
-          {fechasPesaje.map(val => <option key={val} style={{background:"lightgrey"}} value={val}>{val}</option>)}
-          </select>
-        </label>
-        <label style={{display:'block'}}> Ventas
-               <input style={{display:'block'}} type="checkbox" id="checkboxVentas" name= "todasLasVentas" onChange={handleCheckboxChange} />
-       </label>
-      <button onClick={applyFilters} >Ok</button>
-    </section>
-    <section className="totals">
-      <label >{captions.resultCabezas} </label> 
+    <div className="container codigos-root" style={{ width: '100%' }}>
+      <section className="filter-section">
+        <div className="filters-row">
+          <div className="filter-group">
+            <label>Codigo</label>
+            <input
+              className="freeinputsmall"
+              name="filtroCodigo"
+              placeholder="Codigo"
+              onChange={handleFilterChange}
+              value={filtros.filtroCodigo}
+              maxLength={10}
+            />
+          </div>
+          <div className="filter-group tiny">
+            <label>Marca</label>
+            <input
+              id="filtroMarca"
+              className="freeinputtiny"
+              name="filtroMarca"
+              onChange={handleFilterChange}
+              value={filtros.filtroMarca}
+              maxLength={4}
+            />
+          </div>
+          <label className="center-label">
+            Revisar
+            <input
+              type="checkbox"
+              id="checkboxVx"
+              name="sinEntrada"
+              onChange={handleCheckboxChange}
+              checked={!!filtros.sinEntrada}
+            />
+          </label>
+          <div className="filter-group">
+            <label>Fecha Control</label>
+            <select
+              name="fechaSalida"
+              onChange={handleFilterChange}
+              value={filtros.fechaSalida}
+            >
+              {fechasPesaje.map(val => (
+                <option key={val} value={val}>{val}</option>
+              ))}
+            </select>
+          </div>
+          <label className="center-label">
+            Ventas
+            <input
+              type="checkbox"
+              id="checkboxVentas"
+              name="todasLasVentas"
+              onChange={handleCheckboxChange}
+              checked={!!filtros.todasLasVentas}
+            />
+          </label>
+          <button className="filter-button" onClick={applyFilters}>Ok</button>
+        </div>
       </section>
-      <Table
-        caption="Pesajes"
-        data={gridData}
-        columns={columns}></Table>
-      </div>
-    </>
+      <section className="totals">
+        <label >{captions.resultCabezas} </label> 
+        </section>
+        <Table
+          caption="Pesajes"
+          data={gridData}
+          columns={columns}></Table>
+    </div>
   );
 };
 
