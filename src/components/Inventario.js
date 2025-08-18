@@ -37,30 +37,28 @@ const Inventario = ({ eventEmitter }) => {
     { label: "PRY", accessor: "Proyeccion", width: "12%" },
   ];
 
-  const [selectedOption, setSelectedOption] = useState("cabezas");
-  const [filtroBuscar, setFiltroBuscar] = useState("");
-  const [filtroCodigo, setFiltroCodigo] = useState("");
-  const [filtroExacto, setFiltroExacto] = useState(true);
+  const [filtros, setFiltros] = useState({
+    filtroBuscar: "",
+    filtroExacto: true,
+    selectedOption: "cabezas",
+    projectionDate: new Date().toISOString().split("T")[0],
+  });
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = useCallback((event) => {
-    setSelectedOption(event.target.value);
+    setFiltros((prev) => ({ ...prev, selectedOption: event.target.value }));
   }, []);
 
   const handleFilterChange = useCallback((event) => {
-    setFiltroBuscar(event.target.value.toUpperCase());
+    const { name, value } = event.target;
+    setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
   }, []);
-
-  const handleFilterCodigoChange = useCallback((event) => {
-    setFiltroCodigo(event.target.value.toUpperCase());
-  }, []);
-
 
   const handleCheckboxChange = useCallback((event) => {
-    setFiltroExacto(event.target.checked);
+    setFiltros((prev) => ({ ...prev, filtroExacto: event.target.checked }));
   }, []);
 
   const refreshData = useCallback((allPesajes) => {
@@ -73,11 +71,11 @@ const Inventario = ({ eventEmitter }) => {
       FechaUltimoControl: formatDate(pesaje.FechaUltimoControl)
     }));
 
-    if (filtroCodigo.length > 0) {
-      filteredData = filteredData.filter(w => w.Codigo?.toUpperCase().includes(filtroCodigo));
+    if (filtros.filtroCodigo?.length > 0) {
+      filteredData = filteredData.filter(w => w.Codigo?.toUpperCase().includes(filtros.filtroCodigo));
     }
-    if (filtroBuscar.length > 1) {
-      filteredData = filteredGData(filteredData, filtroBuscar, "Peso", filtroExacto);
+    if (filtros.filtroBuscar?.length > 1) {
+      filteredData = filteredGData(filteredData, filtros.filtroBuscar, "Peso", filtros.filtroExacto);
     }
 
     let movimientos = filteredData
@@ -88,11 +86,12 @@ const Inventario = ({ eventEmitter }) => {
       let movimientosByFecha = groupByFechaOperacion(movimientos);
       setGridMovimientos(movimientosByFecha);
 
-      let inventario = getInventario(filteredData);
+      // Pass projection date into getInventario
+      const inventario = getInventario(filteredData, filtros.projectionDate);
       setGridInventario(inventario);
 
       // Emit table data for export functionality based on selected option
-      if (selectedOption === "movimientos") {
+      if (filtros.selectedOption === "movimientos") {
         eventEmitter.emit('tableDataUpdate', {
           data: movimientosByFecha,
           columns: columns,
@@ -106,7 +105,7 @@ const Inventario = ({ eventEmitter }) => {
         });
       }
     }
-  }, [filtroBuscar, filtroExacto, filtroCodigo]);
+  }, [filtros]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -143,20 +142,20 @@ const Inventario = ({ eventEmitter }) => {
 
   // Emit table data when selected option changes
   useEffect(() => {
-    if (selectedOption === "movimientos" && gridMovimientos.length > 0) {
+    if (filtros.selectedOption === "movimientos" && gridMovimientos.length > 0) {
       eventEmitter.emit('tableDataUpdate', {
         data: gridMovimientos,
         columns: columns,
         title: 'Inventario - Movimientos'
       });
-    } else if (selectedOption === "cabezas" && gridInventario.length > 0) {
+    } else if (filtros.selectedOption === "cabezas" && gridInventario.length > 0) {
       eventEmitter.emit('tableDataUpdate', {
         data: gridInventario,
         columns: columnsInventario,
         title: 'Inventario - Actual'
       });
     }
-  }, [selectedOption, gridMovimientos, gridInventario, eventEmitter]);
+  }, [filtros.selectedOption, gridMovimientos, gridInventario, eventEmitter]);
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
@@ -164,7 +163,7 @@ const Inventario = ({ eventEmitter }) => {
 
   return (
     <div>
-      <section className="filter-section inventario-filters">
+      <section className="filter-section">
         <div className="filters-row">
           <div className="filter-group radio-filter-group">
             <label>Vista</label>
@@ -174,7 +173,7 @@ const Inventario = ({ eventEmitter }) => {
                   type="radio"
                   name="details"
                   value="cabezas"
-                  checked={selectedOption === "cabezas"}
+                  checked={filtros.selectedOption === "cabezas"}
                 />
                 Inventario
               </label>
@@ -183,7 +182,7 @@ const Inventario = ({ eventEmitter }) => {
                   type="radio"
                   name="details"
                   value="movimientos"
-                  checked={selectedOption === "movimientos"}
+                  checked={filtros.selectedOption === "movimientos"}
                 />
                 Movimientos
               </label>
@@ -194,8 +193,8 @@ const Inventario = ({ eventEmitter }) => {
             <input
               className="freeinputsmall"
               name="filtroCodigo"
-              onChange={handleFilterCodigoChange}
-              value={filtroCodigo}
+              onChange={handleFilterChange}
+              value={filtros.filtroCodigo}
             />
           </div>
           <div className="filter-group">
@@ -204,7 +203,7 @@ const Inventario = ({ eventEmitter }) => {
               className="freeinputsmall"
               name="filtroGeneral"
               onChange={handleFilterChange}
-              value={filtroBuscar}
+              value={filtros.filtroBuscar}
             />
           </div>
           <div className="filter-group checkbox-group">
@@ -214,7 +213,16 @@ const Inventario = ({ eventEmitter }) => {
               id="checkboxFE"
               name="filtroExacto"
               onChange={handleCheckboxChange}
-              checked={filtroExacto}
+              checked={filtros.filtroExacto}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Fecha Proyección</label>
+            <input
+              type="date"
+              name="projectionDate"
+              value={filtros.projectionDate}
+              onChange={handleFilterChange}
             />
           </div>
         </div>
@@ -222,14 +230,14 @@ const Inventario = ({ eventEmitter }) => {
 
       <section className="totals">
         <label>
-          {selectedOption === "movimientos"
+          {filtros.selectedOption === "movimientos"
             ? `Movimientos: ${gridMovimientos.length}`
             : `Total Inventario: ${gridInventario.length}`}
         </label>
       </section>
 
       <section className="table-container">
-        {selectedOption === "movimientos" ? (
+        {filtros.selectedOption === "movimientos" ? (
           <Table data={gridMovimientos} columns={columns} />
         ) : (
           <Table data={gridInventario} columns={columnsInventario} />

@@ -28,27 +28,31 @@ const getProyeccion = (fechaUltimoPeso,ultimoPeso,fechaProyeccion,gananciaDiaria
 
 }
 
-export const getInventario = (data) => {
-    const groupedData = getPesajesByCodigo(data)
-    let result = Object.values(groupedData);
-    result = result.filter(w=>w.Pesajes[0].Operacion?.toUpperCase()==='COMPRA'); 
-    let codigosVendidos = data.filter(w=>['VENTA','MUERTE','CORRECCION'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
-    result = result.filter(x => !codigosVendidos.includes(x.Codigo));
+export const getInventario = (data, fechaProyeccion) => {
+  const groupedData = getPesajesByCodigo(data)
+  let result = Object.values(groupedData);
+  result = result.filter(w=>w.Pesajes[0].Operacion?.toUpperCase()==='COMPRA'); 
+  let codigosVendidos = data.filter(w=>['VENTA','MUERTE','CORRECCION'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
+  result = result.filter(x => !codigosVendidos.includes(x.Codigo));
 
-    result = result.map(w=> {return {
-      Codigo: w.Codigo,
-      Marca: w.Marca,
-      Chapeta: w.Chapeta,
-      FechaCompra: w.Pesajes[0]?.Fecha,      
-      PesoInicial: w.Pesajes[0]?.Peso,
-      FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,
-      PesoFinal: w.Pesajes[w.Pesajes.length-1]?.Peso,
-      Proyeccion: getProyeccion(w.Pesajes[w.Pesajes.length-1]?.Fecha,
-                                w.Pesajes[w.Pesajes.length-1]?.Peso,
-                                Date.now(),350/1000) // Assuming 0.35 as the daily gain
-                           }});
-    return result;
-  }
+  result = result.map(w=> {return {
+    Codigo: w.Codigo,
+    Marca: w.Marca,
+    Chapeta: w.Chapeta,
+    FechaCompra: w.Pesajes[0]?.Fecha,      
+    PesoInicial: w.Pesajes[0]?.Peso,
+    FechaUltimoControl: w.Pesajes[w.Pesajes.length-1]?.Fecha,
+    PesoFinal: w.Pesajes[w.Pesajes.length-1]?.Peso,
+    // Use provided projection date; fallback to now if missing
+    Proyeccion: getProyeccion(
+      w.Pesajes[w.Pesajes.length-1]?.Fecha,
+      w.Pesajes[w.Pesajes.length-1]?.Peso,
+      fechaProyeccion || Date.now(),
+      350/1000 // Assuming 0.35 as the daily gain
+    )
+  }});
+  return result;
+}
 
   
   function intersectCount (comprados,vendidos){
@@ -97,4 +101,4 @@ export const getInventario = (data) => {
     return filteredData.map((group) => {return {Codigo: group[0].Codigo,Operacion: group[0].Operacion,Marcas:group[0].Marca+','+group[1].Marca}})
   
     }
-  
+
