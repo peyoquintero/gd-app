@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import IntegerMatrix from "./Matrix";
-import Table from "./Table";
 import { resurrect } from "./Helpers";
 import Duplicados from "./Duplicados";
 import Codigos from "./Codigos";
@@ -8,12 +7,6 @@ import { dataService } from "../services/DataService";
 import "../App.css";
 
 const Ayuda = ({ eventEmitter }) => {
-  const columnsMuertes = [
-    { label: "Codigo", accessor: "Codigo", width: "30%" },
-    { label: "Fecha", accessor: "Fecha", width: "40%" },
-    { label: "Marca", accessor: "Marca", width: "30%" }
-  ];
-
   const [filtros, setFiltros] = useState({
     filtroDups: false,
     filtroMuertos: false,
@@ -23,7 +16,6 @@ const Ayuda = ({ eventEmitter }) => {
     return localStorage.getItem('cleanDataRange') || '-0200/1750';
   });
   const [gridDups, setGridDups] = useState([]);
-  const [gridMuertes, setGridMuertes] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,13 +26,6 @@ const Ayuda = ({ eventEmitter }) => {
     }));
   }, []);
 
-  const handleCheckboxChange = useCallback((event) => {
-    const { name } = event.target;
-    setFiltros(prev => ({
-      ...prev,
-      [name]: event.target.checked
-    }));
-  }, []);
 
   const handleCleanDataRangeChange = useCallback((event) => {
     const value = event.target.value;
@@ -58,10 +43,6 @@ const Ayuda = ({ eventEmitter }) => {
 
     // Process data for grids
     setGridDups(resurrect(allPesajes));
-    const muertes = allPesajes
-      .filter(w => w.Operacion?.toUpperCase().trim() === 'MUERTE')
-      .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
-    setGridMuertes(muertes);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -83,10 +64,6 @@ const Ayuda = ({ eventEmitter }) => {
     if (hisPesajes.length > 0) {
       // Refresh processed data when raw data changes
       setGridDups(resurrect(hisPesajes));
-      const muertes = hisPesajes
-        .filter(w => w.Operacion?.toUpperCase().trim() === 'MUERTE')
-        .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
-      setGridMuertes(muertes);
     }
   }, [hisPesajes]);
 
@@ -163,29 +140,8 @@ const Ayuda = ({ eventEmitter }) => {
         )}
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
-
-      <section className="filter-section ayuda-bottom-filters">
-        <div className="filters-row">
-          <div className="filter-group checkbox-group">
-            <label>Muertes</label>
-            <input
-              type="checkbox"
-              name="filtroMuertos"
-              onChange={handleCheckboxChange}
-              checked={filtros.filtroMuertos}
-            />
-          </div>
-        </div>
-      </section>
-
-      {filtros.filtroMuertos && (
-        <section className="table-container">
-          <Table data={gridMuertes} columns={columnsMuertes} />
-        </section>
-      )}
-
       <section className="version-info">
-        <label>Version 1.0.25 - {dataService.getLastUpdate()}</label>
+        <label>Version 1.0.5 - {dataService.getLastUpdate()}</label>
       </section>
     </div>
   );
