@@ -106,24 +106,35 @@ export const mapApiDataToPesajes= (apiResult) => {
   return rows;
 }
 
-export const resurrect = (pesajes) =>
-{
-  try{
-  let result = Object.values(getPesajesByCodigo(pesajes));
 
-  let loners = result.filter(w => w.pesajes?.length===1 && ['VENTA','MUERTE','CORRECCION'].includes(w.Operacion?.toUpperCase())); 
+export const resurrect = (rows) => {
+  const grouped = getPesajesByCodigo(rows) || {};
+  const TERMINALS = new Set(['VENTA', 'MUERTE', 'CORRECCION']);
+  const out = [];
 
-  let dupSalida = result.filter(w=> w.pesajes?.length && ['VENTA','MUERTE','CORRECCION'].includes(w.pesajes[w.pesajes.length-1].Operacion?.toUpperCase()) );
-  dupSalida = dupSalida.filter(w=>{ let otrosPesajes =  w.pesajes.slice(0,w.pesajes.length-1);
-                                    return otrosPesajes.some(x=>['VENTA','MUERTE','CORRECCION'].includes (x.Operacion?.toUpperCase()))
-                                  });  
+  Object.values(grouped).forEach(g => {
+    const arr = g.Pesajes || g.pesajes || [];
+    if (!Array.isArray(arr) || arr.length === 0) return;
 
-  return loners.concat(dupSalida);
-                                }
-  catch{
-    return []
-  }
-}
+    const ops = arr.map(p => (p?.Operacion || '').toUpperCase().trim());
+    const terminalIdxs = ops
+      .map((op, idx) => (TERMINALS.has(op) ? idx : -1))
+      .filter(idx => idx >= 0);
+
+    const lastIdx = arr.length - 1;
+
+    const singleTerminalOnly = arr.length === 1 && terminalIdxs.length === 1;
+    const multipleTerminals = terminalIdxs.length >= 2;
+    const terminalBeforeLast = terminalIdxs.some(idx => idx < lastIdx);
+
+    if (singleTerminalOnly || multipleTerminals || terminalBeforeLast) {
+      out.push({ Codigo: g.Codigo, pesajes: arr });
+    }
+  });
+
+  return out;
+};
+
 
 const gananciaDiaria = (pesoInicial,pesoFinal) =>
 {
