@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
+import "../App.css";
 import IntegerMatrix from "./Matrix";
 import { resurrect } from "./Helpers";
 import Duplicados from "./Duplicados";
 import Codigos from "./Codigos";
 import { dataService } from "../services/DataService";
-import "../App.css";
+import Table from "./Table";
+
 
 const Ayuda = ({ eventEmitter }) => {
   const [filtros, setFiltros] = useState({
@@ -18,6 +20,8 @@ const Ayuda = ({ eventEmitter }) => {
   const [gridDups, setGridDups] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCodigo, setSelectedCodigo] = useState(null);
+  const [selectedPesajes, setSelectedPesajes] = useState([]);
 
   const handleOptionChange = useCallback((event) => {
     setFiltros(prev => ({
@@ -81,7 +85,7 @@ const Ayuda = ({ eventEmitter }) => {
     return <div className="loading">Cargando...</div>;
   }
 
-  return (
+ return (
     <div className="ayuda-filters">
       <section className="filter-section">
         <div className="filters-row">
@@ -116,24 +120,26 @@ const Ayuda = ({ eventEmitter }) => {
               />
               Duplicados
             </label>
-          <div className="filter-group">
-            <label>Rango Ganancias</label>
-            <input
-              type="text"
-              value={cleanDataRange}
-              onChange={handleCleanDataRangeChange}
-              placeholder="-0200/1750"
-              className="freeinputsmall"
-              style={{ width: '100px' }}
-            />
-          </div>
+            <div className="filter-group">
+              <label>Rango Ganancias</label>
+              <input
+                type="text"
+                value={cleanDataRange}
+                onChange={handleCleanDataRangeChange}
+                placeholder="-0200/1750"
+                className="freeinputsmall"
+                style={{ width: '100px' }}
+              />
+            </div>
           </div>
         </div>
       </section>
-
-      <section className="content-section">
+       <section className="content-section">
         {filtros.selectedOption === "optionInconsistencias" && gridDups?.length > 0 && (
-          <IntegerMatrix nColumns={5} integers={gridDups} />
+            <IntegerMatrix
+              nColumns={5}
+              integers={gridDups}
+            />
         )}
         {filtros.selectedOption === "optionRevisionCodigos" && (
           <Codigos eventEmitter={eventEmitter} />
@@ -146,5 +152,4 @@ const Ayuda = ({ eventEmitter }) => {
     </div>
   );
 };
-
 export default Ayuda;

@@ -39,7 +39,7 @@ const Inventario = ({ eventEmitter }) => {
 
   const [filtros, setFiltros] = useState({
     filtroBuscar: "",
-    filtroExacto: true,
+    filtroExacto: false,
     selectedOption: "cabezas",
     projectionDate: new Date().toISOString().split("T")[0],
   });
@@ -201,9 +201,10 @@ const Inventario = ({ eventEmitter }) => {
             <label>Otros</label>
             <input
               className="freeinputsmall"
-              name="filtroGeneral"
+              name="filtroBuscar"
               onChange={handleFilterChange}
               value={filtros.filtroBuscar}
+              maxLength={10}
             />
           </div>
           <div className="filter-group checkbox-group">

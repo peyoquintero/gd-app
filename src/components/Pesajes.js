@@ -39,7 +39,7 @@ const Pesajes = ({ eventEmitter }) => {
     filtroMarca: "",
     filtroCodigo: "",
     filtroChapeta: "",
-    filtroExacto: true,
+    filtroExacto: "contains",
   });
   const [gridData, setGridData] = useState([]);
   const [hisPesajes, setHispesajes] = useState([]);
@@ -142,15 +142,15 @@ const Pesajes = ({ eventEmitter }) => {
             (w) => w.Codigo?.toUpperCase().endsWith(codeFilter)
           );
           break;
-        case "contains":
-          filteredData = filteredData.filter(
-            (w) => w.Codigo?.toUpperCase().includes(codeFilter)
-          );
-          break;
         case "none":
-        default:
           filteredData = filteredData.filter(
             (w) => w.Codigo?.toUpperCase() === codeFilter
+          );
+          break;
+        case "contains":
+        default:
+          filteredData = filteredData.filter(
+            (w) => w.Codigo?.toUpperCase().includes(codeFilter)
           );
           break;
       }
@@ -274,7 +274,7 @@ const Pesajes = ({ eventEmitter }) => {
           <select
             name="filtroExacto"
             onChange={handleFilterChange}
-            value={filtros.filtroExacto ?? "none"}
+            value={filtros.filtroExacto ?? "contains"}
           >
             <option value="none">Exacto</option>
             <option value="starts">Empieza con</option>
