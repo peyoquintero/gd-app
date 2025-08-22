@@ -5,7 +5,6 @@ import { resurrect } from "./Helpers";
 import Duplicados from "./Duplicados";
 import Codigos from "./Codigos";
 import { dataService } from "../services/DataService";
-import Table from "./Table";
 
 
 const Ayuda = ({ eventEmitter }) => {

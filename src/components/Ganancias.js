@@ -242,10 +242,11 @@ const Ganancias = ({ eventEmitter }) => {
       const columns = [
         { label: "Codigo", accessor: "Codigo",width:"12%" },
         { label: "Chapeta", accessor: "Chapeta",width:"12%" },
-        { label: "Fecha Inicial", accessor: "FechaInicial",width:"20%" },
-        { label: "Fecha Final", accessor: "FechaFinal",width:"20%" },
-        { label: "Peso Inicial", accessor: "PesoInicial",width:"12%" },
-        { label: "Peso Final", accessor: "PesoFinal",width:"12%" },
+        { label: "Marca", accessor: "Marca",width:"6%" },
+        { label: "F. Inicial", accessor: "FechaInicial",width:"15%" },
+        { label: "F. Final", accessor: "FechaFinal",width:"15%" },
+        { label: "P. Inicial", accessor: "PesoInicial",width:"13%" },
+        { label: "P. Final", accessor: "PesoFinal",width:"13%" },
         { label: "Ganancia", accessor: "Ganancia",width:"12%" },
        ];
 
