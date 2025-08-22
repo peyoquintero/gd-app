@@ -38,7 +38,7 @@ const Inventario = ({ eventEmitter }) => {
   ];
 
   const [filtros, setFiltros] = useState({
-    filtroBuscar: "",
+    filtroMarca: "",
     filtroExacto: false,
     selectedOption: "cabezas",
     projectionDate: new Date().toISOString().split("T")[0],
@@ -57,10 +57,6 @@ const Inventario = ({ eventEmitter }) => {
     setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
   }, []);
 
-  const handleCheckboxChange = useCallback((event) => {
-    setFiltros((prev) => ({ ...prev, filtroExacto: event.target.checked }));
-  }, []);
-
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
 
@@ -71,11 +67,35 @@ const Inventario = ({ eventEmitter }) => {
       FechaUltimoControl: formatDate(pesaje.FechaUltimoControl)
     }));
 
+    const matchesFilter = (fieldValue, filterValue) => {
+      if (!filterValue) return true;
+      
+      const field = (fieldValue || '').toUpperCase();
+      const filter = filterValue.toUpperCase();
+      
+      // If no wildcards, use the original logic (all characters must be present)
+      if (!filter.includes('*')) {
+        return [...filter].every(char => field.includes(char));
+      }
+      
+      // Convert wildcard pattern to regex
+      // Escape special regex characters except *
+      const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+      // Replace * with .* (match any characters)
+      const regexPattern = escapedFilter.replace(/\*/g, '.*');
+      const regex = new RegExp(`^${regexPattern}$`);
+      
+      return regex.test(field);
+    };
+
     if (filtros.filtroCodigo?.length > 0) {
-      filteredData = filteredData.filter(w => w.Codigo?.toUpperCase().includes(filtros.filtroCodigo));
+      filteredData = filteredData.filter(w => matchesFilter(w.Codigo, filtros.filtroCodigo));
     }
-    if (filtros.filtroBuscar?.length > 1) {
-      filteredData = filteredGData(filteredData, filtros.filtroBuscar, "Peso", filtros.filtroExacto);
+    if (filtros.filtroMarca?.length > 1) {
+      filteredData = filteredData.filter(w => matchesFilter(w.Marca, filtros.filtroMarca));
+    }
+    if (filtros.filtroChapeta?.length > 1) {
+      filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, filtros.filtroChapeta));
     }
 
     let movimientos = filteredData
@@ -195,26 +215,27 @@ const Inventario = ({ eventEmitter }) => {
               name="filtroCodigo"
               onChange={handleFilterChange}
               value={filtros.filtroCodigo}
-            />
-          </div>
-          <div className="filter-group">
-            <label>Otros</label>
-            <input
-              className="freeinputsmall"
-              name="filtroBuscar"
-              onChange={handleFilterChange}
-              value={filtros.filtroBuscar}
               maxLength={10}
             />
           </div>
-          <div className="filter-group checkbox-group">
-            <label>Exacto</label>
+          <div className="filter-group">
+            <label>Chapeta</label>
             <input
-              type="checkbox"
-              id="checkboxFE"
-              name="filtroExacto"
-              onChange={handleCheckboxChange}
-              checked={filtros.filtroExacto}
+              className="freeinputsmall"
+              name="filtroChapeta"
+              onChange={handleFilterChange}
+              value={filtros.filtroChapeta}
+              maxLength={10}
+            />
+          </div>
+          <div className="filter-group">          
+            <label>Marca</label>
+            <input
+              className="freeinputtiny"
+              name="filtroMarca"
+              onChange={handleFilterChange}
+              value={filtros.filtroMarca}
+              maxLength={3}
             />
           </div>
           <div className="filter-group">
