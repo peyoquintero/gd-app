@@ -88,7 +88,8 @@ const Ayuda = ({ eventEmitter }) => {
     <div className="ayuda-filters">
       <section className="filter-section">
         <div className="filters-row">
-          <div className="filter-group radio-group">
+          {/* This single div will contain all the filters in a row */}
+          <div className="filter-group radio-group-horizontal">
             <label className="radio-label">
               <input
                 type="radio"
@@ -109,31 +110,24 @@ const Ayuda = ({ eventEmitter }) => {
               />
               Revision Codigos
             </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="details"
-                value="optionDuplicados"
-                checked={filtros.selectedOption === "optionDuplicados"}
-                onChange={handleOptionChange}
-              />
-              Duplicados
-            </label>
-            <div className="filter-group">
-              <label>Rango Ganancias</label>
-              <input
-                type="text"
-                value={cleanDataRange}
-                onChange={handleCleanDataRangeChange}
-                placeholder="-0200/1750"
-                className="freeinputsmall"
-                style={{ width: '100px' }}
-              />
-            </div>
+          </div>
+          
+          {/* The Rango Ganancias input is now in the same filters-row */}
+          <div className="filter-group">
+            <label>Rango Ganancias</label>
+            <input
+              type="text"
+              value={cleanDataRange}
+              onChange={handleCleanDataRangeChange}
+              placeholder="-0200/1750"
+              className="freeinputsmall"
+              style={{ width: '100px' }}
+            />
           </div>
         </div>
       </section>
-       <section className="content-section">
+
+      <section className="content-section">
         {filtros.selectedOption === "optionInconsistencias" && gridDups?.length > 0 && (
             <IntegerMatrix
               nColumns={5}
@@ -151,4 +145,5 @@ const Ayuda = ({ eventEmitter }) => {
     </div>
   );
 };
+
 export default Ayuda;

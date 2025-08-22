@@ -86,10 +86,9 @@ label {
 
 .filters-row {
   display: flex;
+  align-items: center;
+  gap: 2rem; /* Adds space between the radio group and the input field */
   flex-wrap: wrap;
-  gap: 0.25rem;
-  align-items: end;
-  justify-content: space-between;
 }
 
 .filter-group {
@@ -1079,4 +1078,13 @@ input[type="text"] {
   width: 12ch;
   max-width: 12ch;
   min-width: 10ch;
+}
+
+/* Add this to your main CSS file */
+.radio-group-horizontal {
+  display: flex;
+  flex-direction: row; /* Align items in a row */
+  align-items: center; /* Vertically align items in the center */
+  gap: 1.5rem; /* Add space between the radio buttons */
+  flex-wrap: wrap; /* Allow items to wrap to the next line on smaller screens */
 }
