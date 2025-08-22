@@ -140,86 +140,104 @@ const Ganancias = ({ eventEmitter }) => {
       };
 
     const applyFilters = (event) => {
-          // Start with fresh data each time
-          let hispesajesFiltered = [...hisPesajes].filter(pesaje => 
-              !['CORRECCION', 'MUERTE'].includes(pesaje.Operacion?.toUpperCase())
+  // Helper function for enhanced filtering with wildcard support
+  const matchesFilter = (fieldValue, filterValue) => {
+    if (!filterValue) return true;
+    
+    const field = (fieldValue || '').toUpperCase();
+    const filter = filterValue.toUpperCase();
+    
+    // If no wildcards, use substring matching (contains)
+    if (!filter.includes('*')) {
+      return field.includes(filter);
+    }
+    
+    // Convert wildcard pattern to regex
+    // Escape special regex characters except *
+    const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+    // Replace * with .* (match any characters)
+    const regexPattern = escapedFilter.replace(/\*/g, '.*');
+    const regex = new RegExp(`^${regexPattern}$`);
+    
+    return regex.test(field);
+  };
+
+  // Start with fresh data each time
+  let hispesajesFiltered = [...hisPesajes].filter(pesaje => 
+    !['CORRECCION', 'MUERTE'].includes(pesaje.Operacion?.toUpperCase())
+  );
+
+  // Apply marca filter with enhanced logic
+  if (filtros.filtroMarca.startsWith("~")) {
+    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+      pesaje.Marca !== filtros.filtroMarca.trim().substring(1)
+    );
+  } else if (filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
+    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+      matchesFilter(pesaje.Marca, filtros.filtroMarca.trim())
+    );
+  }
+
+  // Apply codigo filter with enhanced logic
+  if (filtros.filtroCodigo.trim() !== "") {
+    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+      matchesFilter(pesaje.Codigo, filtros.filtroCodigo.trim())
+    );
+  }
+
+  // Apply chapeta filter with enhanced logic
+  if (filtros.filtroChapeta.trim() !== "") {
+    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
+      matchesFilter(pesaje.Chapeta, filtros.filtroChapeta.trim())
+    );
+  }
+
+  // Calculate ganancias with filtered data
+  let gridDataResults = ganancias(
+    hispesajesFiltered,
+    filtros.fechaInicial,
+    filtros.fiExacta,
+    filtros.fechaFinal,
+    filtros.ffExacta,
+    filtros.filtroVentas
+  );
+
+  // Add IDs
+  gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
+
+  // Apply peso filter if needed
+  if (filtros.filtroPeso !== "*" && filtros.filtroPeso.trim() !== "") {
+      const array = filtros.filtroPeso.split("-");
+      if (array.length === 2) {
+          gridDataResults = gridDataResults.filter(pesaje => 
+              parseInt(pesaje.PesoInicial) >= parseInt(array[0]) && 
+              parseInt(pesaje.PesoInicial) <= parseInt(array[1])
           );
+      }
+  }
 
-          // Apply marca filter
-          if (filtros.filtroMarca.startsWith("~")) {
-              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-                  pesaje.Marca !== filtros.filtroMarca.trim().substring(1)
-              );
-          }
-          else {
-            if (filtros.filtroMarca !== "*" && filtros.filtroMarca !== "") {
-                hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-                    pesaje.Marca === filtros.filtroMarca.trim()
-                );
-            }
-          }
+  // Clean data and update state
+  const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
+  const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
+  let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
+  setGridData(gridDataResults);
+  
+  // Update captions
+  setCaptions({
+      resultGanancia: captionGanancia(scrubbedData),
+      resultCabezas: captionCabezas(scrubbedData.length, gridDataResults.length),
+      resultUltPeso: captionUltPeso(scrubbedData),
+      resultDias: captionDias(scrubbedData),
+      resultMedia: captionMedia(scrubbedData)
+  });
 
-
-          // Apply codigo filter
-          if (filtros.filtroCodigo !== "") {
-              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-                  pesaje.Codigo.startsWith(filtros.filtroCodigo.trim())
-              );
-          }
-
-          // Apply chapeta filter
-          if (filtros.filtroChapeta !== "") {
-              hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-                  pesaje.Chapeta.startsWith(filtros.filtroChapeta.trim())
-              );
-          }
-
-          // Calculate ganancias with filtered data
-          let gridDataResults = ganancias(
-              hispesajesFiltered,
-              filtros.fechaInicial,
-              filtros.fiExacta,
-              filtros.fechaFinal,
-              filtros.ffExacta,
-              filtros.filtroVentas
-          );
-
-          // Add IDs
-          gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
-
-          // Apply peso filter if needed
-          if (filtros.filtroPeso !== "*" && filtros.filtroPeso.trim() !== "") {
-              const array = filtros.filtroPeso.split("-");
-              if (array.length === 2) {
-                  gridDataResults = gridDataResults.filter(pesaje => 
-                      parseInt(pesaje.PesoInicial) >= parseInt(array[0]) && 
-                      parseInt(pesaje.PesoInicial) <= parseInt(array[1])
-                  );
-              }
-          }
-
-          // Clean data and update state
-          const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
-          const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
-          let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
-          setGridData(gridDataResults);
-          
-          // Update captions
-          setCaptions({
-              resultGanancia: captionGanancia(scrubbedData),
-              resultCabezas: captionCabezas(scrubbedData.length, gridDataResults.length),
-              resultUltPeso: captionUltPeso(scrubbedData),
-              resultDias: captionDias(scrubbedData),
-              resultMedia: captionMedia(scrubbedData)
-          });
-
-          // Emit table data for export functionality
-          eventEmitter.emit('tableDataUpdate', {
-            data: scrubbedData,
-            columns: columns,
-            title: 'Ganancias'
-          });
-     };
+  // Emit table data for export functionality
+  eventEmitter.emit('tableDataUpdate', {
+    data: scrubbedData,
+    columns: columns,
+    title: 'Ganancias'
+  });
+};
 
       const columns = [
         { label: "Codigo", accessor: "Codigo",width:"12%" },

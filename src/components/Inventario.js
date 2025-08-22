@@ -73,9 +73,9 @@ const Inventario = ({ eventEmitter }) => {
       const field = (fieldValue || '').toUpperCase();
       const filter = filterValue.toUpperCase();
       
-      // If no wildcards, use the original logic (all characters must be present)
+      // If no wildcards, use substring matching (contains)
       if (!filter.includes('*')) {
-        return [...filter].every(char => field.includes(char));
+        return field.includes(filter);
       }
       
       // Convert wildcard pattern to regex
