@@ -19,8 +19,6 @@ const Ayuda = ({ eventEmitter }) => {
   const [gridDups, setGridDups] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCodigo, setSelectedCodigo] = useState(null);
-  const [selectedPesajes, setSelectedPesajes] = useState([]);
 
   const handleOptionChange = useCallback((event) => {
     setFiltros(prev => ({

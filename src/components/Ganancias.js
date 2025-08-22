@@ -54,16 +54,25 @@ const Ganancias = ({ eventEmitter }) => {
         let allPesajes = dataService.getCachedData();
         if (!allPesajes) return;
         
-        allPesajes = allPesajes.filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"))
-        let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha))];
-        setHispesajes(allPesajes);
-        setFechasPesaje(allFechas);
-        let fechasPesajeDes = Array.from(allFechas).sort(function(a,b){return new Date(b) - new Date(a);})
-        setFechasPesajeDesc(fechasPesajeDes);
+        // Filter valid pesajes and normalize the 'Fecha' property immediately
+        allPesajes = allPesajes
+            .filter(w=>w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"))
+            .map(pesaje => ({ ...pesaje, Fecha: formatDate(pesaje.Fecha) }));
 
+        // Get unique dates and sort them chronologically for the dropdowns
+        const allFechasSorted = [...new Set(allPesajes.map(obj => obj.Fecha))]
+            .sort((a, b) => new Date(a) - new Date(b));
+        
+        const fechasPesajeDesc = [...allFechasSorted].reverse();
+
+        setHispesajes(allPesajes);
+        setFechasPesaje(allFechasSorted); // Use sorted dates for FechaInicial
+        setFechasPesajeDesc(fechasPesajeDesc); // Use reverse sorted for FechaFinal
+
+        // Reset filters and set default date range from the available data
         setFiltros({
-            fechaInicial: allFechas[0] ?? new Date('2020-01-01T00:00:00'),
-            fechaFinal : fechasPesajeDes[0] ?? new Date(),
+            fechaInicial: allFechasSorted[0] ?? new Date('2020-01-01T00:00:00'),
+            fechaFinal : fechasPesajeDesc[0] ?? new Date(),
             filtroCodigo: "",
             filtroMarca: "",
             filtroPeso: "",

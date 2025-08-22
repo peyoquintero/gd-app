@@ -134,6 +134,7 @@ const Inventario = ({ eventEmitter }) => {
       if (data) {
         refreshData(data);
         setHisPesajes(data);
+        console.log(data);
       }
     } catch (error) {
       console.error("Error loading data:", error);
