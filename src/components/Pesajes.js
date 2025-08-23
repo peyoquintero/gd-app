@@ -26,11 +26,12 @@ const formatDate = (dateString) => {
 const Pesajes = ({ eventEmitter }) => {
   const columns = [
     { label: "Codigo", accessor: "Codigo", width: "15%" },
-    { label: "Chapeta", accessor: "Chapeta", width: "15%" },
-    { label: "Marca", accessor: "Marca", width: "15%" },
-    { label: "Fecha", accessor: "Fecha", width: "20%" },
-    { label: "Peso", accessor: "Peso", width: "15%" },
-    { label: "Operacion", accessor: "Operacion", width: "20%" },
+    { label: "Chapeta", accessor: "Chapeta", width: "10%" },
+    { label: "Marca", accessor: "Marca", width: "10%" },
+    { label: "Fecha", accessor: "Fecha", width: "15%" },
+    { label: "Peso", accessor: "Peso", width: "10%" },
+    { label: "Operacion", accessor: "Operacion", width: "15%" },
+    { label: "Comentario", accessor: "Comentario", width: "25%" },
   ];
 
   const [filtros, setFiltros] = useState({

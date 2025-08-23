@@ -18,12 +18,11 @@ export function App() {
   const [currentTableData, setCurrentTableData] = useState({ data: [], columns: [], title: '' });
   const { online } = useNetwork();
 
-  // Debug: Log connection status changes
   useEffect(() => {
     console.log('Connection status changed:', online ? 'ONLINE' : 'OFFLINE');
   }, [online]);
   
-  const dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+const dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo!A:H?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
