@@ -84,6 +84,17 @@ label {
   }
 }
 
+/* --- REMOVE THE FOLLOWING THREE RULE BLOCKS --- */
+.filters-row,
+.date-filters {
+  display: flex;
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens if needed */
+  justify-content: flex-start; /* THIS IS THE KEY: Aligns all items to the left */
+  align-items: flex-end; /* Aligns items neatly along their bottom edge */
+  gap: 12px; /* Creates tight, consistent spacing between filter groups */
+  padding: 8px 0; /* Adds some vertical spacing */
+}
+
 .filters-row {
   display: flex;
   align-items: center;
@@ -91,54 +102,75 @@ label {
   flex-wrap: wrap;
 }
 
+/* --- ADD THIS NEW UNIFIED RULE IN THEIR PLACE --- */
+.filters-row,
+.date-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Aligns all items to the left */
+  align-items: flex-end;       /* Aligns items neatly along their bottom edge */
+  gap: 12px;                   /* Creates tight, consistent spacing */
+  width: 100%;                 /* Ensures the container takes full width */
+  padding: 4px 0;              /* Adds some vertical spacing */
+}
+
+
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 4px; /* Small space between a label and its input */
   min-width: 80px;
   max-width: 100px;
   flex-shrink: 0;
 }
 
-.filter-group label {
-  font-size: 0.65rem;
-  color: #666;
-  margin: 0;
-  text-align: left;
-  align-self: flex-start;
-  white-space: nowrap;
+/* --- ADD THIS NEW RULE BLOCK --- */
+/* Unified border color for inputs and selects in all filter sections */
+.pesajes-filters .filter-group input,
+.pesajes-filters .filter-group select,
+.inventario-filters .filter-group input,
+.inventario-filters .filter-group select,
+.date-filters select,
+.filters-row input {
+  border: 1px solid #ccc !important; /* Use #ccc from Pesajes and !important to override others */
 }
 
-.filter-group input,
-.filter-group select {
-  font-size: 0.75rem;
-  padding: 0.25rem;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 32px;
+/* --- ADD THIS NEW RULE BLOCK --- */
+/* This group ensures the date select and its checkbox are grouped together */
+.date-combo-group {
+  display: flex;
+  align-items: flex-end; /* Aligns the select and the checkbox group to their bottom edge */
+  gap: 4px; /* This creates the very narrow gap between the select and the checkbox group */
 }
 
-.filter-group input[type="text"] {
-  text-transform: uppercase;
+/* This specifically targets the '=' checkbox group inside the combo group */
+.date-combo-group .filter-group.checkbox-group {
+  flex-direction: row; /* Override the default column layout to be side-by-side */
+  align-items: center; /* Vertically center the '=' label and the checkbox */
+  gap: 4px; /* Space between the '=' and the checkbox */
+  padding-bottom: 5px; /* Adjust to align perfectly with the bottom of the select input */
 }
 
-.checkbox-group {
-  align-items: center;
+
+/* REPLACE THE BLOCK BELOW */
+.filter-group.checkbox-group {
+  flex-direction: column;      /* Stack label on top of checkbox */
+  justify-content: flex-end; /* Align the whole group to the bottom */
+  align-items: center;         /* Center the label and checkbox horizontally */
+  gap: 4px;                    /* Space between label and checkbox */
+  padding-bottom: 2px;         /* Fine-tune vertical alignment with other controls */
 }
 
-.checkbox-group label {
-  text-align: center;
-  align-self: center;
+.filter-group.checkbox-group label {
+  margin-bottom: 0; /* Remove extra space below the label */
 }
 
-.checkbox-group input[type="checkbox"] {
-  align-self: center;
-  transform: scale(0.56);
-  margin: 0;
+.filter-group.checkbox-group input[type="checkbox"] {
+  transform: scale(1.4); /* Make the checkbox larger */
+  margin: 0;             /* Remove default margins */
 }
 
+/* --- REMOVE THIS RULE BLOCK --- */
 .date-filters {
   display: flex;
   flex-wrap: wrap;
@@ -267,7 +299,8 @@ label {
   }
 
   .pesajes-filters .fecha-control-group select {
-    min-width: 140px;
+    width: 100%;
+    min-width: 120px;
   }
 }
 
@@ -384,12 +417,19 @@ label {
   }
 }
 
-.inventario-filters .filter-group label {
-  font-size: 0.6rem;
-  color: #666;
+/* REPLACE THE RULE BLOCK BELOW */
+/* This single rule now correctly styles labels for both components */
+.inventario-filters .filter-group label,
+.pesajes-filters .filter-group label {
+  font-family: arial; /* Ensures consistent font */
+  font-size: 0.65rem;
+  color: #666; /* The light gray color */
   margin: 0;
   text-align: left;
   white-space: nowrap;
+  font-weight: normal; /* Ensures font is not bold */
+  display: block;
+  width: 100%;
 }
 
 .radio-container-compact {
@@ -437,6 +477,7 @@ label {
     min-height: 28px;
   }
 
+  /* REMOVE THE RULE BLOCK BELOW */
   .inventario-filters .filter-group label {
     font-size: 0.65rem;
   }
@@ -673,11 +714,9 @@ input{
 label{
   font-family: arial;
   font-size:12px;
-  font-weight: bold;
   margin: 5px;
   display:block;
   max-height:12px;
-  text-align: center;
 }
 .center-label{
   display: flex;
@@ -777,17 +816,18 @@ label{
   max-width: 150px;
 }
 
-.pesajes-filters .fecha-control-group select {
-  width: 100%;
-  min-width: 120px;
-}
-
+/* REMOVE THE RULE BLOCK BELOW */
 .pesajes-filters .filter-group label {
   font-size: 0.65rem;
   color: #666;
   margin: 0;
   text-align: left;
   white-space: nowrap;
+}
+
+/* Target the "Comentario" checkbox specifically and make it smaller */
+.pesajes-filters .filter-group.checkbox-group input[name="showComentario"] {
+  transform: scale(0.7); /* Half the size of the default 1.4 scale */
 }
 
 
