@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Table from "./Table";
 import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
@@ -24,16 +24,6 @@ const formatDate = (dateString) => {
 };
 
 const Pesajes = ({ eventEmitter }) => {
-  const columns = [
-    { label: "Codigo", accessor: "Codigo", width: "15%" },
-    { label: "Chapeta", accessor: "Chapeta", width: "10%" },
-    { label: "Marca", accessor: "Marca", width: "10%" },
-    { label: "Fecha", accessor: "Fecha", width: "15%" },
-    { label: "Peso", accessor: "Peso", width: "10%" },
-    { label: "Operacion", accessor: "Operacion", width: "15%" },
-    { label: "Comentario", accessor: "Comentario", width: "25%" },
-  ];
-
   const [filtros, setFiltros] = useState({
     fechaControl: null,
     filtroOperacion: "",
@@ -42,11 +32,30 @@ const Pesajes = ({ eventEmitter }) => {
     filtroChapeta: "",
     filtroExacto: "contains",
   });
+  const [showComentario, setShowComentario] = useState(false); // <-- ADD new state for the checkbox
   const [gridData, setGridData] = useState([]);
   const [hisPesajes, setHispesajes] = useState([]);
   const [fechasPesaje, setFechasPesaje] = useState([]);
   const [captions, setCaptions] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Dynamically build columns based on the checkbox state
+  const columns = useMemo(() => {
+    const baseColumns = [
+      { label: "Codigo", accessor: "Codigo", width: "15%" },
+      { label: "Chapeta", accessor: "Chapeta", width: "10%" },
+      { label: "Marca", accessor: "Marca", width: "10%" },
+      { label: "Fecha", accessor: "Fecha", width: "15%" },
+      { label: "Peso", accessor: "Peso", width: "10%" },
+      { label: "Operacion", accessor: "Operacion", width: "15%" },
+    ];
+
+    if (showComentario) {
+      return [...baseColumns, { label: "Comentario", accessor: "Comentario", width: "25%" }];
+    }
+
+    return baseColumns;
+  }, [showComentario]);
 
   const initializeData = useCallback(() => {
     let allPesajes = dataService.getCachedData();
@@ -108,7 +117,7 @@ const Pesajes = ({ eventEmitter }) => {
         title: 'Pesajes'
       });
     }
-  }, [gridData, eventEmitter]);
+  }, [gridData, eventEmitter, columns]); // <-- ADD 'columns' to dependency array
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -241,7 +250,7 @@ const Pesajes = ({ eventEmitter }) => {
           <div className="filter-group">
             <label>Marca</label>
             <input
-              className="freeinputsmall"
+              className="freeinputtiny"
               name="filtroMarca"
               onChange={handleFilterChange}
               value={filtros.filtroMarca}
@@ -256,7 +265,7 @@ const Pesajes = ({ eventEmitter }) => {
               value={filtros.filtroOperacion}
             />
           </div>
-          <div className="filter-group fecha-control-group">
+          <div className="filter-group">
             <label>Fecha</label>
             <select
               name="fechaControl"
@@ -282,6 +291,15 @@ const Pesajes = ({ eventEmitter }) => {
             <option value="ends">Termina con</option>
             <option value="contains">Contiene</option>
           </select>
+        </div>
+        <div className="filter-group checkbox-group">
+          <label>Comentario</label>
+          <input
+            type="checkbox"
+            name="showComentario"
+            checked={showComentario}
+            onChange={(e) => setShowComentario(e.target.checked)}
+          />
         </div>
          <button className="filter-button" onClick={applyFilters}>Ok</button>
         </div>
