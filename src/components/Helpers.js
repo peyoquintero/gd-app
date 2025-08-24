@@ -223,7 +223,7 @@ export const ganancias = (hispesajes, fechaInicial, fiComparator, fechaFinal, ff
             } else {
                 // If no sale, use the last control weigh-in from the relevant pesajes
                 const controls = relevantPesajes.filter(p => p.Operacion?.toUpperCase() === 'CONTROL');
-                if (controls.length > 1) { // Ensure there's more than one to be a range
+                if (controls.length > 0) { // Last control
                     maxP = controls[controls.length - 1];
                 }
             }
@@ -244,6 +244,7 @@ export const ganancias = (hispesajes, fechaInicial, fiComparator, fechaFinal, ff
 
     var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
         "Chapeta":w.pi.Chapeta,
+        "Marca":w.pi.Marca, // <-- THIS IS THE FIX
         "FechaInicial":formatDate(w.pi.Fecha),
         "FechaFinal":formatDate(w.pf.Fecha),
         "PesoInicial":w.pi.Peso,
@@ -252,7 +253,7 @@ export const ganancias = (hispesajes, fechaInicial, fiComparator, fechaFinal, ff
         "Dias": Math.round((new Date(w.pf.Fecha)-new Date(w.pi.Fecha))/86400000)
     }});
 
-    return datos;
+    return datos
 }
 
 export const compareNumAlphas = (str1, str2) =>

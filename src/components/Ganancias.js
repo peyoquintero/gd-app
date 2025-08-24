@@ -171,50 +171,49 @@ const Ganancias = ({ eventEmitter }) => {
     return regex.test(field);
   };
 
-  // Start with fresh data each time
-  let hispesajesFiltered = [...hisPesajes].filter(pesaje => 
+  // 1. Start with the full, unfiltered dataset of historical weigh-ins, excluding correccion o muerte
+  let hispesajesToProcess = [...hisPesajes].filter(pesaje => 
     !['CORRECCION', 'MUERTE'].includes(pesaje.Operacion?.toUpperCase())
   );
 
-  // Apply marca filter with enhanced logic
-  if (filtros.filtroMarca.startsWith("~")) {
-    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-      pesaje.Marca !== filtros.filtroMarca.trim().substring(1)
-    );
-  } else if (filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
-    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-      matchesFilter(pesaje.Marca, filtros.filtroMarca.trim())
-    );
-  }
-
-  // Apply codigo filter with enhanced logic
-  if (filtros.filtroCodigo.trim() !== "") {
-    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-      matchesFilter(pesaje.Codigo, filtros.filtroCodigo.trim())
-    );
-  }
-
-  // Apply chapeta filter with enhanced logic
-  if (filtros.filtroChapeta.trim() !== "") {
-    hispesajesFiltered = hispesajesFiltered.filter(pesaje => 
-      matchesFilter(pesaje.Chapeta, filtros.filtroChapeta.trim())
-    );
-  }
-
-  // Calculate ganancias with filtered data
+  // 2. Calculate gains based on date criteria and Ventas filter ONLY.
+  // This function needs the full history to work correctly.
   let gridDataResults = ganancias(
-    hispesajesFiltered,
+    hispesajesToProcess,
     filtros.fechaInicial,
-    filtros.fiComparator, // Pass the new comparator
+    filtros.fiComparator,
     filtros.fechaFinal,
-    filtros.ffComparator, // Pass the new comparator
+    filtros.ffComparator,
     filtros.filtroVentas
   );
 
-  // Add IDs
-  gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
+  // 3. Apply the text and weight filters to the results from the ganancias function.
+  // Apply marca filter
+  if (filtros.filtroMarca.startsWith("~")) {
+    gridDataResults = gridDataResults.filter(res => 
+      res.Marca !== filtros.filtroMarca.trim().substring(1)
+    );
+  } else if (filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
+    gridDataResults = gridDataResults.filter(res => 
+      matchesFilter(res.Marca, filtros.filtroMarca.trim())
+    );
+  }
 
-  // Apply peso filter if needed
+  // Apply codigo filter
+  if (filtros.filtroCodigo.trim() !== "") {
+    gridDataResults = gridDataResults.filter(res => 
+      matchesFilter(res.Codigo, filtros.filtroCodigo.trim())
+    );
+  }
+
+  // Apply chapeta filter
+  if (filtros.filtroChapeta.trim() !== "") {
+    gridDataResults = gridDataResults.filter(res => 
+      matchesFilter(res.Chapeta, filtros.filtroChapeta.trim())
+    );
+  }
+  
+  // Apply peso filter
   if (filtros.filtroPeso !== "*" && filtros.filtroPeso.trim() !== "") {
       const array = filtros.filtroPeso.split("-");
       if (array.length === 2) {
@@ -225,11 +224,15 @@ const Ganancias = ({ eventEmitter }) => {
       }
   }
 
-  // Clean data and update state
+  // Add IDs
+  gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
+
+  // Exclude dubious data and update state
   const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
   const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
   let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
-  setGridData(gridDataResults);
+  
+  setGridData(scrubbedData);
   
   // Update captions
   setCaptions({
@@ -318,7 +321,6 @@ const Ganancias = ({ eventEmitter }) => {
                   {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
               </select>
             </div>
-            {/* Replace checkbox with select */}
             <div className="filter-group">
               <label>&nbsp;</label> {/* Spacer label */}
               <select
