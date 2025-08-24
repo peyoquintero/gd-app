@@ -23,7 +23,7 @@ const Inventario = ({ eventEmitter }) => {
     { label: "Chapeta", accessor: "Chapeta", width: "15%" },
     { label: "Marca", accessor: "Marca", width: "10%" },
     { label: "Total", accessor: "Total", width: "15%" },
-    { label: "Vendidos", accessor: "Vendidos", width: "15%" },
+    { label: "Sacados", accessor: "Vendidos", width: "15%" },
   ];
 
   const columnsInventario = [
