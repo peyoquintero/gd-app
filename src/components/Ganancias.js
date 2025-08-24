@@ -171,10 +171,15 @@ const Ganancias = ({ eventEmitter }) => {
     return regex.test(field);
   };
 
-  // 1. Start with the full, unfiltered dataset of historical weigh-ins, excluding correccion o muerte
-  let hispesajesToProcess = [...hisPesajes].filter(pesaje => 
-    !['CORRECCION', 'MUERTE'].includes(pesaje.Operacion?.toUpperCase())
+  // 1. Identify and exclude any animal codes that have a 'CORRECCION' / 'MUERTE' record.
+  // These entire animals will be excluded from the calculation.
+  const codigosToExclude = new Set(
+    hisPesajes
+      .filter(p => p.Operacion?.toUpperCase() === 'CORRECCION' || p.Operacion?.toUpperCase() === 'MUERTE')
+      .map(p => p.Codigo)
   );
+
+  let hispesajesToProcess = hisPesajes.filter(pesaje => !codigosToExclude.has(pesaje.Codigo));
 
   // 2. Calculate gains based on date criteria and Ventas filter ONLY.
   // This function needs the full history to work correctly.
