@@ -28,11 +28,11 @@ const Ganancias = ({ eventEmitter }) => {
         filtroCodigo: "",
         filtroMarca: "",
         filtroPeso: "",
-        filtroLote: "",
+        filtroChapeta: "",
         fechaInicial:  new Date('2020-01-01T00:00:00'),
         fechaFinal: new Date(),
-        fiExacta: false,
-        ffExacta: false,
+        fiComparator: '>=', // Replaces fiExacta
+        ffComparator: '<=', // Replaces ffExacta
         filtroVentas: false,
       });
 
@@ -77,8 +77,8 @@ const Ganancias = ({ eventEmitter }) => {
             filtroMarca: "",
             filtroPeso: "",
             filtroChapeta: "",
-            fiExacta: false,
-            ffExacta: false,
+            fiComparator: '>=', // Replaces fiExacta
+            ffComparator: '<=', // Replaces ffExacta
             filtroVentas: false,
         });
     }, []);
@@ -205,9 +205,9 @@ const Ganancias = ({ eventEmitter }) => {
   let gridDataResults = ganancias(
     hispesajesFiltered,
     filtros.fechaInicial,
-    filtros.fiExacta,
+    filtros.fiComparator, // Pass the new comparator
     filtros.fechaFinal,
-    filtros.ffExacta,
+    filtros.ffComparator, // Pass the new comparator
     filtros.filtroVentas
   );
 
@@ -311,33 +311,54 @@ const Ganancias = ({ eventEmitter }) => {
       </div>
 
       <div className="date-filters">
-        <div className="filter-group">
-          <label>Fecha Inicial</label>
-          <select 
-            name="fechaInicial" 
-            onChange={handleFilterChange}
-          >
-            {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
-          </select>
+        <div className="date-control-pair">
+            <div className="filter-group">
+              <label>Fecha Inicial</label>
+              <select name="fechaInicial" onChange={handleFilterChange}>
+                  {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
+              </select>
+            </div>
+            {/* Replace checkbox with select */}
+            <div className="filter-group">
+              <label>&nbsp;</label> {/* Spacer label */}
+              <select
+                  name="fiComparator"
+                  className="date-comparator"
+                  onChange={handleFilterChange}
+                  value={filtros.fiComparator}
+                  style={{ width: '50px', textAlign: 'center' }}
+              >
+                  <option value=">=">&gt;=</option>
+                  <option value="=">=</option>
+                  <option value="<=">&lt;=</option>
+              </select>
+            </div>
         </div>
-        <div className="filter-group checkbox-group">
-          <label>=</label>
-          <input type="checkbox" name="fiExacta" onChange={handleCheckboxChange}/>
+
+        <div className="date-control-pair">
+            <div className="filter-group">
+              <label>Fecha Final</label>
+              <select name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
+                  {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)}
+              </select>
+            </div>
+            {/* Replace checkbox with select */}
+            <div className="filter-group">
+              <label>&nbsp;</label> {/* Spacer label */}
+              <select
+                  name="ffComparator"
+                  className="date-comparator"
+                  onChange={handleFilterChange}
+                  value={filtros.ffComparator}
+                  style={{ width: '50px', textAlign: 'center' }}
+              >
+                  <option value="<=">&lt;=</option>
+                  <option value="=">=</option>
+                  <option value=">=">&gt;=</option>
+              </select>
+            </div>
         </div>
-        <div className="filter-group">
-          <label>Fecha Final</label>
-          <select
-            name="fechaFinal"
-            onChange={handleFilterChange}
-            value={filtros.fechaFinal}
-          >
-            {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)}
-          </select>
-        </div>
-        <div className="filter-group checkbox-group">
-          <label>=</label>
-          <input type="checkbox" name="ffExacta" onChange={handleCheckboxChange}/>
-        </div>
+
         <div className="filter-group checkbox-group">
           <label>Ventas</label>
           <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>

@@ -141,88 +141,118 @@ const gananciaDiaria = (pesoInicial,pesoFinal) =>
   return Math.round((pesoFinal.Peso-pesoInicial.Peso)/ ((new Date(pesoFinal.Fecha)-new Date(pesoInicial.Fecha))/86400000)*1000)
 }
 
-const  gananciaDiariaPesajes = (results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas) =>
+
+export const ganancias = (hispesajes, fechaInicial, fiComparator, fechaFinal, ffComparator, filtroVentas) =>
 {
-  var minmaxPesajes = [];
-
-  // Normalize date formats for comparison
-  const normalizeDate = (dateStr) => {
-    if (!dateStr) return null;
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
-    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
-  };
-
-  const fechaInicialNorm = normalizeDate(fechaInicial);
-  const fechaFinalNorm = normalizeDate(fechaFinal);
-
-  results.forEach(result => {
-    let datafilter=result.pesajes;
-    // Use proper date comparison instead of string comparison
-    datafilter=datafilter.filter(w => {
-      const fechaNorm = normalizeDate(w.Fecha);
-      return fechaNorm >= fechaInicialNorm && fechaNorm <= fechaFinalNorm;
-    });
-    let minP=datafilter[0];
-    let maxP=datafilter[datafilter.length-1];
-    if(fiExacta) {
-      minP=datafilter.find(w => normalizeDate(w.Fecha) === fechaInicialNorm);
-    }
-    if(ffExacta) {
-      maxP=datafilter.find(w => normalizeDate(w.Fecha) === fechaFinalNorm);
-    }
-    if(filtroVentas) {
-      maxP=datafilter.find(w => w.Operacion.toLowerCase()==="venta"&&(!ffExacta||normalizeDate(w.Fecha)===fechaFinalNorm));
+    if (!hispesajes || hispesajes.length === 0) {
+        return [];
     }
 
-    let minMaxPesajes=[minP, maxP];
-    let objresult={ Codigo: result.Codigo, pi: minMaxPesajes[0], pf: minMaxPesajes[1] };
-    if((minP!==undefined)&&(maxP!==undefined)&&(maxP.Fecha>minP.Fecha)) { minmaxPesajes.push(objresult); };
-  });
-  return minmaxPesajes;
-}
-
-
-export const ganancias = (hispesajes,fechaInicial,fiExacta,fechaFinal,ffExacta,filtroVentas) =>
-{
-    var results = hispesajes.reduce(function(h, obj) {
+    // 1. Group all weigh-ins by animal code
+    var groupedByCodigo = hispesajes.reduce(function(h, obj) {
       h[obj.Codigo] = (h[obj.Codigo] || []).concat(obj);
       return h; 
     }, {});
 
-    results = Object.keys(results).map(key => {
-              return {
-                Codigo: key, 
-                pesajes : hispesajes.filter(pesaje=>pesaje.Codigo===key)
-                                    .sort(function(a,b){
-                                            return new Date(a.Fecha) - new Date(b.Fecha);
-                                          })}
-              }
-            );
+    // 2. Create a clean array of animals, each with their weigh-ins sorted by date
+    let results = Object.keys(groupedByCodigo).map(key => {
+        return {
+            Codigo: key, 
+            pesajes : groupedByCodigo[key].sort((a,b) => new Date(a.Fecha) - new Date(b.Fecha))
+        }
+    }).filter(result => result.pesajes.length > 1); // Exclude animals with only one weigh-in or dead/corrected
 
-    results = results.filter(result=>result.pesajes.length>1) // Excluir semovientes con un solo pesaje
+    // 3. Filter animals based on the new date criteria
+    const fiDate = new Date(fechaInicial);
+    fiDate.setUTCHours(0, 0, 0, 0);
+    const ffDate = new Date(fechaFinal);
+    ffDate.setUTCHours(0, 0, 0, 0);
 
-    let minmaxPesajes = gananciaDiariaPesajes(results, fechaInicial, fechaFinal, fiExacta, ffExacta, filtroVentas);
+    const checkDateCondition = (dateStr, comparator, referenceDate) => {
+      const pDate = new Date(dateStr);
+      if (isNaN(pDate.getTime())) return false;
+      pDate.setUTCHours(0, 0, 0, 0);
 
-    // Helper function to ensure consistent date format
+      switch (comparator) {
+        case '>=': return pDate >= referenceDate;
+        case '=':  return pDate.getTime() === referenceDate.getTime();
+        case '<=': return pDate <= referenceDate;
+        default:   return true;
+      }
+    };
+
+    const filteredAnimals = results.filter(animal => {
+      // An animal is included if ANY of its weigh-ins match the start OR end conditions.
+      const hasStartMatch = animal.pesajes.some(p => checkDateCondition(p.Fecha, fiComparator, fiDate));
+      const hasEndMatch = animal.pesajes.some(p => checkDateCondition(p.Fecha, ffComparator, ffDate));
+      return hasStartMatch || hasEndMatch;
+    });
+
+    // 4. For the filtered animals, find their initial and final weigh-ins for calculation
+    const minmaxPesajes = [];
+    filteredAnimals.forEach(animal => {
+        let minP = null;
+        let maxP = null;
+        
+        // Find the index of the first weigh-in that meets the start condition.
+        const startIndex = animal.pesajes.findIndex(p => checkDateCondition(p.Fecha, fiComparator, fiDate));
+        // Find the index of the LAST weigh-in that meets the end condition.
+        const endIndex = animal.pesajes.findLastIndex(p => checkDateCondition(p.Fecha, ffComparator, ffDate));
+
+        // If valid start and end points are found, slice the array to get the relevant range.
+        const relevantPesajes = (startIndex !== -1 && endIndex !== -1 && endIndex >= startIndex)
+            ? animal.pesajes.slice(startIndex, endIndex + 1)
+            : [];
+
+        // With this filter, only ventas and compras are used for calculations
+        if (filtroVentas) {
+            const venta = relevantPesajes.slice().reverse().find(w => w.Operacion?.toUpperCase() === "VENTA");
+            if (venta) {
+                maxP = venta;
+                const compra = relevantPesajes.filter(w => w.Operacion?.toUpperCase() === "COMPRA" && new Date(w.Fecha) <= new Date(maxP.Fecha)).pop();
+                if (compra) minP = compra;
+            }
+        } 
+        else {
+            const primerPesajeRelevante = relevantPesajes.find(p => p.Operacion?.toUpperCase() === 'COMPRA' || p.Operacion?.toUpperCase() === 'CONTROL');
+            minP = primerPesajeRelevante; 
+
+            const ventas = relevantPesajes.filter(p => p.Operacion?.toUpperCase() === 'VENTA');
+            if (ventas.length > 0) {
+                maxP = ventas[ventas.length - 1]; // Last sale in the relevant history
+            } else {
+                // If no sale, use the last control weigh-in from the relevant pesajes
+                const controls = relevantPesajes.filter(p => p.Operacion?.toUpperCase() === 'CONTROL');
+                if (controls.length > 1) { // Ensure there's more than one to be a range
+                    maxP = controls[controls.length - 1];
+                }
+            }
+        }
+
+        if (minP && maxP && new Date(maxP.Fecha) > new Date(minP.Fecha)) {
+            minmaxPesajes.push({ Codigo: animal.Codigo, pi: minP, pf: maxP });
+        }
+    });
+
+    // 5. Map the final data to the grid format
     const formatDate = (dateStr) => {
       if (!dateStr) return dateStr;
       const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return dateStr; // Return original if invalid date
-      return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+      if (isNaN(date.getTime())) return dateStr;
+      return date.toISOString().split('T')[0];
     };
 
     var datos = minmaxPesajes.map(w=> {return {"Codigo":w.Codigo,
-    "Chapeta":w.pi.Chapeta,
-    "FechaInicial":formatDate(w.pi.Fecha),
-    "FechaFinal":formatDate(w.pf.Fecha),
-    "PesoInicial":w.pi.Peso,
-    "PesoFinal":w.pf.Peso,
-    "Ganancia": gananciaDiaria(w.pi,w.pf),
-    "Dias": Math.round((new Date(w.pf.Fecha)-new Date(w.pi.Fecha))/86400000)
+        "Chapeta":w.pi.Chapeta,
+        "FechaInicial":formatDate(w.pi.Fecha),
+        "FechaFinal":formatDate(w.pf.Fecha),
+        "PesoInicial":w.pi.Peso,
+        "PesoFinal":w.pf.Peso,
+        "Ganancia": gananciaDiaria(w.pi,w.pf),
+        "Dias": Math.round((new Date(w.pf.Fecha)-new Date(w.pi.Fecha))/86400000)
     }});
 
-    return datos
+    return datos;
 }
 
 export const compareNumAlphas = (str1, str2) =>
@@ -244,4 +274,4 @@ export const compareNumAlphas = (str1, str2) =>
   
     // If only one string starts with numbers, return that string first.
     return match1 ? -1 : 1;
-  }  
+  }
