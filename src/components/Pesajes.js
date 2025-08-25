@@ -132,94 +132,64 @@ const Pesajes = ({ eventEmitter }) => {
     }));
   };
 
-  const applyFilters = (event) => {
-    let filteredData = filteredGData(
-      hisPesajes,
-      filtros.filtroOperacion,
-      "Peso",
-      filtros.filtroExacto
-    );
-    if (filtros.filtroCodigo.trim() !== "") {
-      const codeFilter = filtros.filtroCodigo.trim().toUpperCase();
-      switch (filtros.filtroExacto) {
-        case "starts":
-          filteredData = filteredData.filter(
-            (w) => w.Codigo?.toUpperCase().startsWith(codeFilter)
-          );
-          break;
-        case "ends":
-          filteredData = filteredData.filter(
-            (w) => w.Codigo?.toUpperCase().endsWith(codeFilter)
-          );
-          break;
-        case "none":
-          filteredData = filteredData.filter(
-            (w) => w.Codigo?.toUpperCase() === codeFilter
-          );
-          break;
+  const applyFilters = useCallback(() => {
+    // Helper function to apply consistent filtering logic (contains, starts, ends, exact)
+    const matches = (field, filter, comparison) => {
+      if (!field || !filter) return false;
+      const f = field.toUpperCase();
+      const v = filter.toUpperCase().trim();
+      switch (comparison) {
+        case "starts": return f.startsWith(v);
+        case "ends": return f.endsWith(v);
+        case "none": return f === v;
         case "contains":
-        default:
-          filteredData = filteredData.filter(
-            (w) => w.Codigo?.toUpperCase().includes(codeFilter)
-          );
-          break;
+        default: return f.includes(v);
       }
+    };
+
+    let filteredData = [...hisPesajes];
+
+    // Apply all text filters consistently
+    if (filtros.filtroCodigo.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Codigo, filtros.filtroCodigo, filtros.filtroExacto));
     }
-    if (filtros.filtroChapeta.trim() !== "") {
-      filteredData = filteredData.filter(
-        (w) =>
-          (filtros.filtroExacto === "none" &&
-            w.Chapeta?.toUpperCase() ===
-              filtros.filtroChapeta?.trim().toUpperCase()) ||
-          (filtros.filtroExacto === "starts" &&
-            w.Chapeta?.toUpperCase().startsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
-          (filtros.filtroExacto === "ends" &&
-            w.Chapeta?.toUpperCase().endsWith(filtros.filtroChapeta?.trim().toUpperCase())) ||
-          (filtros.filtroExacto === "contains" &&
-            w.Chapeta?.toUpperCase().includes(filtros.filtroChapeta?.trim().toUpperCase()))
-      );
+    if (filtros.filtroChapeta.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Chapeta, filtros.filtroChapeta, filtros.filtroExacto));
+    }
+    if (filtros.filtroMarca.trim() && filtros.filtroMarca !== "*") {
+      filteredData = filteredData.filter(w => matches(w.Marca, filtros.filtroMarca, filtros.filtroExacto));
+    }
+    if (filtros.filtroOperacion.trim() && filtros.filtroOperacion !== "*") {
+      filteredData = filteredData.filter(w => matches(w.Operacion, filtros.filtroOperacion, filtros.filtroExacto));
     }
 
-    if(filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
-                filteredData = filteredData.filter(pesaje => 
-                    pesaje.Marca.toUpperCase() === filtros.filtroMarca.trim()
-                );
-            }
+    // Apply date filter
+    if (filtros.fechaControl && filtros.fechaControl !== "Todas") {
+      filteredData = filteredData.filter(w => w.Fecha === filtros.fechaControl);
+    }
 
-    if(filtros.filtroOperacion  !== "*" && filtros.filtroOperacion.trim() !== "") {
-                filteredData = filteredData.filter(pesaje => 
-                    pesaje.Operacion.toUpperCase() === filtros.filtroOperacion.toUpperCase().trim()
-                );
-            }
-
-    if (filtros.fechaControl) {
-      filteredData = filteredData.filter(
-        (w) => (filtros.fechaControl === "Todas") ||   w.Fecha === filtros.fechaControl
-      );
+    // Apply comment filter
+    if (showComentario) {
+      filteredData = filteredData.filter(w => w.Comentario && w.Comentario.trim() !== "");
     }
 
     setGridData(filteredData);
     let comment = `Total: ${filteredData.length}`;
 
-    // Emit table data for export functionality
     eventEmitter.emit('tableDataUpdate', {
       data: filteredData,
       columns: columns,
       title: 'Pesajes'
     });
 
-    if (
-      filteredData.length &&
-      filteredData.every((w) => w.Peso > 0)
-    ) {
-      const average =
-        filteredData.reduce((acc, cur) => acc + parseInt(cur.Peso), 0) /
-        filteredData.length;
-      comment = comment + ` Promedio: ${average.toFixed(2)}`;
+    if (filteredData.length && filteredData.every(w => w.Peso > 0)) {
+      const average = filteredData.reduce((acc, cur) => acc + parseInt(cur.Peso), 0) / filteredData.length;
+      comment += ` Promedio: ${average.toFixed(2)}`;
     }
 
     setCaptions(comment);
-  };
+  }, [hisPesajes, filtros, showComentario, columns, eventEmitter]);
+
 
   if (isLoading) {
     return <div>Cargando...</div>;

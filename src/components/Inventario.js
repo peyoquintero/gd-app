@@ -99,7 +99,7 @@ const Inventario = ({ eventEmitter }) => {
     }
 
     let movimientos = filteredData
-      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" && w.Operacion?.toUpperCase() !== "CORRECCION" )
+      .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" )
       .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
 
     if (movimientos?.length) {
