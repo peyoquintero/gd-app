@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
 import { getInventario, groupByFechaOperacion } from "./HelperInventario";
-import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
@@ -47,6 +46,8 @@ const Inventario = ({ eventEmitter }) => {
   const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [gananciaDiaria, setGananciaDiaria] = useState(350); // New state for daily gain
+
 
   const handleChange = useCallback((event) => {
     setFiltros((prev) => ({ ...prev, selectedOption: event.target.value }));
@@ -107,7 +108,7 @@ const Inventario = ({ eventEmitter }) => {
       setGridMovimientos(movimientosByFecha);
 
       // Pass projection date into getInventario
-      const inventario = getInventario(filteredData, filtros.projectionDate);
+      const inventario = getInventario(filteredData, filtros.projectionDate,gananciaDiaria);
       setGridInventario(inventario);
 
       // Emit table data for export functionality based on selected option
@@ -125,7 +126,16 @@ const Inventario = ({ eventEmitter }) => {
         });
       }
     }
-  }, [filtros]);
+  }, [filtros,gananciaDiaria]);
+
+    const handleGananciaChange = (e) => {
+    const value = e.target.value;
+    // Enforce max 3 digits
+    if (value.length <= 3 && !value.includes('.')) {
+      setGananciaDiaria(value);
+    }
+  };
+
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -246,6 +256,15 @@ const Inventario = ({ eventEmitter }) => {
               name="projectionDate"
               value={filtros.projectionDate}
               onChange={handleFilterChange}
+            />
+          </div>
+          <div className="filter-group">
+            <label>G. Dia (grs)</label>
+            <input
+              type="number"
+              value={gananciaDiaria}
+              onChange={handleGananciaChange}
+              style={{ width: '70px', textAlign: 'right' }}
             />
           </div>
         </div>

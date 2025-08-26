@@ -28,13 +28,13 @@ const getProyeccion = (fechaUltimoPeso,ultimoPeso,fechaProyeccion,gananciaDiaria
 
 }
 
-export const getInventario = (data, fechaProyeccion) => {
+export const getInventario = (data, fechaProyeccion,gananciaDiaria ) => {
   const groupedData = getPesajesByCodigo(data)
   let result = Object.values(groupedData);
   result = result.filter(w=>w.Pesajes[0].Operacion?.toUpperCase()==='COMPRA'); 
   let codigosVendidos = data.filter(w=>['VENTA','MUERTE','CORRECCION'].includes(w?.Operacion?.toUpperCase())).map(x=>x.Codigo);
   result = result.filter(x => !codigosVendidos.includes(x.Codigo));
-
+  let gd = gananciaDiaria > 0 ? gananciaDiaria/1000 : 350/1000
   result = result.map(w=> {return {
     Codigo: w.Codigo,
     Marca: w.Marca,
@@ -48,7 +48,7 @@ export const getInventario = (data, fechaProyeccion) => {
       w.Pesajes[w.Pesajes.length-1]?.Fecha,
       w.Pesajes[w.Pesajes.length-1]?.Peso,
       fechaProyeccion || Date.now(),
-      350/1000 // Assuming 0.35 as the daily gain
+      gd  
     )
   }});
   return result;
