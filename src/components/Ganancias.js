@@ -42,6 +42,23 @@ const Ganancias = ({ eventEmitter }) => {
     const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
     const [isLoading, setIsLoading] = useState(false);
 
+    // --- START: LOCAL STYLING FIX ---
+    // Define style objects locally to avoid global CSS conflicts.
+    const styles = {
+      dateFiltersContainer: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '15px', // Controls the space between the filter groups
+        flexWrap: 'wrap',
+      },
+      dateControlPair: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '4px', // Controls the small space between a date and its comparator
+      },
+    };
+    // --- END: LOCAL STYLING FIX ---
+
     const [captions,setCaptions] = useState({
         resultCabezas : "",
         resultGanancia : "",
@@ -318,11 +335,12 @@ const Ganancias = ({ eventEmitter }) => {
         </div>
       </div>
 
-      <div className="date-filters">
-        <div className="date-control-pair">
+      {/* Apply the local styles to the container and the pairs */}
+      <div className="date-filters" style={styles.dateFiltersContainer}>
+        <div className="date-control-pair" style={styles.dateControlPair}>
             <div className="filter-group">
               <label>Fecha Inicial</label>
-              <select name="fechaInicial" onChange={handleFilterChange}>
+              <select name="fechaInicial" onChange={handleFilterChange} value={filtros.fechaInicial}>
                   {fechasPesaje.map(val => <option key={val} value={val}>{val}</option>)}
               </select>
             </div>
@@ -342,14 +360,13 @@ const Ganancias = ({ eventEmitter }) => {
             </div>
         </div>
 
-        <div className="date-control-pair">
+        <div className="date-control-pair" style={styles.dateControlPair}>
             <div className="filter-group">
               <label>Fecha Final</label>
               <select name="fechaFinal" onChange={handleFilterChange} value={filtros.fechaFinal}>
                   {fechasPesajeDesc.map(val => <option key={val} value={val}>{val}</option>)}
               </select>
             </div>
-            {/* Replace checkbox with select */}
             <div className="filter-group">
               <label>&nbsp;</label> {/* Spacer label */}
               <select

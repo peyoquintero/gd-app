@@ -68,6 +68,7 @@ const Inventario = ({ eventEmitter }) => {
   const [debouncedFiltros, setDebouncedFiltros] = useState(filtros);
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
+  const [avgProjection, setAvgProjection] = useState(0);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [gananciaDiaria, setGananciaDiaria] = useState(350);
@@ -136,7 +137,6 @@ const Inventario = ({ eventEmitter }) => {
 
       let inventario = getInventario(filteredData, debouncedFiltros.projectionDate, gananciaDiaria);
 
-      // --- FIX FOR PESO FILTER ---
       const pesoFilter = debouncedFiltros.filtroPeso.trim();
       if (pesoFilter && pesoFilter !== "*") {
         const array = pesoFilter.split("-");
@@ -150,9 +150,19 @@ const Inventario = ({ eventEmitter }) => {
           });
         }
       }
-      // --- END FIX ---
 
       setGridInventario(inventario);
+
+      // Calculate and set the average projection
+      if (inventario.length > 0) {
+        const totalProjection = inventario.reduce((acc, item) => {
+          const projectionValue = parseInt(item.Proyeccion, 10);
+          return acc + (isNaN(projectionValue) ? 0 : projectionValue);
+        }, 0);
+        setAvgProjection(Math.round(totalProjection / inventario.length));
+      } else {
+        setAvgProjection(0);
+      }
 
       if (debouncedFiltros.selectedOption === "movimientos") {
         eventEmitter.emit('tableDataUpdate', {
@@ -323,7 +333,7 @@ const Inventario = ({ eventEmitter }) => {
         <label>
           {debouncedFiltros.selectedOption === "movimientos"
             ? `Movimientos: ${gridMovimientos.length}`
-            : `Total Inventario: ${gridInventario.length}`}
+            : `Total: ${gridInventario.length}, Prom PRY: ${avgProjection}`}
         </label>
       </section>
 
