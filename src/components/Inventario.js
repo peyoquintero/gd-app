@@ -41,13 +41,13 @@ const Inventario = ({ eventEmitter }) => {
     filtroExacto: false,
     selectedOption: "cabezas",
     projectionDate: new Date().toISOString().split("T")[0],
+    filtroPeso: ""
   });
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [gananciaDiaria, setGananciaDiaria] = useState(350); // New state for daily gain
-
 
   const handleChange = useCallback((event) => {
     setFiltros((prev) => ({ ...prev, selectedOption: event.target.value }));
@@ -108,7 +108,20 @@ const Inventario = ({ eventEmitter }) => {
       setGridMovimientos(movimientosByFecha);
 
       // Pass projection date into getInventario
-      const inventario = getInventario(filteredData, filtros.projectionDate,gananciaDiaria);
+      let inventario = getInventario(filteredData, filtros.projectionDate,gananciaDiaria);
+
+     if (filtros.filtroPeso && filtros.filtroPeso.trim() !== "" && filtros.filtroPeso !== "*") {
+      const array = filtros.filtroPeso.split("-");
+      if (array.length === 2) {
+        inventario = inventario.filter(item => {
+          const ultimoPeso = parseInt(item.ultimoPeso);
+          const minPeso = parseInt(array[0]);
+          const maxPeso = parseInt(array[1]);
+          return ultimoPeso >= minPeso && ultimoPeso <= maxPeso;
+        });
+      }
+    }
+
       setGridInventario(inventario);
 
       // Emit table data for export functionality based on selected option
@@ -267,6 +280,14 @@ const Inventario = ({ eventEmitter }) => {
               style={{ width: '70px', textAlign: 'right' }}
             />
           </div>
+         <div className="filter-group">
+          <label>Rango Peso</label>
+          <input
+            className="freeinputsmall"
+            name="filtroPeso"
+            onChange={handleFilterChange}
+          />
+        </div>
         </div>
       </section>
 

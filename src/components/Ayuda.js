@@ -109,8 +109,8 @@ const Ayuda = ({ eventEmitter }) => {
               Revision Codigos
             </label>
           </div>
-          
-          {/* The Rango Ganancias input is now in the same filters-row */}
+          </div>
+        <div className="filters-row">
           <div className="filter-group">
             <label>Rango Ganancias</label>
             <input
@@ -138,7 +138,7 @@ const Ayuda = ({ eventEmitter }) => {
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       <section className="version-info">
-        <label>Version 1.0.5 - {dataService.getLastUpdate()}</label>
+        <label>Version 2.0.0 - {dataService.getLastUpdate()}</label>
       </section>
     </div>
   );
