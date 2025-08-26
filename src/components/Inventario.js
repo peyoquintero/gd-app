@@ -36,18 +36,52 @@ const Inventario = ({ eventEmitter }) => {
     { label: "PRY", accessor: "Proyeccion", width: "12%" },
   ];
 
+  // State for immediate input changes
   const [filtros, setFiltros] = useState({
     filtroMarca: "",
     filtroExacto: false,
     selectedOption: "cabezas",
     projectionDate: new Date().toISOString().split("T")[0],
-    filtroPeso: ""
+    filtroPeso: "",
+    filtroCodigo: "",
+    filtroChapeta: ""
   });
+
+  // --- START: LOCAL STYLING FIX ---
+  // Define style objects locally to avoid global CSS conflicts.
+  const styles = {
+    filtersRow: {
+      display: 'flex',
+      alignItems: 'flex-end', // Aligns all filter groups to their bottom edge
+      gap: '5px',            // Sets a very small gap between controls
+      flexWrap: 'nowrap',    // Prevents controls from wrapping to a new line
+    },
+    radioContainer: {
+      display: 'flex',
+      flexDirection: 'column', // Stacks the radio buttons vertically
+      paddingBottom: '3px',    // Fine-tunes vertical alignment with other inputs
+    },
+  };
+  // --- END: LOCAL STYLING FIX ---
+
+  // This state will hold the filter values after the user has stopped typing.
+  const [debouncedFiltros, setDebouncedFiltros] = useState(filtros);
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [gananciaDiaria, setGananciaDiaria] = useState(350); // New state for daily gain
+  const [gananciaDiaria, setGananciaDiaria] = useState(350);
+
+  // This effect debounces the filter inputs.
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFiltros(filtros);
+    }, 500); // Wait 500ms after the user stops typing
+
+    return () => {
+      clearTimeout(handler); // Reset the timer if the user types again
+    };
+  }, [filtros]);
 
   const handleChange = useCallback((event) => {
     setFiltros((prev) => ({ ...prev, selectedOption: event.target.value }));
@@ -70,33 +104,26 @@ const Inventario = ({ eventEmitter }) => {
 
     const matchesFilter = (fieldValue, filterValue) => {
       if (!filterValue) return true;
-      
       const field = (fieldValue || '').toUpperCase();
       const filter = filterValue.toUpperCase();
-      
-      // If no wildcards, use substring matching (contains)
       if (!filter.includes('*')) {
         return field.includes(filter);
       }
-      
-      // Convert wildcard pattern to regex
-      // Escape special regex characters except *
       const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-      // Replace * with .* (match any characters)
       const regexPattern = escapedFilter.replace(/\*/g, '.*');
       const regex = new RegExp(`^${regexPattern}$`);
-      
       return regex.test(field);
     };
 
-    if (filtros.filtroCodigo?.length > 0) {
-      filteredData = filteredData.filter(w => matchesFilter(w.Codigo, filtros.filtroCodigo));
+    // Use the debounced filters for all filtering logic
+    if (debouncedFiltros.filtroCodigo?.length > 0) {
+      filteredData = filteredData.filter(w => matchesFilter(w.Codigo, debouncedFiltros.filtroCodigo));
     }
-    if (filtros.filtroMarca?.length > 1) {
-      filteredData = filteredData.filter(w => matchesFilter(w.Marca, filtros.filtroMarca));
+    if (debouncedFiltros.filtroMarca?.length > 1) {
+      filteredData = filteredData.filter(w => matchesFilter(w.Marca, debouncedFiltros.filtroMarca));
     }
-    if (filtros.filtroChapeta?.length > 1) {
-      filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, filtros.filtroChapeta));
+    if (debouncedFiltros.filtroChapeta?.length > 1) {
+      filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
     }
 
     let movimientos = filteredData
@@ -107,25 +134,27 @@ const Inventario = ({ eventEmitter }) => {
       let movimientosByFecha = groupByFechaOperacion(movimientos);
       setGridMovimientos(movimientosByFecha);
 
-      // Pass projection date into getInventario
-      let inventario = getInventario(filteredData, filtros.projectionDate,gananciaDiaria);
+      let inventario = getInventario(filteredData, debouncedFiltros.projectionDate, gananciaDiaria);
 
-     if (filtros.filtroPeso && filtros.filtroPeso.trim() !== "" && filtros.filtroPeso !== "*") {
-      const array = filtros.filtroPeso.split("-");
-      if (array.length === 2) {
-        inventario = inventario.filter(item => {
-          const ultimoPeso = parseInt(item.ultimoPeso);
+      // --- FIX FOR PESO FILTER ---
+      const pesoFilter = debouncedFiltros.filtroPeso.trim();
+      if (pesoFilter && pesoFilter !== "*") {
+        const array = pesoFilter.split("-");
+        // Only filter if we have a valid range with two numbers
+        if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
           const minPeso = parseInt(array[0]);
           const maxPeso = parseInt(array[1]);
-          return ultimoPeso >= minPeso && ultimoPeso <= maxPeso;
-        });
+          inventario = inventario.filter(item => {
+            const ultimoPeso = parseInt(item.PesoFinal); // Use PesoFinal as per columnsInventario
+            return ultimoPeso >= minPeso && ultimoPeso <= maxPeso;
+          });
+        }
       }
-    }
+      // --- END FIX ---
 
       setGridInventario(inventario);
 
-      // Emit table data for export functionality based on selected option
-      if (filtros.selectedOption === "movimientos") {
+      if (debouncedFiltros.selectedOption === "movimientos") {
         eventEmitter.emit('tableDataUpdate', {
           data: movimientosByFecha,
           columns: columns,
@@ -139,32 +168,28 @@ const Inventario = ({ eventEmitter }) => {
         });
       }
     }
-  }, [filtros,gananciaDiaria]);
+  }, [debouncedFiltros, gananciaDiaria, eventEmitter]);
 
-    const handleGananciaChange = (e) => {
+  const handleGananciaChange = (e) => {
     const value = e.target.value;
-    // Enforce max 3 digits
     if (value.length <= 3 && !value.includes('.')) {
       setGananciaDiaria(value);
     }
   };
-
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = dataService.getCachedData();
       if (data) {
-        refreshData(data);
         setHisPesajes(data);
-        console.log(data);
       }
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [refreshData]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -184,22 +209,21 @@ const Inventario = ({ eventEmitter }) => {
     };
   }, [eventEmitter, loadData]);
 
-  // Emit table data when selected option changes
   useEffect(() => {
-    if (filtros.selectedOption === "movimientos" && gridMovimientos.length > 0) {
+    if (debouncedFiltros.selectedOption === "movimientos" && gridMovimientos.length > 0) {
       eventEmitter.emit('tableDataUpdate', {
         data: gridMovimientos,
         columns: columns,
         title: 'Inventario - Movimientos'
       });
-    } else if (filtros.selectedOption === "cabezas" && gridInventario.length > 0) {
+    } else if (debouncedFiltros.selectedOption === "cabezas" && gridInventario.length > 0) {
       eventEmitter.emit('tableDataUpdate', {
         data: gridInventario,
         columns: columnsInventario,
         title: 'Inventario - Actual'
       });
     }
-  }, [filtros.selectedOption, gridMovimientos, gridInventario, eventEmitter]);
+  }, [debouncedFiltros.selectedOption, gridMovimientos, gridInventario, eventEmitter, columns, columnsInventario]);
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
@@ -207,17 +231,19 @@ const Inventario = ({ eventEmitter }) => {
 
   return (
     <div>
+      {/* Apply the local styles using the 'style' prop */}
       <section className="filter-section">
-        <div className="filters-row">
+        <div className="filters-row" style={styles.filtersRow}>
           <div className="filter-group radio-filter-group">
             <label>Vista</label>
-            <div className="radio-container-compact" onChange={handleChange}>
+            <div className="radio-container-compact" style={styles.radioContainer} onChange={handleChange}>
               <label className="radio-label-compact">
                 <input
                   type="radio"
                   name="details"
                   value="cabezas"
                   checked={filtros.selectedOption === "cabezas"}
+                  readOnly
                 />
                 Inventario
               </label>
@@ -227,6 +253,7 @@ const Inventario = ({ eventEmitter }) => {
                   name="details"
                   value="movimientos"
                   checked={filtros.selectedOption === "movimientos"}
+                  readOnly
                 />
                 Movimientos
               </label>
@@ -286,6 +313,7 @@ const Inventario = ({ eventEmitter }) => {
             className="freeinputsmall"
             name="filtroPeso"
             onChange={handleFilterChange}
+            value={filtros.filtroPeso}
           />
         </div>
         </div>
@@ -293,14 +321,14 @@ const Inventario = ({ eventEmitter }) => {
 
       <section className="totals">
         <label>
-          {filtros.selectedOption === "movimientos"
+          {debouncedFiltros.selectedOption === "movimientos"
             ? `Movimientos: ${gridMovimientos.length}`
             : `Total Inventario: ${gridInventario.length}`}
         </label>
       </section>
 
       <section className="table-container">
-        {filtros.selectedOption === "movimientos" ? (
+        {debouncedFiltros.selectedOption === "movimientos" ? (
           <Table data={gridMovimientos} columns={columns} />
         ) : (
           <Table data={gridInventario} columns={columnsInventario} />
