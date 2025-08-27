@@ -53,8 +53,8 @@ const Inventario = ({ eventEmitter }) => {
     filtersRow: {
       display: 'flex',
       alignItems: 'flex-end', // Aligns all filter groups to their bottom edge
-      gap: '5px',            // Sets a very small gap between controls
-      flexWrap: 'nowrap',    // Prevents controls from wrapping to a new line
+      gap: '5px',            // Sets a gap between controls, both horizontally and vertically
+      flexWrap: 'wrap',      // THIS IS THE FIX: Allows controls to wrap onto new lines on smaller screens
     },
     radioContainer: {
       display: 'flex',
@@ -300,7 +300,7 @@ const Inventario = ({ eventEmitter }) => {
             />
           </div>
           <div className="filter-group">
-            <label>Fecha Proyección</label>
+            <label>F. Proyección</label>
             <input
               type="date"
               name="projectionDate"
