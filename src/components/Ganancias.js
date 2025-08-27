@@ -168,20 +168,26 @@ const Ganancias = ({ eventEmitter }) => {
     const applyFilters = (event) => {
   // Helper function for enhanced filtering with wildcard support
   const matchesFilter = (fieldValue, filterValue) => {
-    if (!filterValue) return true;
+    // If filterValue is null, undefined, or an empty string, it's always a match.
+    if (!filterValue || filterValue.trim() === "") {
+      return true;
+    }
     
     const field = (fieldValue || '').toUpperCase();
-    const filter = filterValue.toUpperCase();
+    const filter = filterValue.toUpperCase().trim();
     
+    // Handle negation with '~'
+    if (filter.startsWith("~")) {
+      return field !== filter.substring(1);
+    }
+
     // If no wildcards, use substring matching (contains)
     if (!filter.includes('*')) {
       return field.includes(filter);
     }
     
     // Convert wildcard pattern to regex
-    // Escape special regex characters except *
     const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-    // Replace * with .* (match any characters)
     const regexPattern = escapedFilter.replace(/\*/g, '.*');
     const regex = new RegExp(`^${regexPattern}$`);
     
@@ -189,7 +195,6 @@ const Ganancias = ({ eventEmitter }) => {
   };
 
   // 1. Identify and exclude any animal codes that have a 'CORRECCION' / 'MUERTE' record.
-  // These entire animals will be excluded from the calculation.
   const codigosToExclude = new Set(
     hisPesajes
       .filter(p => p.Operacion?.toUpperCase() === 'CORRECCION' || p.Operacion?.toUpperCase() === 'MUERTE')
@@ -199,7 +204,6 @@ const Ganancias = ({ eventEmitter }) => {
   let hispesajesToProcess = hisPesajes.filter(pesaje => !codigosToExclude.has(pesaje.Codigo));
 
   // 2. Calculate gains based on date criteria and Ventas filter ONLY.
-  // This function needs the full history to work correctly.
   let gridDataResults = ganancias(
     hispesajesToProcess,
     filtros.fechaInicial,
@@ -209,39 +213,24 @@ const Ganancias = ({ eventEmitter }) => {
     filtros.filtroVentas
   );
 
-  // 3. Apply the text and weight filters to the results from the ganancias function.
-  // Apply marca filter
-  if (filtros.filtroMarca.startsWith("~")) {
-    gridDataResults = gridDataResults.filter(res => 
-      res.Marca !== filtros.filtroMarca.trim().substring(1)
-    );
-  } else if (filtros.filtroMarca !== "*" && filtros.filtroMarca.trim() !== "") {
-    gridDataResults = gridDataResults.filter(res => 
-      matchesFilter(res.Marca, filtros.filtroMarca.trim())
-    );
-  }
-
-  // Apply codigo filter
-  if (filtros.filtroCodigo.trim() !== "") {
-    gridDataResults = gridDataResults.filter(res => 
-      matchesFilter(res.Codigo, filtros.filtroCodigo.trim())
-    );
-  }
-
-  // Apply chapeta filter
-  if (filtros.filtroChapeta.trim() !== "") {
-    gridDataResults = gridDataResults.filter(res => 
-      matchesFilter(res.Chapeta, filtros.filtroChapeta.trim())
-    );
-  }
+  // 3. Apply all text and weight filters to the results from the ganancias function.
+  // This consolidated block now correctly handles empty filters.
+  gridDataResults = gridDataResults.filter(res => 
+    matchesFilter(res.Marca, filtros.filtroMarca) &&
+    matchesFilter(res.Codigo, filtros.filtroCodigo) &&
+    matchesFilter(res.Chapeta, filtros.filtroChapeta)
+  );
   
-  // Apply peso filter
-  if (filtros.filtroPeso !== "*" && filtros.filtroPeso.trim() !== "") {
+  // Apply peso filter separately as it has different logic
+  if (filtros.filtroPeso && filtros.filtroPeso.trim() !== "" && filtros.filtroPeso !== "*") {
       const array = filtros.filtroPeso.split("-");
-      if (array.length === 2) {
+      if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
+          // --- THIS IS THE FIX ---
+          const minPeso = parseInt(array[0]);
+          const maxPeso = parseInt(array[1]);
           gridDataResults = gridDataResults.filter(pesaje => 
-              parseInt(pesaje.PesoInicial) >= parseInt(array[0]) && 
-              parseInt(pesaje.PesoInicial) <= parseInt(array[1])
+              parseInt(pesaje.PesoInicial) >= minPeso && 
+              parseInt(pesaje.PesoInicial) <= maxPeso
           );
       }
   }
