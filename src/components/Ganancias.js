@@ -64,6 +64,17 @@ const Ganancias = ({ eventEmitter }) => {
         alignItems: 'flex-end',
         gap: '4px', // Controls the small space between a date and its comparator
       },
+      checkboxGroup: {
+        // This style arranges the label and checkbox into a horizontal unit
+        // and then pushes the entire unit down to align with the other controls.
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '5px',
+        // This paddingTop simulates the space taken up by the labels in the other
+        // filter groups, pushing this group down into perfect alignment.
+        paddingTop: '15px' 
+      }
     };
     // --- END: LOCAL STYLING FIX ---
 
