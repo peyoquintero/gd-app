@@ -45,11 +45,19 @@ const Ganancias = ({ eventEmitter }) => {
     // --- START: LOCAL STYLING FIX ---
     // Define style objects locally to avoid global CSS conflicts.
     const styles = {
+      filtersRow: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '5px', // Small gap for the top row of filters
+        flexWrap: 'wrap',
+        marginBottom: '10px', // Adds space between the two filter rows
+      },
       dateFiltersContainer: {
         display: 'flex',
         alignItems: 'flex-end',
-        gap: '15px', // Controls the space between the filter groups
+        gap: '2px', // REDUCED: Makes the gap between all date controls very small
         flexWrap: 'wrap',
+        justifyContent: 'flex-start', // THIS IS THE FIX: Aligns all controls to the left.
       },
       dateControlPair: {
         display: 'flex',
@@ -146,15 +154,28 @@ const Ganancias = ({ eventEmitter }) => {
         ...filtros,
         [name]: upperValue,
       });
-      if (upperValue!=="*" && upperValue.trim()!=="")
-      {
-      let allFechas = [...new Set(hisPesajes.filter(w=>w.Marca===upperValue.trim()).map(obj => obj.Fecha))];
-      setFechasPesaje(allFechas);
-    }
-    else{
-      let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
-      setFechasPesaje(allFechas);
-    }
+
+      const trimmedValue = upperValue.trim();
+
+      if (trimmedValue !== "*" && trimmedValue !== "") {
+        let filteredPesajes;
+        // Check if the filter is a negation
+        if (trimmedValue.startsWith("~")) {
+          const brandToExclude = trimmedValue.substring(1);
+          // Filter for all pesajes that DO NOT match the brand
+          filteredPesajes = hisPesajes.filter(w => w.Marca !== brandToExclude);
+        } else {
+          // Otherwise, filter for pesajes that DO match the brand
+          filteredPesajes = hisPesajes.filter(w => w.Marca === trimmedValue);
+        }
+        // Get unique dates from the result of the filtering
+        let allFechas = [...new Set(filteredPesajes.map(obj => obj.Fecha))];
+        setFechasPesaje(allFechas);
+      } else {
+        // If the filter is empty or "*", reset to show all dates
+        let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
+        setFechasPesaje(allFechas);
+      }
     };
 
     const handleCheckboxChange = (event) => {
@@ -225,7 +246,6 @@ const Ganancias = ({ eventEmitter }) => {
   if (filtros.filtroPeso && filtros.filtroPeso.trim() !== "" && filtros.filtroPeso !== "*") {
       const array = filtros.filtroPeso.split("-");
       if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
-          // --- THIS IS THE FIX ---
           const minPeso = parseInt(array[0]);
           const maxPeso = parseInt(array[1]);
           gridDataResults = gridDataResults.filter(pesaje => 
@@ -280,7 +300,7 @@ const Ganancias = ({ eventEmitter }) => {
  return (
   <div>
     <section className="filter-section">
-      <div className="filters-row">
+      <div className="filters-row" style={styles.filtersRow}>
         <div className="filter-group">
           <label>Codigo</label>
           <input 
@@ -322,9 +342,13 @@ const Ganancias = ({ eventEmitter }) => {
             onChange={handleFilterChange}
           />
         </div>
+        <div className="filter-group checkbox-group">
+          <label>Ventas</label>
+          <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
+        </div>
+
       </div>
 
-      {/* Apply the local styles to the container and the pairs */}
       <div className="date-filters" style={styles.dateFiltersContainer}>
         <div className="date-control-pair" style={styles.dateControlPair}>
             <div className="filter-group">
@@ -372,10 +396,6 @@ const Ganancias = ({ eventEmitter }) => {
             </div>
         </div>
 
-        <div className="filter-group checkbox-group">
-          <label>Ventas</label>
-          <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
-        </div>
         <button className="filter-button" onClick={applyFilters}>Ok</button>
       </div>
     </section>
