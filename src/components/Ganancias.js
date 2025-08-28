@@ -95,6 +95,47 @@ const Ganancias = ({ eventEmitter }) => {
       setSortConfig({ key, direction });
     }, [sortConfig]);
 
+    // --- START: REORDERED LOGIC ---
+
+    // 1. Declare columns first.
+    const columns = [
+      { label: "Codigo", accessor: "Codigo",width:"12%" },
+      { label: "Chapeta", accessor: "Chapeta",width:"12%" },
+      { label: "Marca", accessor: "Marca",width:"6%" },
+      { label: "F. Inicial", accessor: "FechaInicial",width:"15%" },
+      { label: "F. Final", accessor: "FechaFinal",width:"15%" },
+      { label: "P. Inicial", accessor: "PesoInicial",width:"13%" },
+      { label: "P. Final", accessor: "PesoFinal",width:"13%" },
+      { label: "Ganancia", accessor: "Ganancia",width:"12%" },
+    ];
+
+    // 2. Declare processedGridData, which depends on gridData and sortConfig.
+    const processedGridData = useMemo(() => {
+      let sortedData = [...gridData];
+      if (sortConfig.key) {
+        sortedData.sort((a, b) => {
+          const aVal = a[sortConfig.key];
+          const bVal = b[sortConfig.key];
+          const comparison = compareNumAlphas(String(aVal), String(bVal));
+          return sortConfig.direction === 'ascending' ? comparison : -comparison;
+        });
+      }
+      return sortedData;
+    }, [gridData, sortConfig]);
+
+    // 3. Now, the useEffect hook can safely access both 'processedGridData' and 'columns'.
+    useEffect(() => {
+      if (processedGridData) {
+        eventEmitter.emit('tableDataUpdate', { 
+          data: processedGridData, 
+          columns, 
+          title: 'Ganancias' 
+        });
+      }
+    }, [processedGridData, columns, eventEmitter]);
+
+    // --- END: REORDERED LOGIC ---
+
     const initializeData = useCallback(() => {
         let allPesajes = dataService.getCachedData();
         if (!allPesajes) return;
@@ -193,6 +234,7 @@ const Ganancias = ({ eventEmitter }) => {
         setFechasPesaje(allFechas);
       } else {
         // If the filter is empty or "*", reset to show all dates
+        // --- THIS IS THE FIX ---
         let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
         setFechasPesaje(allFechas);
       }
@@ -316,38 +358,7 @@ const Ganancias = ({ eventEmitter }) => {
       resultDias: captionDias(scrubbedData),
       resultMedia: captionMedia(scrubbedData)
   });
-
-  // Emit table data for export functionality
-  eventEmitter.emit('tableDataUpdate', {
-    data: scrubbedData,
-    columns: columns,
-    title: 'Ganancias'
-  });
 };
-
-      const processedGridData = useMemo(() => {
-        let sortedData = [...gridData];
-        if (sortConfig.key) {
-          sortedData.sort((a, b) => {
-            const aVal = a[sortConfig.key];
-            const bVal = b[sortConfig.key];
-            const comparison = compareNumAlphas(String(aVal), String(bVal));
-            return sortConfig.direction === 'ascending' ? comparison : -comparison;
-          });
-        }
-        return sortedData;
-      }, [gridData, sortConfig]);
-
-      const columns = [
-        { label: "Codigo", accessor: "Codigo",width:"12%" },
-        { label: "Chapeta", accessor: "Chapeta",width:"12%" },
-        { label: "Marca", accessor: "Marca",width:"6%" },
-        { label: "F. Inicial", accessor: "FechaInicial",width:"15%" },
-        { label: "F. Final", accessor: "FechaFinal",width:"15%" },
-        { label: "P. Inicial", accessor: "PesoInicial",width:"13%" },
-        { label: "P. Final", accessor: "PesoFinal",width:"13%" },
-        { label: "Ganancia", accessor: "Ganancia",width:"12%" },
-       ];
 
    if (isLoading) {
         return <div>Cargando...</div>;
