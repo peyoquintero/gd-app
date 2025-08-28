@@ -1,35 +1,43 @@
-import { useState,useEffect } from "react";
-import TableBody from "./TableBody";
-import TableHead from "./TableHead";
-import { compareNumAlphas } from "./Helpers"
+import React from "react";
 
+const Table = ({ data, columns, onSort, sortConfig }) => {
+  if (!data || data.length === 0) {
+    return <div className="no-data">No hay datos para mostrar</div>;
+  }
 
-const Table = ({ data, columns }) => {
-const [tableData, setTableData] = useState(data);
-const [sortOrder,setSortOrder] = useState({accessor:columns[0].accessor,sortOrder:'down'})
-const isDate = (par) => par && /^\d{4}-\d{2}-\d{2}$/.test(par??"");
-const compareDate = (a,b) => {return (new Date(a) - new Date(b)) > 0 ? 1 : -1; }
+  const getSortIndicator = (columnAccessor) => {
+    if (!sortConfig || sortConfig.key !== columnAccessor) {
+      return null; // No indicator
+    }
+    return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
+  };
 
-useEffect(() => { setTableData(data) }, [data]);
-useEffect(() => { 
-  let sortKey = sortOrder.accessor;
-  let sortDescending = sortOrder.sortOrder === 'down' ? 1 : -1
-  let data  = tableData.slice().sort((a, b) => {
-      a = a[sortKey]
-      b = b[sortKey]
-      let x = isDate(a)? compareDate(a,b) : compareNumAlphas(a,b)
-      return (a === b ? 0 :  x * sortDescending) 
-    });
-  setTableData(data);
-}, [sortOrder]);
-
-return (
-    <>
-      <table>
-        <TableHead {...{ columns, setSortOrder, sortOrder}} />
-        <TableBody {...{ tableData, columns  }} />
-      </table>
-    </>
+  return (
+    <table>
+      <thead>
+        <tr>
+          {columns.map((col) => (
+            <th 
+              key={col.accessor} 
+              style={{ width: col.width, cursor: 'pointer' }}
+              onClick={() => onSort(col.accessor)} // Tell the parent to sort
+            >
+              {col.label}
+              {getSortIndicator(col.accessor)}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row, index) => (
+          <tr key={row.id ?? index}>
+            {columns.map((col) => (
+              <td key={col.accessor}>{row[col.accessor]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

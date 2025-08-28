@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react"; // Add useMemo
 import Table from "./Table";
 import { getInventario, groupByFechaOperacion } from "./HelperInventario";
+// Assuming you have this helper function for smart sorting
+import { compareNumAlphas } from "./Helpers"; 
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
@@ -72,6 +74,11 @@ const Inventario = ({ eventEmitter }) => {
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [gananciaDiaria, setGananciaDiaria] = useState(350);
+  
+  // --- START: NEW STATE ---
+  const [topX, setTopX] = useState(''); // State for the "Top X" input
+  const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' }); // State for sorting
+  // --- END: NEW STATE ---
 
   // This effect debounces the filter inputs.
   useEffect(() => {
@@ -92,6 +99,16 @@ const Inventario = ({ eventEmitter }) => {
     const { name, value } = event.target;
     setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
   }, []);
+
+  // --- START: NEW SORT HANDLER ---
+  const handleSort = useCallback((key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  }, [sortConfig]);
+  // --- END: NEW SORT HANDLER ---
 
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
@@ -151,6 +168,8 @@ const Inventario = ({ eventEmitter }) => {
         }
       }
 
+      // IMPORTANT: We set the FULL unfiltered inventory here.
+      // The sorting and slicing will happen later.
       setGridInventario(inventario);
 
       // Calculate and set the average projection
@@ -234,6 +253,68 @@ const Inventario = ({ eventEmitter }) => {
       });
     }
   }, [debouncedFiltros.selectedOption, gridMovimientos, gridInventario, eventEmitter, columns, columnsInventario]);
+
+  // --- START: SORTING LOGIC ---
+  const sortedInventario = useMemo(() => {
+    let sortableItems = [...gridInventario];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (aValue === bValue) {
+          return 0;
+        }
+        const modifier = sortConfig.direction === 'ascending' ? 1 : -1;
+        // Use the smart comparison function for flexible sorting
+        return compareNumAlphas(aValue, bValue) * modifier;
+      });
+    }
+    return sortableItems;
+  }, [gridInventario, sortConfig]);
+
+  const sortedMovimientos = useMemo(() => {
+    let sortableItems = [...gridMovimientos];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (aValue === bValue) {
+          return 0;
+        }
+        const modifier = sortConfig.direction === 'ascending' ? 1 : -1;
+        // Use the smart comparison function for flexible sorting
+        return compareNumAlphas(aValue, bValue) * modifier;
+      });
+    }
+    return sortableItems;
+  }, [gridMovimientos, sortConfig]);
+  // --- END: SORTING LOGIC ---
+
+  // --- START: NEW MEMOIZED PROCESSING LOGIC ---
+  // This hook creates the final data to be displayed in the table.
+  // It runs only when the underlying data, sort config, or topX value changes.
+  const processedGridData = useMemo(() => {
+    let sortedData = [...gridInventario];
+
+    if (sortConfig.key) {
+      sortedData.sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        // Use a smart sort function that handles numbers and text
+        const comparison = compareNumAlphas(String(aVal), String(bVal));
+        return sortConfig.direction === 'ascending' ? comparison : -comparison;
+      });
+    }
+
+    // Apply the "Top X" slice AFTER sorting
+    const topXValue = parseInt(topX, 10);
+    if (!isNaN(topXValue) && topXValue > 0) {
+      return sortedData.slice(0, topXValue);
+    }
+
+    return sortedData;
+  }, [gridInventario, sortConfig, topX]);
+  // --- END: NEW MEMOIZED PROCESSING LOGIC ---
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
@@ -326,6 +407,18 @@ const Inventario = ({ eventEmitter }) => {
             value={filtros.filtroPeso}
           />
         </div>
+        {/* --- START: NEW INPUT FIELD --- */}
+        <div className="filter-group">
+          <label>Top</label>
+          <input
+            type="number"
+            value={topX}
+            onChange={(e) => setTopX(e.target.value)}
+            style={{ width: '60px' }}
+            placeholder="N°"
+          />
+        </div>
+        {/* --- END: NEW INPUT FIELD --- */}
         </div>
       </section>
 
@@ -339,9 +432,16 @@ const Inventario = ({ eventEmitter }) => {
 
       <section className="table-container">
         {debouncedFiltros.selectedOption === "movimientos" ? (
-          <Table data={gridMovimientos} columns={columns} />
+          <Table data={gridMovimientos} columns={columns} onSort={() => {}} />
         ) : (
-          <Table data={gridInventario} columns={columnsInventario} />
+          // --- START: UPDATE TABLE PROPS ---
+          <Table 
+            data={processedGridData} // Pass the final processed data
+            columns={columnsInventario} 
+            onSort={handleSort} // Pass the sort handler function
+            sortConfig={sortConfig} // Pass the current sort configuration
+          />
+          // --- END: UPDATE TABLE PROPS ---
         )}
       </section>
     </div>
