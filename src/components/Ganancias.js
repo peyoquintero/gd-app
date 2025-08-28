@@ -190,12 +190,35 @@ const Ganancias = ({ eventEmitter }) => {
     };
 
     const handleCheckboxChange = (event) => {
-        const { name } = event.target;
-        setFiltros({
-          ...filtros,
-          [name]: event.target.checked,
-        });
-      };
+      const { name, checked } = event.target;
+      
+      setFiltros({
+        ...filtros,
+        [name]: checked,
+      });
+  
+      // If the changed checkbox is 'filtroVentas', update the fechaFinal dropdown
+      if (name === 'filtroVentas') {
+        if (checked) {
+          // Filter for dates where the operation was a VENTA
+          const ventaDates = hisPesajes
+            .filter(p => p.Operacion?.toUpperCase() === 'VENTA')
+            .map(p => p.Fecha);
+          
+          // Get unique dates and sort them in descending order
+          const uniqueVentaDates = [...new Set(ventaDates)]
+            .sort((a, b) => new Date(b) - new Date(a));
+          
+          setFechasPesajeDesc(uniqueVentaDates);
+        } else {
+          // When unchecked, revert to showing all unique dates in descending order
+          const allFechasDesc = [...new Set(hisPesajes.map(obj => obj.Fecha))]
+            .sort((a, b) => new Date(b) - new Date(a));
+          
+          setFechasPesajeDesc(allFechasDesc);
+        }
+      }
+    };
 
     const applyFilters = (event) => {
   // Helper function for enhanced filtering with wildcard support
