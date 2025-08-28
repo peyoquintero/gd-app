@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Table from "./Table"
-import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias} from "./Helpers"
+import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, compareNumAlphas} from "./Helpers"
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
@@ -41,6 +41,7 @@ const Ganancias = ({ eventEmitter }) => {
     const [fechasPesaje,setFechasPesaje] = useState([])
     const [fechasPesajeDesc,setFechasPesajeDesc] = useState([])
     const [isLoading, setIsLoading] = useState(false);
+    const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' });
 
     // --- START: LOCAL STYLING FIX ---
     // Define style objects locally to avoid global CSS conflicts.
@@ -85,6 +86,14 @@ const Ganancias = ({ eventEmitter }) => {
         resultUltPeso : "",
         resultDias : "",
       })
+
+    const handleSort = useCallback((key) => {
+      let direction = 'ascending';
+      if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+        direction = 'descending';
+      }
+      setSortConfig({ key, direction });
+    }, [sortConfig]);
 
     const initializeData = useCallback(() => {
         let allPesajes = dataService.getCachedData();
@@ -316,6 +325,19 @@ const Ganancias = ({ eventEmitter }) => {
   });
 };
 
+      const processedGridData = useMemo(() => {
+        let sortedData = [...gridData];
+        if (sortConfig.key) {
+          sortedData.sort((a, b) => {
+            const aVal = a[sortConfig.key];
+            const bVal = b[sortConfig.key];
+            const comparison = compareNumAlphas(String(aVal), String(bVal));
+            return sortConfig.direction === 'ascending' ? comparison : -comparison;
+          });
+        }
+        return sortedData;
+      }, [gridData, sortConfig]);
+
       const columns = [
         { label: "Codigo", accessor: "Codigo",width:"12%" },
         { label: "Chapeta", accessor: "Chapeta",width:"12%" },
@@ -443,7 +465,12 @@ const Ganancias = ({ eventEmitter }) => {
     </section>
 
     <section className="table-container">
-      <Table data={gridData} columns={columns} />
+      <Table 
+        data={processedGridData} 
+        columns={columns} 
+        onSort={handleSort}
+        sortConfig={sortConfig}
+      />
     </section>
   </div>
     

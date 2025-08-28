@@ -1,29 +1,29 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Table from "./Table";
-import { filteredGData } from "./Helpers";
 import { dataService } from "../services/DataService";
+import { compareNumAlphas } from "./Helpers"; // Assuming this helper is available
 import "../App.css";
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
   try {
-    let date;
-    if (dateString.includes('\\') || dateString.includes('/')) {
-      // Handle MM\DD\YYYY or MM/DD/YYYY format
-      const [month, day, year] = dateString.split(/[\\/]/);
-      date = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
-    } else {
-      date = new Date(dateString);
-    }
-    
-    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
     return date.toISOString().split('T')[0];
   } catch {
-    return dateString; // Return original if parsing fails
+    return dateString;
   }
 };
 
 const Pesajes = ({ eventEmitter }) => {
+  const [hisPesajes, setHisPesajes] = useState([]);
+  const [gridData, setGridData] = useState([]);
+  const [fechasPesaje, setFechasPesaje] = useState([]);
+  const [showComentario, setShowComentario] = useState(false);
+  const [captions, setCaptions] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // State for immediate input changes
   const [filtros, setFiltros] = useState({
     fechaControl: null,
     filtroOperacion: "",
@@ -32,164 +32,208 @@ const Pesajes = ({ eventEmitter }) => {
     filtroChapeta: "",
     filtroExacto: "contains",
   });
-  const [showComentario, setShowComentario] = useState(false); // <-- ADD new state for the checkbox
-  const [gridData, setGridData] = useState([]);
-  const [hisPesajes, setHispesajes] = useState([]);
-  const [fechasPesaje, setFechasPesaje] = useState([]);
-  const [captions, setCaptions] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Dynamically build columns based on the checkbox state
+  // State for debounced filters and sorting
+  const [debouncedFiltros, setDebouncedFiltros] = useState(filtros);
+  const [sortConfig, setSortConfig] = useState({ key: 'Fecha', direction: 'descending' });
+
+  // Local styles for responsive filter layout
+  const styles = {
+    filtersRow: {
+      display: 'flex',
+      alignItems: 'flex-end',
+      gap: '5px',
+      flexWrap: 'wrap',
+    },
+  };
+
+  // Debounce filter inputs to improve performance
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFiltros(filtros);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [filtros]);
+
+  // Memoized columns definition
   const columns = useMemo(() => {
     const baseColumns = [
-      { label: "Codigo", accessor: "Codigo", width: "15%" },
-      { label: "Chapeta", accessor: "Chapeta", width: "10%" },
-      { label: "Marca", accessor: "Marca", width: "10%" },
       { label: "Fecha", accessor: "Fecha", width: "15%" },
-      { label: "Peso", accessor: "Peso", width: "10%" },
+      { label: "Codigo", accessor: "Codigo", width: "15%" },
+      { label: "Chapeta", accessor: "Chapeta", width: "15%" },
+      { label: "Marca", accessor: "Marca", width: "10%" },
       { label: "Operacion", accessor: "Operacion", width: "15%" },
+      { label: "Peso", accessor: "Peso", width: "10%" },
     ];
-
     if (showComentario) {
-      return [...baseColumns, { label: "Comentario", accessor: "Comentario", width: "25%" }];
+      baseColumns.push({ label: "Comentario", accessor: "Comentario", width: "20%" });
     }
-
     return baseColumns;
   }, [showComentario]);
 
-  const initializeData = useCallback(() => {
-    let allPesajes = dataService.getCachedData();
-    if (!allPesajes) return;
-
-    allPesajes = allPesajes
-      .filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha)
-      .map(pesaje => ({
-        ...pesaje,
-        Fecha: formatDate(pesaje.Fecha)
-      }));
-
-    setHispesajes(allPesajes);
-    let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))]
-      .filter(Boolean)
-      .sort((a, b) => new Date(b) - new Date(a));
-    
-    allFechas.unshift(null);
-    setFechasPesaje(allFechas);
-    setGridData(allPesajes.slice(0, 200));
-    setCaptions(
-      allPesajes.length > 0
-        ? `Ultimos 200 - Total: ${allPesajes.length}`
-        : "No hay datos disponibles"
-    );
-  }, []);
-
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      initializeData();
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [initializeData]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    const refreshHandler = () => {
-      loadData();
-    };
-    eventEmitter.on("refresh", refreshHandler);
-    return () => {
-      eventEmitter.off("refresh", refreshHandler);
-    };
-  }, [eventEmitter, loadData]);
-
-  // Emit table data when gridData changes (for export functionality)
-  useEffect(() => {
-    if (gridData.length > 0) {
-      eventEmitter.emit('tableDataUpdate', {
-        data: gridData,
-        columns: columns,
-        title: 'Pesajes'
-      });
-    }
-  }, [gridData, eventEmitter, columns]); // <-- ADD 'columns' to dependency array
-
   const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-    // Convert text inputs to uppercase
-    const upperValue = (event.target.type === 'text' || event.target.tagName === 'INPUT') &&
-                      event.target.type !== 'checkbox' &&
-                      event.target.type !== 'radio' ?
-                      value.toUpperCase() : value;
-    setFiltros((prev) => ({
-      ...prev,
-      [name]: upperValue,
-    }));
+    const { name, value, type, checked } = event.target;
+    const upperValue = type === 'text' ? value.toUpperCase() : value;
+
+    if (type === 'checkbox' && name === 'showComentario') {
+      setShowComentario(checked);
+      return;
+    }
+
+    setFiltros((prev) => ({ ...prev, [name]: upperValue }));
+
+    if (name === 'filtroOperacion') {
+      const targetOperations = ['COMPRA', 'CONTROL', 'VENTA', 'CORRECCION', 'MUERTE'];
+      const trimmedValue = upperValue.trim();
+      let relevantPesajes = hisPesajes;
+
+      if (targetOperations.includes(trimmedValue)) {
+        relevantPesajes = hisPesajes.filter(p => p.Operacion?.toUpperCase() === trimmedValue);
+      }
+      
+      let allFechas = [...new Set(relevantPesajes.map(obj => obj.Fecha.trim()))]
+        .filter(Boolean)
+        .sort((a, b) => new Date(b) - new Date(a));
+      
+      allFechas.unshift(null);
+      setFechasPesaje(allFechas);
+    }
+
+    // When the 'filtroMarca' input changes, update the available dates.
+    if (name === 'filtroMarca') {
+      const trimmedValue = upperValue.trim();
+      let relevantPesajes = hisPesajes;
+
+      // If the brand filter has a value, filter the data.
+      if (trimmedValue) {
+        relevantPesajes = hisPesajes.filter(p => p.Marca?.toUpperCase() === trimmedValue);
+      }
+      
+      // Get unique dates from the (potentially filtered) list of pesajes.
+      let allFechas = [...new Set(relevantPesajes.map(obj => obj.Fecha.trim()))]
+        .filter(Boolean)
+        .sort((a, b) => new Date(b) - new Date(a));
+      
+      allFechas.unshift(null); // Add the "Todas" option to the top.
+      setFechasPesaje(allFechas);
+    }
   };
 
   const applyFilters = useCallback(() => {
-    // Helper function to apply consistent filtering logic (contains, starts, ends, exact)
+    // --- START: NEW LOGIC ---
+    // Check if any filter has a value.
+    const hasActiveFilter = 
+      (debouncedFiltros.filtroCodigo && debouncedFiltros.filtroCodigo.trim() !== "") ||
+      (debouncedFiltros.filtroChapeta && debouncedFiltros.filtroChapeta.trim() !== "") ||
+      (debouncedFiltros.filtroMarca && debouncedFiltros.filtroMarca.trim() !== "") ||
+      (debouncedFiltros.filtroOperacion && debouncedFiltros.filtroOperacion.trim() !== "") ||
+      debouncedFiltros.fechaControl ||
+      showComentario;
+
+    // If no filters are active, clear the grid and captions, then exit.
+    if (!hasActiveFilter) {
+      setGridData([]);
+      setCaptions("Establezca un filtro para ver los resultados.");
+      eventEmitter.emit('tableDataUpdate', { data: [], columns, title: 'Pesajes' });
+      return;
+    }
+    // --- END: NEW LOGIC ---
+
     const matches = (field, filter, comparison) => {
       if (!field || !filter) return false;
-      const f = field.toUpperCase();
-      const v = filter.toUpperCase().trim();
+      const f = String(field).toUpperCase();
+      const v = String(filter).toUpperCase().trim();
       switch (comparison) {
         case "starts": return f.startsWith(v);
         case "ends": return f.endsWith(v);
         case "none": return f === v;
-        case "contains":
-        default: return f.includes(v);
+        case "contains": default: return f.includes(v);
       }
     };
 
     let filteredData = [...hisPesajes];
 
-    // Apply all text filters consistently
-    if (filtros.filtroCodigo.trim()) {
-      filteredData = filteredData.filter(w => matches(w.Codigo, filtros.filtroCodigo, filtros.filtroExacto));
+    if (debouncedFiltros.filtroCodigo.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Codigo, debouncedFiltros.filtroCodigo, debouncedFiltros.filtroExacto));
     }
-    if (filtros.filtroChapeta.trim()) {
-      filteredData = filteredData.filter(w => matches(w.Chapeta, filtros.filtroChapeta, filtros.filtroExacto));
+    if (debouncedFiltros.filtroChapeta.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Chapeta, debouncedFiltros.filtroChapeta, debouncedFiltros.filtroExacto));
     }
-    if (filtros.filtroMarca.trim() && filtros.filtroMarca !== "*") {
-      filteredData = filteredData.filter(w => matches(w.Marca, filtros.filtroMarca, filtros.filtroExacto));
+    if (debouncedFiltros.filtroMarca.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Marca, debouncedFiltros.filtroMarca, debouncedFiltros.filtroExacto));
     }
-    if (filtros.filtroOperacion.trim() && filtros.filtroOperacion !== "*") {
-      filteredData = filteredData.filter(w => matches(w.Operacion, filtros.filtroOperacion, filtros.filtroExacto));
+    if (debouncedFiltros.filtroOperacion.trim()) {
+      filteredData = filteredData.filter(w => matches(w.Operacion, debouncedFiltros.filtroOperacion, debouncedFiltros.filtroExacto));
     }
-
-    // Apply date filter
-    if (filtros.fechaControl && filtros.fechaControl !== "Todas") {
-      filteredData = filteredData.filter(w => w.Fecha === filtros.fechaControl);
+    if (debouncedFiltros.fechaControl) {
+      filteredData = filteredData.filter(w => w.Fecha === debouncedFiltros.fechaControl);
     }
-
-    // Apply comment filter
     if (showComentario) {
       filteredData = filteredData.filter(w => w.Comentario && w.Comentario.trim() !== "");
     }
 
     setGridData(filteredData);
     let comment = `Total: ${filteredData.length}`;
-
-    eventEmitter.emit('tableDataUpdate', {
-      data: filteredData,
-      columns: columns,
-      title: 'Pesajes'
-    });
-
-    if (filteredData.length && filteredData.every(w => w.Peso > 0)) {
+    if (filteredData.length > 0 && filteredData.every(w => w.Peso > 0)) {
       const average = filteredData.reduce((acc, cur) => acc + parseInt(cur.Peso), 0) / filteredData.length;
       comment += ` Promedio: ${average.toFixed(2)}`;
     }
-
     setCaptions(comment);
-  }, [hisPesajes, filtros, showComentario, columns, eventEmitter]);
 
+    eventEmitter.emit('tableDataUpdate', { data: filteredData, columns, title: 'Pesajes' });
+  }, [hisPesajes, debouncedFiltros, showComentario, columns, eventEmitter]);
+
+  const handleSort = useCallback((key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  }, [sortConfig]);
+
+  const processedGridData = useMemo(() => {
+    let sortedData = [...gridData];
+    if (sortConfig.key) {
+      sortedData.sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        const comparison = compareNumAlphas(String(aVal), String(bVal));
+        return sortConfig.direction === 'ascending' ? comparison : -comparison;
+      });
+    }
+    return sortedData;
+  }, [gridData, sortConfig]);
+
+  const loadData = useCallback(() => {
+    setIsLoading(true);
+    try {
+      const allPesajes = dataService.getCachedData().map(p => ({ ...p, Fecha: formatDate(p.Fecha) }));
+      setHisPesajes(allPesajes);
+      let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))]
+        .filter(Boolean)
+        .sort((a, b) => new Date(b) - new Date(a));
+      allFechas.unshift(null);
+      setFechasPesaje(allFechas);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [debouncedFiltros, showComentario, applyFilters]);
+
+  useEffect(() => {
+    const refreshHandler = () => loadData();
+    eventEmitter.on("refresh", refreshHandler);
+    return () => eventEmitter.off("refresh", refreshHandler);
+  }, [eventEmitter, loadData]);
 
   if (isLoading) {
     return <div>Cargando...</div>;
@@ -198,80 +242,46 @@ const Pesajes = ({ eventEmitter }) => {
   return (
     <div>
       <section className="filter-section pesajes-filters">
-        <div className="filters-row">
+        <div className="filters-row" style={styles.filtersRow}>
           <div className="filter-group">
             <label>Codigo</label>
-            <input
-              className="freeinputsmall"
-              name="filtroCodigo"
-              onChange={handleFilterChange}
-              value={filtros.filtroCodigo}
-            />
+            <input className="freeinputsmall" name="filtroCodigo" onChange={handleFilterChange} value={filtros.filtroCodigo} />
           </div>
           <div className="filter-group">
             <label>Chapeta</label>
-            <input
-              className="freeinputsmall"
-              name="filtroChapeta"
-              onChange={handleFilterChange}
-              value={filtros.filtroChapeta}
-            />
+            <input className="freeinputsmall" name="filtroChapeta" onChange={handleFilterChange} value={filtros.filtroChapeta} />
           </div>
           <div className="filter-group">
             <label>Marca</label>
-            <input
-              className="freeinputtiny"
-              name="filtroMarca"
-              onChange={handleFilterChange}
-              value={filtros.filtroMarca}
-            />
+            <input className="freeinputtiny" name="filtroMarca" onChange={handleFilterChange} value={filtros.filtroMarca} />
           </div>
           <div className="filter-group">
             <label>Operacion</label>
-            <input
-              className="freeinputsmall"
-              name="filtroOperacion"
-              onChange={handleFilterChange}
-              value={filtros.filtroOperacion}
-            />
+            <input className="freeinputsmall" name="filtroOperacion" onChange={handleFilterChange} value={filtros.filtroOperacion} />
           </div>
           <div className="filter-group">
             <label>Fecha</label>
-            <select
-              name="fechaControl"
-              onChange={handleFilterChange}
-              value={filtros.fechaControl || ""}
-            >
+            <select name="fechaControl" onChange={handleFilterChange} value={filtros.fechaControl || ""}>
               {fechasPesaje.map((fecha) => (
-                <option key={fecha} value={fecha}>
+                <option key={fecha || 'all'} value={fecha || ""}>
                   {fecha || "Todas"}
                 </option>
               ))}
             </select>
           </div>
           <div className="filter-group">
-        <label>Comparación</label>
-          <select
-            name="filtroExacto"
-            onChange={handleFilterChange}
-            value={filtros.filtroExacto ?? "contains"}
-          >
-            <option value="none">Exacto</option>
-            <option value="starts">Empieza con</option>
-            <option value="ends">Termina con</option>
-            <option value="contains">Contiene</option>
-          </select>
-        </div>
-        <div className="filter-group checkbox-group">
-          <label>Comentario</label>
-          <input
-            type="checkbox"
-            name="showComentario"
-            checked={showComentario}
-            onChange={(e) => setShowComentario(e.target.checked)}
-          />
-        </div>
-         <button className="filter-button" onClick={applyFilters}>Ok</button>
+            <label>Comparación</label>
+            <select name="filtroExacto" onChange={handleFilterChange} value={filtros.filtroExacto ?? "contains"}>
+              <option value="none">Exacto</option>
+              <option value="starts">Empieza con</option>
+              <option value="ends">Termina con</option>
+              <option value="contains">Contiene</option>
+            </select>
+          </div>
+          <div className="filter-group checkbox-group">
+            <label>Comentario</label>
+            <input type="checkbox" name="showComentario" checked={showComentario} onChange={handleFilterChange} />
+          </div>
         </div>
       </section>
 
@@ -280,7 +290,12 @@ const Pesajes = ({ eventEmitter }) => {
       </section>
 
       <section className="table-container">
-        <Table data={gridData} columns={columns} />
+        <Table 
+          data={processedGridData} 
+          columns={columns} 
+          onSort={handleSort}
+          sortConfig={sortConfig}
+        />
       </section>
     </div>
   );
