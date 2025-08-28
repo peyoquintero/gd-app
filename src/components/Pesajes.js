@@ -180,8 +180,9 @@ const Pesajes = ({ eventEmitter }) => {
     }
     setCaptions(comment);
 
-    eventEmitter.emit('tableDataUpdate', { data: filteredData, columns, title: 'Pesajes' });
-  }, [hisPesajes, debouncedFiltros, showComentario, columns, eventEmitter]);
+    // REMOVE THE LINE BELOW
+    // eventEmitter.emit('tableDataUpdate', { data: filteredData, columns, title: 'Pesajes' });
+  }, [hisPesajes, debouncedFiltros, showComentario]); // Dependencies updated
 
   const handleSort = useCallback((key) => {
     let direction = 'ascending';
@@ -228,6 +229,19 @@ const Pesajes = ({ eventEmitter }) => {
   useEffect(() => {
     applyFilters();
   }, [debouncedFiltros, showComentario, applyFilters]);
+
+  // --- START: NEW EXPORT LOGIC ---
+  // This effect ensures the exported data always matches the sorted/processed data on screen.
+  useEffect(() => {
+    if (processedGridData) {
+      eventEmitter.emit('tableDataUpdate', { 
+        data: processedGridData, 
+        columns, 
+        title: 'Pesajes' 
+      });
+    }
+  }, [processedGridData, columns, eventEmitter]);
+  // --- END: NEW EXPORT LOGIC ---
 
   useEffect(() => {
     const refreshHandler = () => loadData();
