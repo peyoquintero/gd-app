@@ -110,6 +110,32 @@ const Inventario = ({ eventEmitter }) => {
   }, [sortConfig]);
   // --- END: NEW SORT HANDLER ---
 
+  // --- START: ADD THIS MISSING LOGIC ---
+  // This hook creates the final data to be displayed in the table.
+  // It runs only when the underlying data, sort config, or topX value changes.
+  const processedGridData = useMemo(() => {
+    let sortedData = [...gridInventario];
+
+    if (sortConfig.key) {
+      sortedData.sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        // Use a smart sort function that handles numbers and text
+        const comparison = compareNumAlphas(String(aVal), String(bVal));
+        return sortConfig.direction === 'ascending' ? comparison : -comparison;
+      });
+    }
+
+    // Apply the "Top X" slice AFTER sorting
+    const topXValue = parseInt(topX, 10);
+    if (!isNaN(topXValue) && topXValue > 0) {
+      return sortedData.slice(0, topXValue);
+    }
+
+    return sortedData;
+  }, [gridInventario, sortConfig, topX]);
+  // --- END: ADD THIS MISSING LOGIC ---
+
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
 
@@ -183,6 +209,7 @@ const Inventario = ({ eventEmitter }) => {
         setAvgProjection(0);
       }
 
+      // --- START: REMOVE THIS BLOCK ---
       if (debouncedFiltros.selectedOption === "movimientos") {
         eventEmitter.emit('tableDataUpdate', {
           data: movimientosByFecha,
@@ -196,8 +223,9 @@ const Inventario = ({ eventEmitter }) => {
           title: 'Inventario - Actual'
         });
       }
+      // --- END: REMOVE THIS BLOCK ---
     }
-  }, [debouncedFiltros, gananciaDiaria, eventEmitter]);
+  }, [debouncedFiltros, gananciaDiaria, topX]); // Dependencies updated
 
   const handleGananciaChange = (e) => {
     const value = e.target.value;
@@ -228,6 +256,25 @@ const Inventario = ({ eventEmitter }) => {
     refreshData(hisPesajes);
   }, [refreshData, hisPesajes]);
 
+  // --- START: NEW EXPORT LOGIC ---
+  // This effect ensures the exported data always matches the data on screen for either view.
+  useEffect(() => {
+    if (debouncedFiltros.selectedOption === "movimientos") {
+      eventEmitter.emit('tableDataUpdate', {
+        data: gridMovimientos,
+        columns: columns,
+        title: 'Inventario - Movimientos'
+      });
+    } else {
+      eventEmitter.emit('tableDataUpdate', {
+        data: processedGridData,
+        columns: columnsInventario,
+        title: 'Inventario - Actual'
+      });
+    }
+  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData, columns, columnsInventario, eventEmitter]);
+  // --- END: NEW EXPORT LOGIC ---
+
   useEffect(() => {
     const refreshHandler = () => {
       loadData();
@@ -237,84 +284,6 @@ const Inventario = ({ eventEmitter }) => {
       eventEmitter.off("refresh", refreshHandler);
     };
   }, [eventEmitter, loadData]);
-
-  useEffect(() => {
-    if (debouncedFiltros.selectedOption === "movimientos" && gridMovimientos.length > 0) {
-      eventEmitter.emit('tableDataUpdate', {
-        data: gridMovimientos,
-        columns: columns,
-        title: 'Inventario - Movimientos'
-      });
-    } else if (debouncedFiltros.selectedOption === "cabezas" && gridInventario.length > 0) {
-      eventEmitter.emit('tableDataUpdate', {
-        data: gridInventario,
-        columns: columnsInventario,
-        title: 'Inventario - Actual'
-      });
-    }
-  }, [debouncedFiltros.selectedOption, gridMovimientos, gridInventario, eventEmitter, columns, columnsInventario]);
-
-  // --- START: SORTING LOGIC ---
-  const sortedInventario = useMemo(() => {
-    let sortableItems = [...gridInventario];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-        if (aValue === bValue) {
-          return 0;
-        }
-        const modifier = sortConfig.direction === 'ascending' ? 1 : -1;
-        // Use the smart comparison function for flexible sorting
-        return compareNumAlphas(aValue, bValue) * modifier;
-      });
-    }
-    return sortableItems;
-  }, [gridInventario, sortConfig]);
-
-  const sortedMovimientos = useMemo(() => {
-    let sortableItems = [...gridMovimientos];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-        if (aValue === bValue) {
-          return 0;
-        }
-        const modifier = sortConfig.direction === 'ascending' ? 1 : -1;
-        // Use the smart comparison function for flexible sorting
-        return compareNumAlphas(aValue, bValue) * modifier;
-      });
-    }
-    return sortableItems;
-  }, [gridMovimientos, sortConfig]);
-  // --- END: SORTING LOGIC ---
-
-  // --- START: NEW MEMOIZED PROCESSING LOGIC ---
-  // This hook creates the final data to be displayed in the table.
-  // It runs only when the underlying data, sort config, or topX value changes.
-  const processedGridData = useMemo(() => {
-    let sortedData = [...gridInventario];
-
-    if (sortConfig.key) {
-      sortedData.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
-        // Use a smart sort function that handles numbers and text
-        const comparison = compareNumAlphas(String(aVal), String(bVal));
-        return sortConfig.direction === 'ascending' ? comparison : -comparison;
-      });
-    }
-
-    // Apply the "Top X" slice AFTER sorting
-    const topXValue = parseInt(topX, 10);
-    if (!isNaN(topXValue) && topXValue > 0) {
-      return sortedData.slice(0, topXValue);
-    }
-
-    return sortedData;
-  }, [gridInventario, sortConfig, topX]);
-  // --- END: NEW MEMOIZED PROCESSING LOGIC ---
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
@@ -436,7 +405,7 @@ const Inventario = ({ eventEmitter }) => {
         ) : (
           // --- START: UPDATE TABLE PROPS ---
           <Table 
-            data={processedGridData} // Pass the final processed data
+            data={processedGridData} // Use the final processed data here
             columns={columnsInventario} 
             onSort={handleSort} // Pass the sort handler function
             sortConfig={sortConfig} // Pass the current sort configuration
