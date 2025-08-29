@@ -86,12 +86,6 @@ var ultpeso = data.length>0 ? `${labelPromUltPeso}`: "";
 return ultpeso;
 }
 
-export const validLoteOptions= (lotes) =>
-{
-lotes.push('*');
-return lotes.filter(w=>(w!=='NULL'))
-}
-
 export const mapApiDataToPesajes= (apiResult) => {
   const rows = [];
   const rawRows = apiResult.values || [];
@@ -99,13 +93,12 @@ export const mapApiDataToPesajes= (apiResult) => {
     rawRows.forEach((row) => {
     const rowData = {};
     row.forEach((item, index) => {
-    rowData[headers[index]] = item.toUpperCase();
+    rowData[headers[index]] = item?.trim()?.toUpperCase();
   });
   rows.push(rowData);
   });
   return rows;
 }
-
 
 export const resurrect = (rows) => {
   const grouped = getPesajesByCodigo(rows) || {};
@@ -140,7 +133,6 @@ const gananciaDiaria = (pesoInicial,pesoFinal) =>
 {
   return Math.round((pesoFinal.Peso-pesoInicial.Peso)/ ((new Date(pesoFinal.Fecha)-new Date(pesoInicial.Fecha))/86400000)*1000)
 }
-
 
 export const ganancias = (hispesajes, fechaInicial, fiComparator, fechaFinal, ffComparator, filtroVentas) =>
 {
