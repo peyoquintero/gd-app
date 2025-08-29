@@ -269,10 +269,25 @@ const Pesajes = ({ eventEmitter }) => {
             <label>Marca</label>
             <input className="freeinputtiny" name="filtroMarca" onChange={handleFilterChange} value={filtros.filtroMarca} />
           </div>
+          {/* --- START: REFACTORED INPUT --- */}
           <div className="filter-group">
             <label>Operacion</label>
-            <input className="freeinputsmall" name="filtroOperacion" onChange={handleFilterChange} value={filtros.filtroOperacion} />
+            <input
+              className="freeinputsmall"
+              name="filtroOperacion"
+              onChange={handleFilterChange}
+              value={filtros.filtroOperacion}
+              list="operacion-options"
+            />
+            <datalist id="operacion-options">
+              <option value="COMPRA" />
+              <option value="CONTROL" />
+              <option value="VENTA" />
+              <option value="MUERTE" />
+              <option value="CORRECCION" />
+            </datalist>
           </div>
+          {/* --- END: REFACTORED INPUT --- */}
           <div className="filter-group">
             <label>Fecha</label>
             <select name="fechaControl" onChange={handleFilterChange} value={filtros.fechaControl || ""}>
