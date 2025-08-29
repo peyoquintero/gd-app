@@ -49,7 +49,6 @@ const Inventario = ({ eventEmitter }) => {
     filtroChapeta: ""
   });
 
-  // --- START: LOCAL STYLING FIX ---
   // Define style objects locally to avoid global CSS conflicts.
   const styles = {
     filtersRow: {
@@ -64,21 +63,17 @@ const Inventario = ({ eventEmitter }) => {
       paddingBottom: '3px',    // Fine-tunes vertical alignment with other inputs
     },
   };
-  // --- END: LOCAL STYLING FIX ---
 
   // This state will hold the filter values after the user has stopped typing.
   const [debouncedFiltros, setDebouncedFiltros] = useState(filtros);
   const [gridMovimientos, setGridMovimientos] = useState([]);
   const [gridInventario, setGridInventario] = useState([]);
-  const [avgProjection, setAvgProjection] = useState(0);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [gananciaDiaria, setGananciaDiaria] = useState(350);
   
-  // --- START: NEW STATE ---
   const [topX, setTopX] = useState(''); // State for the "Top X" input
   const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' }); // State for sorting
-  // --- END: NEW STATE ---
 
   // This effect debounces the filter inputs.
   useEffect(() => {
@@ -100,7 +95,7 @@ const Inventario = ({ eventEmitter }) => {
     setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
   }, []);
 
-  // --- START: NEW SORT HANDLER ---
+  // NEW SORT HANDLER ---
   const handleSort = useCallback((key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -108,9 +103,7 @@ const Inventario = ({ eventEmitter }) => {
     }
     setSortConfig({ key, direction });
   }, [sortConfig]);
-  // --- END: NEW SORT HANDLER ---
 
-  // --- START: ADD THIS MISSING LOGIC ---
   // This hook creates the final data to be displayed in the table.
   // It runs only when the underlying data, sort config, or topX value changes.
   const processedGridData = useMemo(() => {
@@ -134,7 +127,6 @@ const Inventario = ({ eventEmitter }) => {
 
     return sortedData;
   }, [gridInventario, sortConfig, topX]);
-  // --- END: ADD THIS MISSING LOGIC ---
 
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
@@ -198,34 +190,8 @@ const Inventario = ({ eventEmitter }) => {
       // The sorting and slicing will happen later.
       setGridInventario(inventario);
 
-      // Calculate and set the average projection
-      if (inventario.length > 0) {
-        const totalProjection = inventario.reduce((acc, item) => {
-          const projectionValue = parseInt(item.Proyeccion, 10);
-          return acc + (isNaN(projectionValue) ? 0 : projectionValue);
-        }, 0);
-        setAvgProjection(Math.round(totalProjection / inventario.length));
-      } else {
-        setAvgProjection(0);
-      }
-
-      // --- START: REMOVE THIS BLOCK ---
-      if (debouncedFiltros.selectedOption === "movimientos") {
-        eventEmitter.emit('tableDataUpdate', {
-          data: movimientosByFecha,
-          columns: columns,
-          title: 'Inventario - Movimientos'
-        });
-      } else {
-        eventEmitter.emit('tableDataUpdate', {
-          data: inventario,
-          columns: columnsInventario,
-          title: 'Inventario - Actual'
-        });
-      }
-      // --- END: REMOVE THIS BLOCK ---
     }
-  }, [debouncedFiltros, gananciaDiaria, topX]); // Dependencies updated
+  }, [debouncedFiltros, gananciaDiaria]); // Dependencies updated
 
   const handleGananciaChange = (e) => {
     const value = e.target.value;
@@ -256,7 +222,27 @@ const Inventario = ({ eventEmitter }) => {
     refreshData(hisPesajes);
   }, [refreshData, hisPesajes]);
 
-  // --- START: NEW EXPORT LOGIC ---
+  // --- START: NEW CAPTION LOGIC ---
+  const totalsCaption = useMemo(() => {
+    if (debouncedFiltros.selectedOption === "movimientos") {
+      return `Movimientos: ${gridMovimientos.length}`;
+    }
+    
+    // For the "Inventario" view, use the final processed data
+    const data = processedGridData;
+    if (data.length > 0) {
+      const totalProjection = data.reduce((acc, item) => {
+        const projectionValue = parseInt(item.Proyeccion, 10);
+        return acc + (isNaN(projectionValue) ? 0 : projectionValue);
+      }, 0);
+      const avgProj = Math.round(totalProjection / data.length);
+      return `Total: ${data.length}, Prom PRY: ${avgProj}`;
+    }
+    
+    return `Total: 0, Prom PRY: 0`;
+  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData]);
+  // --- END: NEW CAPTION LOGIC ---
+
   // This effect ensures the exported data always matches the data on screen for either view.
   useEffect(() => {
     if (debouncedFiltros.selectedOption === "movimientos") {
@@ -273,7 +259,6 @@ const Inventario = ({ eventEmitter }) => {
       });
     }
   }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData, columns, columnsInventario, eventEmitter]);
-  // --- END: NEW EXPORT LOGIC ---
 
   useEffect(() => {
     const refreshHandler = () => {
@@ -376,7 +361,6 @@ const Inventario = ({ eventEmitter }) => {
             value={filtros.filtroPeso}
           />
         </div>
-        {/* --- START: NEW INPUT FIELD --- */}
         <div className="filter-group">
           <label>Top</label>
           <input
@@ -387,15 +371,12 @@ const Inventario = ({ eventEmitter }) => {
             placeholder="N°"
           />
         </div>
-        {/* --- END: NEW INPUT FIELD --- */}
         </div>
       </section>
 
       <section className="totals">
         <label>
-          {debouncedFiltros.selectedOption === "movimientos"
-            ? `Movimientos: ${gridMovimientos.length}`
-            : `Total: ${gridInventario.length}, Prom PRY: ${avgProjection}`}
+          {totalsCaption}
         </label>
       </section>
 
