@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"; // Add useMemo
 import Table from "./Table";
 import { getInventario, groupByFechaOperacion } from "./HelperInventario";
-// Assuming you have this helper function for smart sorting
 import { compareNumAlphas } from "./Helpers"; 
 import { dataService } from "../services/DataService";
 import "../App.css"; 
@@ -74,6 +73,7 @@ const Inventario = ({ eventEmitter }) => {
   
   const [topX, setTopX] = useState(''); // State for the "Top X" input
   const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' }); // State for sorting
+  const [showPesoDistribution, setShowPesoDistribution] = useState(false); // State for the popup
 
   // This effect debounces the filter inputs.
   useEffect(() => {
@@ -128,6 +128,32 @@ const Inventario = ({ eventEmitter }) => {
     return sortedData;
   }, [gridInventario, sortConfig, topX]);
 
+  // --- START: NEW DISTRIBUTION LOGIC ---
+  // This hook calculates the weight distribution for the popup.
+  // It uses gridInventario to reflect the filtered data before the "Top X" slice.
+  const pesoDistribution = useMemo(() => {
+    if (!gridInventario.length) return [];
+
+    const distribution = gridInventario.reduce((acc, animal) => {
+      const peso = parseInt(animal.Proyeccion, 10); // Changed from PesoFinal
+      if (isNaN(peso)) return acc;
+
+      // Group by 25kg slots
+      const slot = Math.floor(peso / 25) * 25;
+      acc[slot] = (acc[slot] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(distribution)
+      .map(([slot, count]) => ({
+        // Create the range string for 25kg slots
+        range: `${slot} - ${parseInt(slot, 10) + 24} kg`,
+        count,
+      }))
+      .sort((a, b) => parseInt(a.range) - parseInt(b.range));
+  }, [gridInventario]);
+  // --- END: NEW DISTRIBUTION LOGIC ---
+
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
 
@@ -155,9 +181,23 @@ const Inventario = ({ eventEmitter }) => {
     if (debouncedFiltros.filtroCodigo?.length > 0) {
       filteredData = filteredData.filter(w => matchesFilter(w.Codigo, debouncedFiltros.filtroCodigo));
     }
-    if (debouncedFiltros.filtroMarca?.length > 1) {
-      filteredData = filteredData.filter(w => matchesFilter(w.Marca, debouncedFiltros.filtroMarca));
+
+    // --- START: REFACTORED MARCA FILTER LOGIC ---
+    const marcaFilterValue = debouncedFiltros.filtroMarca?.trim();
+    if (marcaFilterValue) {
+      // Check if the filter is a comma-separated list
+      if (marcaFilterValue.includes(',')) {
+        const marcas = marcaFilterValue.split(',').map(m => m.trim().toUpperCase()).filter(m => m);
+        if (marcas.length > 0) {
+          filteredData = filteredData.filter(w => w.Marca && marcas.includes(w.Marca.toUpperCase()));
+        }
+      } else {
+        // Fallback to single value filtering (supports wildcards)
+        filteredData = filteredData.filter(w => matchesFilter(w.Marca, marcaFilterValue));
+      }
     }
+    // --- END: REFACTORED MARCA FILTER LOGIC ---
+
     if (debouncedFiltros.filtroChapeta?.length > 1) {
       filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
     }
@@ -180,8 +220,8 @@ const Inventario = ({ eventEmitter }) => {
           const minPeso = parseInt(array[0]);
           const maxPeso = parseInt(array[1]);
           inventario = inventario.filter(item => {
-            const ultimoPeso = parseInt(item.PesoFinal); // Use PesoFinal as per columnsInventario
-            return ultimoPeso >= minPeso && ultimoPeso <= maxPeso;
+            const proyeccion = parseInt(item.Proyeccion, 10); // Changed from PesoFinal
+            return proyeccion >= minPeso && proyeccion <= maxPeso;
           });
         }
       }
@@ -325,13 +365,13 @@ const Inventario = ({ eventEmitter }) => {
             />
           </div>
           <div className="filter-group">          
-            <label>Marca</label>
+            <label>Marcas</label>
             <input
-              className="freeinputtiny"
+              className="freeinputsmall"
               name="filtroMarca"
               onChange={handleFilterChange}
               value={filtros.filtroMarca}
-              maxLength={3}
+              maxLength={15}
             />
           </div>
           <div className="filter-group">
@@ -353,7 +393,7 @@ const Inventario = ({ eventEmitter }) => {
             />
           </div>
          <div className="filter-group">
-          <label>Rango Peso</label>
+          <label>Rango PRY</label>
           <input
             className="freeinputsmall"
             name="filtroPeso"
@@ -373,25 +413,46 @@ const Inventario = ({ eventEmitter }) => {
         </div>
         </div>
       </section>
-
       <section className="totals">
         <label>
           {totalsCaption}
         </label>
+        <button onClick={() => setShowPesoDistribution(!showPesoDistribution)} style={{ marginLeft: '15px', minHeight:'15px',minWidth:'80px' }}>
+          {showPesoDistribution ? 'x' : 'Distribución'}
+        </button>
       </section>
+      {showPesoDistribution && (
+        <section className="table-container" style={{ marginBottom: '20px' }}>
+          <h2>Distribución por Proyección</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Rango de Peso</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pesoDistribution.map(item => (
+                <tr key={item.range}>
+                  <td>{item.range}</td>
+                  <td>{item.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
 
       <section className="table-container">
         {debouncedFiltros.selectedOption === "movimientos" ? (
           <Table data={gridMovimientos} columns={columns} onSort={() => {}} />
         ) : (
-          // --- START: UPDATE TABLE PROPS ---
           <Table 
             data={processedGridData} // Use the final processed data here
             columns={columnsInventario} 
             onSort={handleSort} // Pass the sort handler function
             sortConfig={sortConfig} // Pass the current sort configuration
           />
-          // --- END: UPDATE TABLE PROPS ---
         )}
       </section>
     </div>
