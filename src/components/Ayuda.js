@@ -138,7 +138,7 @@ const Ayuda = ({ eventEmitter }) => {
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       <section className="version-info">
-        <label>Version 2.0.0 - {dataService.getLastUpdate()}</label>
+        <label>Version 2.0.1 - {dataService.getLastUpdate()}</label>
       </section>
     </div>
   );
