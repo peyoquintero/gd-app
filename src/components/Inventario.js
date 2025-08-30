@@ -95,7 +95,6 @@ const Inventario = ({ eventEmitter }) => {
     setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
   }, []);
 
-  // NEW SORT HANDLER ---
   const handleSort = useCallback((key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -128,7 +127,6 @@ const Inventario = ({ eventEmitter }) => {
     return sortedData;
   }, [gridInventario, sortConfig, topX]);
 
-  // --- START: NEW DISTRIBUTION LOGIC ---
   // This hook calculates the weight distribution for the popup.
   // It uses gridInventario to reflect the filtered data before the "Top X" slice.
   const pesoDistribution = useMemo(() => {
@@ -152,7 +150,6 @@ const Inventario = ({ eventEmitter }) => {
       }))
       .sort((a, b) => parseInt(a.range) - parseInt(b.range));
   }, [gridInventario]);
-  // --- END: NEW DISTRIBUTION LOGIC ---
 
   const refreshData = useCallback((allPesajes) => {
     if (!allPesajes?.length) return;
@@ -182,7 +179,6 @@ const Inventario = ({ eventEmitter }) => {
       filteredData = filteredData.filter(w => matchesFilter(w.Codigo, debouncedFiltros.filtroCodigo));
     }
 
-    // --- START: REFACTORED MARCA FILTER LOGIC ---
     const marcaFilterValue = debouncedFiltros.filtroMarca?.trim();
     if (marcaFilterValue) {
       // Check if the filter is a comma-separated list
@@ -196,7 +192,6 @@ const Inventario = ({ eventEmitter }) => {
         filteredData = filteredData.filter(w => matchesFilter(w.Marca, marcaFilterValue));
       }
     }
-    // --- END: REFACTORED MARCA FILTER LOGIC ---
 
     if (debouncedFiltros.filtroChapeta?.length > 1) {
       filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
@@ -262,7 +257,6 @@ const Inventario = ({ eventEmitter }) => {
     refreshData(hisPesajes);
   }, [refreshData, hisPesajes]);
 
-  // --- START: NEW CAPTION LOGIC ---
   const totalsCaption = useMemo(() => {
     if (debouncedFiltros.selectedOption === "movimientos") {
       return `Movimientos: ${gridMovimientos.length}`;
@@ -281,7 +275,6 @@ const Inventario = ({ eventEmitter }) => {
     
     return `Total: 0, Prom PRY: 0`;
   }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData]);
-  // --- END: NEW CAPTION LOGIC ---
 
   // This effect ensures the exported data always matches the data on screen for either view.
   useEffect(() => {

@@ -4,6 +4,12 @@ import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,ca
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
+// --- START: FIX ---
+// Define default dates as constants outside the component to prevent re-creation on every render.
+const defaultStartDate = new Date('2020-01-01T00:00:00');
+const defaultEndDate = new Date();
+// --- END: FIX ---
+
 const formatDate = (dateString) => {
   if (!dateString) return '';
   try {
@@ -29,8 +35,8 @@ const Ganancias = ({ eventEmitter }) => {
         filtroMarca: "",
         filtroPeso: "",
         filtroChapeta: "",
-        fechaInicial:  new Date('2020-01-01T00:00:00'),
-        fechaFinal: new Date(),
+        fechaInicial:  defaultStartDate, // Use constant
+        fechaFinal: defaultEndDate, // Use constant
         fiComparator: '>=', // Replaces fiExacta
         ffComparator: '<=', // Replaces ffExacta
         filtroVentas: false,
@@ -43,7 +49,6 @@ const Ganancias = ({ eventEmitter }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' });
 
-    // --- START: LOCAL STYLING FIX ---
     // Define style objects locally to avoid global CSS conflicts.
     const styles = {
       filtersRow: {
@@ -95,10 +100,10 @@ const Ganancias = ({ eventEmitter }) => {
       setSortConfig({ key, direction });
     }, [sortConfig]);
 
-    // --- START: REORDERED LOGIC ---
+    // --- START: REORDERED AND FIXED LOGIC ---
 
-    // 1. Declare columns first.
-    const columns = [
+    // 1. Declare columns first and memoize them to prevent re-creation on every render.
+    const columns = useMemo(() => [
       { label: "Codigo", accessor: "Codigo",width:"12%" },
       { label: "Chapeta", accessor: "Chapeta",width:"12%" },
       { label: "Marca", accessor: "Marca",width:"6%" },
@@ -107,7 +112,7 @@ const Ganancias = ({ eventEmitter }) => {
       { label: "P. Inicial", accessor: "PesoInicial",width:"13%" },
       { label: "P. Final", accessor: "PesoFinal",width:"13%" },
       { label: "Ganancia", accessor: "Ganancia",width:"12%" },
-    ];
+    ], []); // The empty dependency array is the key to the fix.
 
     // 2. Declare processedGridData, which depends on gridData and sortConfig.
     const processedGridData = useMemo(() => {
@@ -134,8 +139,6 @@ const Ganancias = ({ eventEmitter }) => {
       }
     }, [processedGridData, columns, eventEmitter]);
 
-    // --- END: REORDERED LOGIC ---
-
     const initializeData = useCallback(() => {
         let allPesajes = dataService.getCachedData();
         if (!allPesajes) return;
@@ -157,8 +160,8 @@ const Ganancias = ({ eventEmitter }) => {
 
         // Reset filters and set default date range from the available data
         setFiltros({
-            fechaInicial: allFechasSorted[0] ?? new Date('2020-01-01T00:00:00'),
-            fechaFinal : fechasPesajeDesc[0] ?? new Date(),
+            fechaInicial: allFechasSorted[0] ?? defaultStartDate, // Use constant
+            fechaFinal : fechasPesajeDesc[0] ?? defaultEndDate, // Use constant
             filtroCodigo: "",
             filtroMarca: "",
             filtroPeso: "",
@@ -197,44 +200,41 @@ const Ganancias = ({ eventEmitter }) => {
       
       const handleFilterChange = (event) => {
         const { name, value } = event.target;
-        // Convert text inputs to uppercase
         const upperValue = (event.target.type === 'text' || event.target.tagName === 'INPUT') &&
                           event.target.type !== 'checkbox' &&
                           event.target.type !== 'radio' ?
                           value.toUpperCase() : value;
-        setFiltros({
-          ...filtros,
+        
+        // Use the functional update form to prevent infinite loops
+        setFiltros(prevFiltros => ({
+          ...prevFiltros,
           [name]: upperValue,
-        });
+        }));
      };
 
    const handleFilterMarcaChange = (event) => {
       const { name, value } = event.target;
       const upperValue = value.toUpperCase();
-      setFiltros({
-        ...filtros,
+
+      // Use the functional update form
+      setFiltros(prevFiltros => ({
+        ...prevFiltros,
         [name]: upperValue,
-      });
+      }));
 
       const trimmedValue = upperValue.trim();
 
       if (trimmedValue !== "*" && trimmedValue !== "") {
         let filteredPesajes;
-        // Check if the filter is a negation
         if (trimmedValue.startsWith("~")) {
           const brandToExclude = trimmedValue.substring(1);
-          // Filter for all pesajes that DO NOT match the brand
           filteredPesajes = hisPesajes.filter(w => w.Marca !== brandToExclude);
         } else {
-          // Otherwise, filter for pesajes that DO match the brand
           filteredPesajes = hisPesajes.filter(w => w.Marca === trimmedValue);
         }
-        // Get unique dates from the result of the filtering
         let allFechas = [...new Set(filteredPesajes.map(obj => obj.Fecha))];
         setFechasPesaje(allFechas);
       } else {
-        // If the filter is empty or "*", reset to show all dates
-        // --- THIS IS THE FIX ---
         let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
         setFechasPesaje(allFechas);
       }
@@ -243,33 +243,28 @@ const Ganancias = ({ eventEmitter }) => {
     const handleCheckboxChange = (event) => {
       const { name, checked } = event.target;
       
-      setFiltros({
-        ...filtros,
+      // Use the functional update form
+      setFiltros(prevFiltros => ({
+        ...prevFiltros,
         [name]: checked,
-      });
+      }));
   
-      // If the changed checkbox is 'filtroVentas', update the fechaFinal dropdown
       if (name === 'filtroVentas') {
         if (checked) {
-          // Filter for dates where the operation was a VENTA
           const ventaDates = hisPesajes
             .filter(p => p.Operacion?.toUpperCase() === 'VENTA')
             .map(p => p.Fecha);
-          
-          // Get unique dates and sort them in descending order
           const uniqueVentaDates = [...new Set(ventaDates)]
             .sort((a, b) => new Date(b) - new Date(a));
-          
           setFechasPesajeDesc(uniqueVentaDates);
         } else {
-          // When unchecked, revert to showing all unique dates in descending order
           const allFechasDesc = [...new Set(hisPesajes.map(obj => obj.Fecha))]
             .sort((a, b) => new Date(b) - new Date(a));
-          
           setFechasPesajeDesc(allFechasDesc);
         }
       }
     };
+    // --- END: REFACTORED HANDLERS ---
 
     const applyFilters = (event) => {
   // Helper function for enhanced filtering with wildcard support
@@ -320,7 +315,6 @@ const Ganancias = ({ eventEmitter }) => {
   );
 
   // 3. Apply all text and weight filters to the results from the ganancias function.
-  // This consolidated block now correctly handles empty filters.
   gridDataResults = gridDataResults.filter(res => 
     matchesFilter(res.Marca, filtros.filtroMarca) &&
     matchesFilter(res.Codigo, filtros.filtroCodigo) &&
@@ -344,10 +338,11 @@ const Ganancias = ({ eventEmitter }) => {
   gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
 
   // Exclude dubious data and update state
-  const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
+  const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0100/1250';
   const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
   let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
   
+  console.log(scrubbedData); 
   setGridData(scrubbedData);
   
   // Update captions
