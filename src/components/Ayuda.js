@@ -166,11 +166,8 @@ const Ayuda = ({ eventEmitter }) => {
         <label>Version 2.0.5 - {dataService.getLastUpdate()}</label>
       </section>
       <section style={{ marginTop: '30px' }}>
-        <h2>Configuración de Origen de Datos</h2>
-        <p>
-          Si guarda campo en blanco, se usara la URL configurada por defecto.
-        </p>
         <div style={{ marginTop: '15px' }}>
+          <h2>Configuración de Origen de Datos</h2>
           <label htmlFor="data-url-input" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
             URL de Google Sheets:
           </label>
@@ -179,7 +176,7 @@ const Ayuda = ({ eventEmitter }) => {
             type="text"
             value={dataUrl}
             onChange={handleUrlChange}
-            placeholder="Pegue la URL de la API de Google Sheets aquí"
+            placeholder="Si guarda campo en blanco, se usara la URL configurada por defecto."
             style={{ width: '100%',minWidth:'400px', padding: '8px', boxSizing: 'border-box', marginBottom: '10px' }}
           />
           <button
