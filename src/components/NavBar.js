@@ -6,16 +6,16 @@ const NavBar= () =>{
     <div className="navbar">
 		    <ul >        
             <li>
-              <NavLink to="/inventario" activeClassName="active">Inventario</NavLink>
+              <NavLink to="/inventario" className={({ isActive }) => isActive ? "active-link" : "inactive-link"}>Inventario</NavLink>
             </li>
             <li>
-              <NavLink to="/pesajes" activeClassName="active">Pesajes</NavLink>
+              <NavLink to="/pesajes" className={({ isActive }) => isActive ? "active-link" : "inactive-link"}>Pesajes</NavLink>
             </li>
             <li>
-              <NavLink  to="/ganancias" activeClassName="active">Ganancias</NavLink>
+              <NavLink  to="/ganancias" className={({ isActive }) => isActive ? "active-link" : "inactive-link"}>Ganancias</NavLink>
             </li>
             <li>
-              <NavLink to="/ayuda" activeClassName="active">Ayuda</NavLink>
+              <NavLink to="/ayuda" className={({ isActive }) => isActive ? "active-link" : "inactive-link"}>Ayuda</NavLink>
             </li>
          </ul>
     </div>

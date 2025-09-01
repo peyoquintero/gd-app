@@ -17,16 +17,18 @@ const formatDate = (dateString) => {
 };
 
 const Inventario = ({ eventEmitter }) => {
-  const columns = [
+  // Memoize the column definitions to prevent re-creation on every render.
+  // This breaks the infinite loop caused by the useEffect that depends on them.
+  const columns = useMemo(() => [
     { label: "Fecha", accessor: "Fecha", width: "20%" },
     { label: "Operacion", accessor: "Operacion", width: "25%" },
     { label: "Chapeta", accessor: "Chapeta", width: "15%" },
     { label: "Marca", accessor: "Marca", width: "10%" },
     { label: "Total", accessor: "Total", width: "15%" },
     { label: "Sacados", accessor: "Vendidos", width: "15%" },
-  ];
+  ], []);
 
-  const columnsInventario = [
+  const columnsInventario = useMemo(() => [
     { label: "Codigo", accessor: "Codigo", width: "18%" },
     { label: "Marca", accessor: "Marca", width: "8%" },
     { label: "Chapeta", accessor: "Chapeta", width: "10%" },
@@ -35,7 +37,7 @@ const Inventario = ({ eventEmitter }) => {
     { label: "Ult. Control", accessor: "FechaUltimoControl", width: "16%" },
     { label: "Ultimo Peso", accessor: "PesoFinal", width: "10%" },
     { label: "PRY", accessor: "Proyeccion", width: "12%" },
-  ];
+  ], []);
 
   // State for immediate input changes
   const [filtros, setFiltros] = useState({
