@@ -22,7 +22,12 @@ export function App() {
     console.log('Connection status changed:', online ? 'ONLINE' : 'OFFLINE');
   }, [online]);
   
-const dataUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo!A:H?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+  // --- START: DYNAMIC URL LOGIC ---
+  // Define the default URL as a fallback.
+  const hardcodedUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo!A:H?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
+  
+  // Get the custom URL from localStorage, or use the hardcoded one if not found.
+  const dataUrl = localStorage.getItem('googleSheetDataUrl') || hardcodedUrl;
 
   const loadData = useCallback(async () => {
     setIsLoading(true);

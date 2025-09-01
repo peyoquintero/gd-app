@@ -19,6 +19,7 @@ const Ayuda = ({ eventEmitter }) => {
   const [gridDups, setGridDups] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dataUrl, setDataUrl] = useState('');
 
   const handleOptionChange = useCallback((event) => {
     setFiltros(prev => ({
@@ -77,6 +78,30 @@ const Ayuda = ({ eventEmitter }) => {
       eventEmitter.off("refresh", refreshHandler);
     };
   }, [eventEmitter, loadData]);
+
+  // On component mount, load the currently saved URL from localStorage
+  useEffect(() => {
+    const savedUrl = localStorage.getItem('googleSheetDataUrl');
+    if (savedUrl) {
+      setDataUrl(savedUrl);
+    }
+  }, []);
+
+  const handleUrlChange = (event) => {
+    setDataUrl(event.target.value);
+  };
+
+  const handleSaveUrl = () => {
+    if (dataUrl && dataUrl.trim() !== '') {
+      localStorage.setItem('googleSheetDataUrl', dataUrl.trim());
+      alert('URL guardada exitosamente!');
+    } else {
+      // If the input is empty, remove the key to revert to the default URL
+      localStorage.removeItem('googleSheetDataUrl');
+      setDataUrl('');
+      alert('URL eliminada. La aplicación usará la URL por defecto cuando refresque los datos.');
+    }
+  };
 
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
@@ -138,7 +163,32 @@ const Ayuda = ({ eventEmitter }) => {
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       <section className="version-info">
-        <label>Version 2.0.1 - {dataService.getLastUpdate()}</label>
+        <label>Version 2.0.5 - {dataService.getLastUpdate()}</label>
+      </section>
+      <section style={{ marginTop: '30px' }}>
+        <h2>Configuración de Origen de Datos</h2>
+        <p>
+          Si guarda campo en blanco, se usara la URL configurada por defecto.
+        </p>
+        <div style={{ marginTop: '15px' }}>
+          <label htmlFor="data-url-input" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            URL de Google Sheets:
+          </label>
+          <input
+            id="data-url-input"
+            type="text"
+            value={dataUrl}
+            onChange={handleUrlChange}
+            placeholder="Pegue la URL de la API de Google Sheets aquí"
+            style={{ width: '100%',minWidth:'400px', padding: '8px', boxSizing: 'border-box', marginBottom: '10px' }}
+          />
+          <button
+            onClick={handleSaveUrl}
+            style={{ padding: '10px 15px',minWidth:'80px', cursor: 'pointer' }}
+          >
+            Guardar
+          </button>
+        </div>
       </section>
     </div>
   );
