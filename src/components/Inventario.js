@@ -76,6 +76,7 @@ const Inventario = ({ eventEmitter }) => {
   const [topX, setTopX] = useState(''); // State for the "Top X" input
   const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' }); // State for sorting
   const [showPesoDistribution, setShowPesoDistribution] = useState(false); // State for the popup
+  const [unidentifiedSalesCount, setUnidentifiedSalesCount] = useState(0); // State for sales with '?' in Codigo
 
   // This effect debounces the filter inputs.
   useEffect(() => {
@@ -199,6 +200,17 @@ const Inventario = ({ eventEmitter }) => {
       filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
     }
 
+    // --- START: MINIMAL CHANGE ---
+    // From the already-filtered data, count sales and deaths where Codigo is unknown ('?').
+    // This count is then used in the totalsCaption.
+    const unidentifiedOperations = ['VENTA', 'MUERTE'];
+    const unidentifiedExits = filteredData.filter(p =>
+      unidentifiedOperations.includes(p.Operacion?.toUpperCase()) &&
+      p.Codigo?.includes('?')
+    );
+    setUnidentifiedSalesCount(unidentifiedExits.length);
+    // --- END: MINIMAL CHANGE ---
+
     let movimientos = filteredData
       .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" )
       .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
@@ -264,19 +276,25 @@ const Inventario = ({ eventEmitter }) => {
       return `Movimientos: ${gridMovimientos.length}`;
     }
     
-    // For the "Inventario" view, use the final processed data
     const data = processedGridData;
+    let caption = `Total: ${data.length}`;
+
     if (data.length > 0) {
       const totalProjection = data.reduce((acc, item) => {
         const projectionValue = parseInt(item.Proyeccion, 10);
         return acc + (isNaN(projectionValue) ? 0 : projectionValue);
       }, 0);
       const avgProj = Math.round(totalProjection / data.length);
-      return `Total: ${data.length}, Prom PRY: ${avgProj}`;
+      caption += `, Prom PRY: ${avgProj}`;
+    }
+
+    // Append the count of unidentified exits if there are any
+    if (unidentifiedSalesCount > 0) {
+      caption += ` (Salidas s/ID: ${unidentifiedSalesCount})`;
     }
     
-    return `Total: 0, Prom PRY: 0`;
-  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData]);
+    return caption;
+  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData, unidentifiedSalesCount]);
 
   // This effect ensures the exported data always matches the data on screen for either view.
   useEffect(() => {
