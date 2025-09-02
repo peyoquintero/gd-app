@@ -76,7 +76,8 @@ const Inventario = ({ eventEmitter }) => {
   const [topX, setTopX] = useState(''); // State for the "Top X" input
   const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' }); // State for sorting
   const [showPesoDistribution, setShowPesoDistribution] = useState(false); // State for the popup
-  const [unidentifiedSalesCount, setUnidentifiedSalesCount] = useState(0); // State for sales with '?' in Codigo
+  const [unidentifiedSalidasCount, setUnidentifiedSalesCount] = useState(0); // State for sales with '?' in Codigo
+  const [correccionCount, setCorreccionCount] = useState(0); // State for CORRECCION operations
 
   // This effect debounces the filter inputs.
   useEffect(() => {
@@ -209,6 +210,12 @@ const Inventario = ({ eventEmitter }) => {
       p.Codigo?.includes('?')
     );
     setUnidentifiedSalesCount(unidentifiedExits.length);
+    
+    // Count CORRECCION operations from the same filtered data.
+    const correcciones = filteredData.filter(p =>
+      p.Operacion?.toUpperCase() === 'CORRECCION'
+    );
+    setCorreccionCount(correcciones.length);
     // --- END: MINIMAL CHANGE ---
 
     let movimientos = filteredData
@@ -289,12 +296,17 @@ const Inventario = ({ eventEmitter }) => {
     }
 
     // Append the count of unidentified exits if there are any
-    if (unidentifiedSalesCount > 0) {
-      caption += ` (Salidas s/ID: ${unidentifiedSalesCount})`;
+    if (unidentifiedSalidasCount > 0) {
+      caption += ` (Salidas s/ID: ${unidentifiedSalidasCount})`;
+    }
+
+    // Append the count of corrections if there are any
+    if (correccionCount > 0) {
+      caption += ` (Correcciones: ${correccionCount})`;
     }
     
     return caption;
-  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData, unidentifiedSalesCount]);
+  }, [debouncedFiltros.selectedOption, gridMovimientos, processedGridData, unidentifiedSalidasCount, correccionCount]);
 
   // This effect ensures the exported data always matches the data on screen for either view.
   useEffect(() => {
