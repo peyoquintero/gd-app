@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "../App.css";
 import IntegerMatrix from "./Matrix";
-import { resurrect } from "./Helpers";
+import { resurrect, findPotentialMatches } from "./Helpers"; // Import the new function
 import Duplicados from "./Duplicados";
+import RevisionCodigos from "./RevisionCodigos"; // Import the new component
 import { dataService } from "../services/DataService";
 
 
@@ -16,6 +17,7 @@ const Ayuda = ({ eventEmitter }) => {
     return localStorage.getItem('cleanDataRange') || '-0200/1750';
   });
   const [gridDups, setGridDups] = useState([]);
+  const [potentialMatches, setPotentialMatches] = useState([]); // New state for matches
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataUrl, setDataUrl] = useState('');
@@ -54,15 +56,20 @@ const Ayuda = ({ eventEmitter }) => {
   }, []);
 
   const initializeData = useCallback(() => {
-    let allPesajes = dataService.getCachedData();
-    if (!allPesajes) return;
+    // --- START: FIX ---
+    // 1. Get the original, complete dataset.
+    const originalPesajes = dataService.getCachedData();
+    if (!originalPesajes) return;
 
-    // Filter and clean data similar to Ganancias.js
-    allPesajes = allPesajes.filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"));
-    setHisPesajes(allPesajes);
+    // 2. Call findPotentialMatches with the original, unfiltered data.
+    // This is crucial because it needs to see the sales with '?'.
+    setPotentialMatches(findPotentialMatches(originalPesajes));
 
-    // Process data for grids
-    setGridDups(resurrect(allPesajes));
+    // 3. Now, create a cleaned version for other calculations like 'resurrect'.
+    const cleanedPesajes = originalPesajes.filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"));
+    setHisPesajes(cleanedPesajes);
+    setGridDups(resurrect(cleanedPesajes));
+    // --- END: FIX ---
   }, []);
 
   const loadData = useCallback(async () => {
@@ -175,6 +182,11 @@ const Ayuda = ({ eventEmitter }) => {
               integers={gridDups}
             />
         )}
+        {/* --- START: RENDER NEW COMPONENT --- */}
+        {filtros.selectedOption === "optionRevisionCodigos" && (
+          <RevisionCodigos matches={potentialMatches} />
+        )}
+        {/* --- END: RENDER NEW COMPONENT --- */}
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       <section className="version-info">
