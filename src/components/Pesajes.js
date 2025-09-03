@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Table from "./Table";
 import { dataService } from "../services/DataService";
-import { compareNumAlphas } from "./Helpers"; // Assuming this helper is available
+import { compareNumAlphas } from "./Helpers";
 import "../App.css";
 
 const formatDate = (dateString) => {
@@ -120,7 +120,6 @@ const Pesajes = ({ eventEmitter }) => {
   };
 
   const applyFilters = useCallback(() => {
-    // --- START: NEW LOGIC ---
     // Check if any filter has a value.
     const hasActiveFilter = 
       (debouncedFiltros.filtroCodigo && debouncedFiltros.filtroCodigo.trim() !== "") ||
@@ -137,7 +136,6 @@ const Pesajes = ({ eventEmitter }) => {
       eventEmitter.emit('tableDataUpdate', { data: [], columns, title: 'Pesajes' });
       return;
     }
-    // --- END: NEW LOGIC ---
 
     const matches = (field, filter, comparison) => {
       if (!field || !filter) return false;
@@ -180,8 +178,6 @@ const Pesajes = ({ eventEmitter }) => {
     }
     setCaptions(comment);
 
-    // REMOVE THE LINE BELOW
-    // eventEmitter.emit('tableDataUpdate', { data: filteredData, columns, title: 'Pesajes' });
   }, [hisPesajes, debouncedFiltros, showComentario]); // Dependencies updated
 
   const handleSort = useCallback((key) => {
@@ -230,7 +226,6 @@ const Pesajes = ({ eventEmitter }) => {
     applyFilters();
   }, [debouncedFiltros, showComentario, applyFilters]);
 
-  // --- START: NEW EXPORT LOGIC ---
   // This effect ensures the exported data always matches the sorted/processed data on screen.
   useEffect(() => {
     if (processedGridData) {
@@ -241,7 +236,6 @@ const Pesajes = ({ eventEmitter }) => {
       });
     }
   }, [processedGridData, columns, eventEmitter]);
-  // --- END: NEW EXPORT LOGIC ---
 
   useEffect(() => {
     // Listen for the correct event name: 'dataRefreshed'

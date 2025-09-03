@@ -4,11 +4,9 @@ import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,ca
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
-// --- START: FIX ---
 // Define default dates as constants outside the component to prevent re-creation on every render.
 const defaultStartDate = new Date('2020-01-01T00:00:00');
 const defaultEndDate = new Date();
-// --- END: FIX ---
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -63,7 +61,7 @@ const Ganancias = ({ eventEmitter }) => {
         alignItems: 'flex-end',
         gap: '2px', // REDUCED: Makes the gap between all date controls very small
         flexWrap: 'wrap',
-        justifyContent: 'flex-start', // THIS IS THE FIX: Aligns all controls to the left.
+        justifyContent: 'flex-start', 
       },
       dateControlPair: {
         display: 'flex',
@@ -82,7 +80,6 @@ const Ganancias = ({ eventEmitter }) => {
         paddingTop: '15px' 
       }
     };
-    // --- END: LOCAL STYLING FIX ---
 
     const [captions,setCaptions] = useState({
         resultCabezas : "",
@@ -99,8 +96,6 @@ const Ganancias = ({ eventEmitter }) => {
       }
       setSortConfig({ key, direction });
     }, [sortConfig]);
-
-    // --- START: REORDERED AND FIXED LOGIC ---
 
     // 1. Declare columns first and memoize them to prevent re-creation on every render.
     const columns = useMemo(() => [
@@ -266,7 +261,6 @@ const Ganancias = ({ eventEmitter }) => {
         }
       }
     };
-    // --- END: REFACTORED HANDLERS ---
 
     const applyFilters = (event) => {
   // Helper function for enhanced filtering with wildcard support
