@@ -9,17 +9,17 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroEx
   if (filterKey && !filterKey.includes("^")) {
       filteredData = filteredData.filter((row) => {
       return Object.keys(row).filter(w=>w!==excludeColumn).some((key) => {
-        if(!filterKey.includes(";"))
+        // --- START: FIX ---
+        // Simplified logic to ensure a value is always returned.
+        if(!filterKey.includes(";")) {
             return ((!filtroExacto && matchCodigo(row[key],filterKey)) 
-                      || (filtroExacto && String(row[key]).toLowerCase()===filterKey))  
-        else
-        {
-          if(filterKey.includes(";"))
-          { 
+                      || (filtroExacto && String(row[key]).toLowerCase()===filterKey));
+        }
+        else {
             let fkeys = filterKey.split(";").filter(w=>w!=='');
             return fkeys.some(element =>  matchCodigo(row[key],element));
-         }
-       }
+        }
+        // --- END: FIX ---
     })
   })}
 
@@ -164,7 +164,7 @@ export const resurrect = (rows) => {
   return out;
 };
 
-// --- START: NEW MATCHING FUNCTION ---
+// --- START: MODIFIED MATCHING FUNCTION ---
 export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 0.30) => {
   if (!allPesajes || allPesajes.length === 0) return [];
 
@@ -194,7 +194,28 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
     const baselineDate = new Date(baseline.Fecha);
     const baselineWeight = parseInt(baseline.Peso, 10);
 
-    // 3. Find the first feasible sale match
+    // --- START: SOPHISTICATED DAILY GAIN CALCULATION ---
+    let animalSpecificDailyGain = dailyGain; // Start with the default daily gain
+
+    // If a control record exists, calculate the animal's actual daily gain
+    if (lastControl) {
+      const compraDate = new Date(compra.Fecha);
+      const compraWeight = parseInt(compra.Peso, 10);
+      const lastControlDate = new Date(lastControl.Fecha);
+      const lastControlWeight = parseInt(lastControl.Peso, 10);
+
+      // Ensure the control happened after the purchase to get a valid gain period
+      if (lastControlDate > compraDate) {
+        const daysBetween = (lastControlDate - compraDate) / (1000 * 60 * 60 * 24);
+        if (daysBetween > 0) {
+          const weightGained = lastControlWeight - compraWeight;
+          animalSpecificDailyGain = weightGained / daysBetween;
+        }
+      }
+    }
+    // --- END: SOPHISTICATED DAILY GAIN CALCULATION ---
+
+    // 3. Find the first feasible sale match using the calculated daily gain
     for (const sale of unidentifiedSales) {
       const saleDate = new Date(sale.Fecha);
       const saleWeight = parseInt(sale.Peso, 10);
@@ -202,7 +223,8 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
       // Sale must be after the animal's last known date
       if (saleDate > baselineDate) {
         const daysDiff = (saleDate - baselineDate) / (1000 * 60 * 60 * 24);
-        const projectedWeight = baselineWeight + (daysDiff * dailyGain);
+        // Use the specific daily gain for this animal's projection
+        const projectedWeight = baselineWeight + (daysDiff * animalSpecificDailyGain);
         
         const weightDifference = Math.abs(projectedWeight - saleWeight);
         const isMatch = (weightDifference / saleWeight) <= tolerance;
@@ -212,6 +234,7 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
             Codigo: animalGroup.Codigo,
             Marca: compra.Marca,
             FechaCompra: compra.Fecha,
+            PesoCompra: compra.Peso, // Added Peso Compra to the result
             FechaUltimoControl: baseline.Fecha,
             PesoUltimoControl: baseline.Peso,
             FechaVentaPotencial: sale.Fecha,
@@ -226,7 +249,7 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
 
   return potentialMatches;
 };
-// --- END: NEW MATCHING FUNCTION ---
+// --- END: MODIFIED MATCHING FUNCTION ---
 
 
 const gananciaDiaria = (pesoInicial,pesoFinal) =>
