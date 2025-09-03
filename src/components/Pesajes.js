@@ -244,9 +244,10 @@ const Pesajes = ({ eventEmitter }) => {
   // --- END: NEW EXPORT LOGIC ---
 
   useEffect(() => {
+    // Listen for the correct event name: 'dataRefreshed'
     const refreshHandler = () => loadData();
-    eventEmitter.on("refresh", refreshHandler);
-    return () => eventEmitter.off("refresh", refreshHandler);
+    eventEmitter.on("dataRefreshed", refreshHandler);
+    return () => eventEmitter.off("dataRefreshed", refreshHandler);
   }, [eventEmitter, loadData]);
 
   if (isLoading) {

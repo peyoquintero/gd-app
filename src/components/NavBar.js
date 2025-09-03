@@ -1,7 +1,8 @@
 import React from 'react';
-import {  Link, NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom'; // Removed unused 'Link'
+import '../App.css';
 
-const NavBar= () =>{
+const NavBar = () => {
   return (
     <div className="navbar">
 		    <ul >        

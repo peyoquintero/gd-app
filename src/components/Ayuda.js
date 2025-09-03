@@ -20,6 +20,25 @@ const Ayuda = ({ eventEmitter }) => {
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataUrl, setDataUrl] = useState('');
+  // --- START: FIX ---
+  // Use state to hold the last update time, so we can trigger re-renders.
+  const [lastUpdate, setLastUpdate] = useState(dataService.getLastUpdate());
+
+  // This effect listens for the 'dataRefreshed' event from App.js
+  useEffect(() => {
+    const handleDataRefresh = () => {
+      // When the event is received, update our local state with the new time.
+      setLastUpdate(dataService.getLastUpdate());
+    };
+
+    eventEmitter.on('dataRefreshed', handleDataRefresh);
+
+    // Cleanup: remove the listener when the component unmounts.
+    return () => {
+      eventEmitter.off('dataRefreshed', handleDataRefresh);
+    };
+  }, [eventEmitter]); // Dependency array ensures this runs once.
+  // --- END: FIX ---
 
   const handleOptionChange = useCallback((event) => {
     setFiltros(prev => ({
@@ -163,7 +182,8 @@ const Ayuda = ({ eventEmitter }) => {
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       <section className="version-info">
-        <label>Version 2.0.5 - {dataService.getLastUpdate()}</label>
+        {/* Display the last update time from our state variable */}
+        <label>Version 2.0.5 - {lastUpdate}</label>
       </section>
       <section style={{ marginTop: '30px' }}>
         <div style={{ marginTop: '15px' }}>

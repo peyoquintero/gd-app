@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { EventEmitter } from "events";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useNetwork } from "./hooks/useNetwork";
 import { dataService } from "./services/DataService";
 import { exportTableAsHTML } from "./utils/exportUtils";
 import NavBar from "./components/NavBar";
@@ -12,11 +11,50 @@ import Ayuda from "./components/Ayuda";
 import "./App.css";
 
 export function App() {
-  const eventEmitter = useMemo(() => new EventEmitter(), []);
+  const [online, setOnline] = useState(navigator.onLine);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState(null);
-  const [currentTableData, setCurrentTableData] = useState({ data: [], columns: [], title: '' });
-  const { online } = useNetwork();
+  const [tableData, setTableData] = useState({ data: [], columns: [], title: '' });
+
+  const eventEmitter = useMemo(() => new EventEmitter(), []);
+  
+  // --- START: ROBUST ONLINE DETECTION ---
+  useEffect(() => {
+    // The browser's event listeners are a good first-line defense for instant feedback.
+    const handleEventOnline = () => setOnline(true);
+    const handleEventOffline = () => setOnline(false);
+
+    window.addEventListener('online', handleEventOnline);
+    window.addEventListener('offline', handleEventOffline);
+
+    // A more reliable "heartbeat" check to verify actual internet connectivity.
+    const checkConnectivity = async () => {
+      try {
+        // We fetch a small, non-cached resource. A failed request will throw an error.
+        // The random query string `?_=${new Date().getTime()}` prevents the browser from returning a cached result.
+        await fetch('https://www.google.com/favicon.ico?_=' + new Date().getTime(), {
+          method: 'HEAD', // Use HEAD to be lightweight; we only care if the server is reachable.
+          mode: 'no-cors', // Use no-cors for cross-origin requests where we don't need the response body.
+          cache: 'no-store', // Explicitly tell the browser not to cache.
+        });
+        setOnline(true);
+      } catch (error) {
+        // A TypeError: Failed to fetch indicates a network-level error.
+        setOnline(false);
+      }
+    };
+
+    // Check connectivity immediately on component mount and then every 15 seconds.
+    checkConnectivity();
+    const intervalId = setInterval(checkConnectivity, 15000); // 15 seconds
+
+    // Cleanup function to remove listeners and the interval when the component unmounts.
+    return () => {
+      window.removeEventListener('online', handleEventOnline);
+      window.removeEventListener('offline', handleEventOffline);
+      clearInterval(intervalId);
+    };
+  }, []); // The empty array ensures this effect runs only once.
+  // --- END: ROBUST ONLINE DETECTION ---
 
   useEffect(() => {
     console.log('Connection status changed:', online ? 'ONLINE' : 'OFFLINE');
@@ -32,31 +70,20 @@ export function App() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (online) {
-        // Always try to fetch new data when online
-        const data = await dataService.fetchData(dataUrl);
-        if (data) {
-          setLastUpdate(new Date().toLocaleString());
-          eventEmitter.emit('refresh');
-        }
-      } else {
-        // When offline, just emit refresh to use cached data
-        const cachedData = dataService.getCachedData();
-        if (cachedData) {
-          eventEmitter.emit('refresh');
-        }
+      const data = await dataService.fetchData(dataUrl);
+      if (data) {
+        console.log("Data loaded successfully.");
+        // --- START: FIX ---
+        // Emit the event that Ayuda.js is listening for.
+        eventEmitter.emit('dataRefreshed');
+        // --- END: FIX ---
       }
     } catch (error) {
       console.error("Failed to load data:", error);
-      // On error, try to use cached data
-      const cachedData = dataService.getCachedData();
-      if (cachedData) {
-        eventEmitter.emit('refresh');
-      }
     } finally {
       setIsLoading(false);
     }
-  }, [online, eventEmitter, dataUrl]);
+  }, [dataUrl, eventEmitter]); // Add eventEmitter as a dependency
 
   useEffect(() => {
     loadData();
@@ -65,7 +92,7 @@ export function App() {
   // Listen for table data updates from components
   useEffect(() => {
     const handleTableDataUpdate = (tableInfo) => {
-      setCurrentTableData(tableInfo);
+      setTableData(tableInfo);
     };
 
     eventEmitter.on('tableDataUpdate', handleTableDataUpdate);
@@ -75,8 +102,20 @@ export function App() {
   }, [eventEmitter]);
 
   const handleExportTable = useCallback(() => {
-    exportTableAsHTML(currentTableData);
-  }, [currentTableData]);
+    exportTableAsHTML(tableData);
+  }, [tableData]);
+
+  // --- START: INLINE STYLE FIX ---
+  // Define the style objects for the button's online/offline states.
+  const onlineStyle = {
+    background: 'linear-gradient(135deg, #28a745, #20c997)',
+  };
+
+  const offlineStyle = {
+    background: 'linear-gradient(135deg, #dc3545, #c82333)',
+    animation: 'pulse-red 2s infinite',
+  };
+  // --- END: INLINE STYLE FIX ---
 
   return (
     <BrowserRouter>
@@ -87,6 +126,8 @@ export function App() {
             <div className="header-buttons">
               <button
                 className={`refresh-button ${online ? "online" : "offline"}`}
+                // Apply the style directly based on the 'online' state.
+                style={online ? onlineStyle : offlineStyle}
                 onClick={loadData}
                 disabled={isLoading}
                 title={`Status: ${online ? 'Online' : 'Offline'}`}
@@ -98,7 +139,7 @@ export function App() {
               <button
                 className="export-button"
                 onClick={handleExportTable}
-                disabled={!currentTableData.data || currentTableData.data.length === 0}
+                disabled={!tableData.data || tableData.data.length === 0}
                 title="Exportar tabla como HTML"
               >
                 <div className="export-symbol">

@@ -329,9 +329,11 @@ const Inventario = ({ eventEmitter }) => {
     const refreshHandler = () => {
       loadData();
     };
-    eventEmitter.on("refresh", refreshHandler);
+    // Listen for the correct event name: 'dataRefreshed'
+    eventEmitter.on("dataRefreshed", refreshHandler);
     return () => {
-      eventEmitter.off("refresh", refreshHandler);
+      // Make sure to clean up the correct event name as well
+      eventEmitter.off("dataRefreshed", refreshHandler);
     };
   }, [eventEmitter, loadData]);
 

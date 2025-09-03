@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Table from "./Table";
 import {captionCabezas,validLoteOptions} from "./Helpers"
 import { getPesajesByCodigo } from './HelperInventario'
@@ -12,7 +12,11 @@ const Codigos = ({ eventEmitter }) => {
     { label: "Marca", accessor: "Marca",width:"15%" },
    ];
 
-   const [filtros, setFiltros] = useState({});
+   const [filtros, setFiltros] = useState({
+    filtroCodigo: '', // Or whatever your input's 'name' attribute is
+    filtroChapeta: '',
+    // Add any other properties bound to input fields here
+  });
    const [gridData,setGridData] = useState([])
    const [fechasPesaje,setFechasPesaje] = useState([])
    const [hisPesajes,setHispesajes] = useState([])

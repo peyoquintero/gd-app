@@ -594,28 +594,31 @@ label {
   line-height: 1;
 }
 
-.refresh-button.online {
+/* --- START: INCREASE SPECIFICITY TO FIX OVERRIDE --- */
+#root .refresh-button.online {
   background: linear-gradient(135deg, #28a745, #20c997) !important;
   color: white !important;
   box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
 }
 
-.refresh-button.online:hover {
+#root .refresh-button.online:hover {
   background: linear-gradient(135deg, #218838, #1e7e34) !important;
   transform: translateY(-2px);
   box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
 }
 
-.refresh-button.offline {
+#root .refresh-button.offline {
   background: linear-gradient(135deg, #dc3545, #c82333) !important;
   color: white !important;
   animation: pulse-red 2s infinite;
   box-shadow: 0 3px 6px rgba(220, 53, 69, 0.3);
 }
 
-.refresh-button.offline:hover {
+#root .refresh-button.offline:hover {
   background: linear-gradient(135deg, #c82333, #bd2130) !important;
 }
+/* --- END: INCREASE SPECIFICITY --- */
+
 
 @keyframes pulse-red {
   0% {
@@ -988,24 +991,7 @@ input[type="text"] {
     border-radius: 5px;
     background:#61dafb;
     } 
-  .refresh-button-online,
-  .refresh-button-offline {
-    background-color: rgb(74, 204, 57);
-    color: #fff; /* Button text color */
-    font-size: 22px;
-    border: none;
-    border-radius: 5px; /* Use 50% border-radius to create a circular button */
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center; /* Center the content horizontally */
-    align-items: center; /* Center the content vertically */
-  }
-  .refresh-button-offline {
-    background-color: rgb(250, 120, 141);
-  }
+
   .refresh-symbol{
     display: flex;
     justify-content: center; /* Center the symbol horizontally */
@@ -1128,4 +1114,18 @@ input[type="text"] {
   align-items: center; /* Vertically align items in the center */
   gap: 1.5rem; /* Add space between the radio buttons */
   flex-wrap: wrap; /* Allow items to wrap to the next line on smaller screens */
+}
+
+/* This is likely a rule for a flex container, like .filters-row or similar */
+.some-selector-around-line-178 {
+  display: flex;
+  align-items: flex-end; /* Changed from 'end' */
+  gap: 5px;
+}
+
+/* This could be another flex container rule, like .date-control-pair */
+.another-selector-around-line-313 {
+  display: flex;
+  align-items: flex-end; /* Changed from 'end' */
+  gap: 4px;
 }
