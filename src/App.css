@@ -175,7 +175,7 @@ label {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  align-items: end;
+  align-items: flex-end;
   padding: 0.25rem 0;
   justify-content: space-between;
 }
@@ -310,7 +310,7 @@ label {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.125rem;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .inventario-filters .filter-group {
@@ -1117,15 +1117,17 @@ input[type="text"] {
 }
 
 /* This is likely a rule for a flex container, like .filters-row or similar */
-.some-selector-around-line-178 {
+.filters-row {
   display: flex;
   align-items: flex-end; /* Changed from 'end' */
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 /* This could be another flex container rule, like .date-control-pair */
-.another-selector-around-line-313 {
+.date-control-pair {
   display: flex;
-  align-items: flex-end; /* Changed from 'end' */
+  flex-direction: column;
+  align-items: flex-start; /* This could also be the target, but align-items: end is more likely */
   gap: 4px;
 }
