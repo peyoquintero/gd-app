@@ -60,11 +60,9 @@ export function App() {
     console.log('Connection status changed:', online ? 'ONLINE' : 'OFFLINE');
   }, [online]);
   
-  // --- START: DYNAMIC URL LOGIC ---
   // Define the default URL as a fallback.
   const hardcodedUrl = "https://sheets.googleapis.com/v4/spreadsheets/1ZfXM4qnajw8QSaxrx6aXKa_xbMDZe3ryWt8E3alSyEE/values/PesajesPorCodigo!A:H?key=AIzaSyCGW3gRbBisLX950bZJDylH-_QJTR7ogd8";
   
-  // Get the custom URL from localStorage, or use the hardcoded one if not found.
   const dataUrl = localStorage.getItem('googleSheetDataUrl') || hardcodedUrl;
 
   const loadData = useCallback(async () => {
@@ -72,11 +70,7 @@ export function App() {
     try {
       const data = await dataService.fetchData(dataUrl);
       if (data) {
-        console.log("Data loaded successfully.");
-        // --- START: FIX ---
-        // Emit the event that Ayuda.js is listening for.
         eventEmitter.emit('dataRefreshed');
-        // --- END: FIX ---
       }
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -105,7 +99,6 @@ export function App() {
     exportTableAsHTML(tableData);
   }, [tableData]);
 
-  // --- START: INLINE STYLE FIX ---
   // Define the style objects for the button's online/offline states.
   const onlineStyle = {
     background: 'linear-gradient(135deg, #28a745, #20c997)',
@@ -115,8 +108,7 @@ export function App() {
     background: 'linear-gradient(135deg, #dc3545, #c82333)',
     animation: 'pulse-red 2s infinite',
   };
-  // --- END: INLINE STYLE FIX ---
-
+  
   return (
     <BrowserRouter>
       <div className="main-container">

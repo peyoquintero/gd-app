@@ -338,7 +338,6 @@ const Ganancias = ({ eventEmitter }) => {
   const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
   let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
   
-  console.log(scrubbedData); 
   setGridData(scrubbedData);
   
   // Update captions
