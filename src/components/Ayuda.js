@@ -183,7 +183,7 @@ const Ayuda = ({ eventEmitter }) => {
       </section>
       <section className="version-info">
         {/* Display the last update time from our state variable */}
-        <label>Version 2.0.5 - {lastUpdate}</label>
+        <label>Version 2.1.0 - {lastUpdate}</label>
       </section>
       <section style={{ marginTop: '30px' }}>
         <div style={{ marginTop: '15px' }}>

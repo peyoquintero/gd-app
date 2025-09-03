@@ -109,6 +109,7 @@ export const resurrect = (rows) => {
     const arr = g.Pesajes || g.pesajes || [];
     if (!Array.isArray(arr) || arr.length === 0) return;
 
+    // --- Existing Resurrection Logic ---
     const ops = arr.map(p => (p?.Operacion || '').toUpperCase().trim());
     const terminalIdxs = ops
       .map((op, idx) => (TERMINALS.has(op) ? idx : -1))
@@ -120,7 +121,42 @@ export const resurrect = (rows) => {
     const multipleTerminals = terminalIdxs.length >= 2;
     const terminalBeforeLast = terminalIdxs.some(idx => idx < lastIdx);
 
-    if (singleTerminalOnly || multipleTerminals || terminalBeforeLast) {
+    // --- START: New Marca Mismatch Logic ---
+    let marcaMismatch = false;
+    const compraPesaje = arr.find(p => (p?.Operacion || '').toUpperCase().trim() === 'COMPRA');
+
+    if (compraPesaje && compraPesaje.Marca) {
+      const compraMarca = compraPesaje.Marca.toUpperCase().trim();
+      
+      // Find any VENTA or MUERTE operations that occurred on or after the compra date
+      const exitPesajes = arr.filter(p => {
+        const op = (p?.Operacion || '').toUpperCase().trim();
+        return (op === 'VENTA' || op === 'MUERTE') && new Date(p.Fecha) >= new Date(compraPesaje.Fecha);
+      });
+
+      // Check if any of these exit operations have a different Marca
+      if (exitPesajes.length > 0) {
+        marcaMismatch = exitPesajes.some(exitPesaje => {
+          const exitMarca = exitPesaje.Marca?.toUpperCase().trim();
+          // A mismatch occurs if the exitMarca exists and is different from the compraMarca
+          return exitMarca && exitMarca !== compraMarca;
+        });
+      }
+    }
+    // --- END: New Marca Mismatch Logic ---
+
+    // --- START: New CORRECCION without COMPRA logic ---
+    let correctionWithoutCompra = false;
+    const hasCorrection = ops.includes('CORRECCION');
+    const hasCompra = ops.includes('COMPRA');
+
+    if (hasCorrection && !hasCompra) {
+        correctionWithoutCompra = true;
+    }
+    // --- END: New CORRECCION without COMPRA logic ---
+
+    // Include the Codigo if it meets any of the integrity check conditions
+    if (singleTerminalOnly || multipleTerminals || terminalBeforeLast || marcaMismatch || correctionWithoutCompra) {
       out.push({ Codigo: g.Codigo, pesajes: arr });
     }
   });
