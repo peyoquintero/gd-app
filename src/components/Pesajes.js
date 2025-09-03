@@ -178,7 +178,7 @@ const Pesajes = ({ eventEmitter }) => {
     }
     setCaptions(comment);
 
-  }, [hisPesajes, debouncedFiltros, showComentario]); // Dependencies updated
+  }, [hisPesajes, debouncedFiltros, showComentario, columns, eventEmitter]); // Dependencies updated
 
   const handleSort = useCallback((key) => {
     let direction = 'ascending';
