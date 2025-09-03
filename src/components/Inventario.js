@@ -201,7 +201,6 @@ const Inventario = ({ eventEmitter }) => {
       filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
     }
 
-    // --- START: MINIMAL CHANGE ---
     // From the already-filtered data, count sales and deaths where Codigo is unknown ('?').
     // This count is then used in the totalsCaption.
     const unidentifiedOperations = ['VENTA', 'MUERTE'];
@@ -213,10 +212,9 @@ const Inventario = ({ eventEmitter }) => {
     
     // Count CORRECCION operations from the same filtered data.
     const correcciones = filteredData.filter(p =>
-      p.Operacion?.toUpperCase() === 'CORRECCION'
+      (p.Operacion?.toUpperCase() === 'CORRECCION' && (p.Codigo?.includes('?')===false))
     );
     setCorreccionCount(correcciones.length);
-    // --- END: MINIMAL CHANGE ---
 
     let movimientos = filteredData
       .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" )
