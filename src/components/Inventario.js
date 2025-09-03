@@ -216,6 +216,7 @@ const Inventario = ({ eventEmitter }) => {
     );
     setCorreccionCount(correcciones.length);
 
+    // 1. Calculate and set movimientos.
     let movimientos = filteredData
       .filter((w) => w.Operacion?.toUpperCase() !== "CONTROL" )
       .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
@@ -223,28 +224,30 @@ const Inventario = ({ eventEmitter }) => {
     if (movimientos?.length) {
       let movimientosByFecha = groupByFechaOperacion(movimientos);
       setGridMovimientos(movimientosByFecha);
-
-      let inventario = getInventario(filteredData, debouncedFiltros.projectionDate, gananciaDiaria);
-
-      const pesoFilter = debouncedFiltros.filtroPeso.trim();
-      if (pesoFilter && pesoFilter !== "*") {
-        const array = pesoFilter.split("-");
-        // Only filter if we have a valid range with two numbers
-        if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
-          const minPeso = parseInt(array[0]);
-          const maxPeso = parseInt(array[1]);
-          inventario = inventario.filter(item => {
-            const proyeccion = parseInt(item.Proyeccion, 10); // Changed from PesoFinal
-            return proyeccion >= minPeso && proyeccion <= maxPeso;
-          });
-        }
-      }
-
-      // IMPORTANT: We set the FULL unfiltered inventory here.
-      // The sorting and slicing will happen later.
-      setGridInventario(inventario);
-
+    } else {
+      // Ensure movements are cleared if the filter results in none.
+      setGridMovimientos([]);
     }
+
+    // 2. Calculate and set inventario. 
+    let inventario = getInventario(filteredData, debouncedFiltros.projectionDate, gananciaDiaria);
+
+    const pesoFilter = debouncedFiltros.filtroPeso.trim();
+    if (pesoFilter && pesoFilter !== "*") {
+      const array = pesoFilter.split("-");
+      // Only filter by peso if we have a valid range with two numbers
+      if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
+        const minPeso = parseInt(array[0]);
+        const maxPeso = parseInt(array[1]);
+        inventario = inventario.filter(item => {
+          const proyeccion = parseInt(item.Proyeccion, 10);
+          return proyeccion >= minPeso && proyeccion <= maxPeso;
+        });
+      }
+    }
+
+    setGridInventario(inventario);
+
   }, [debouncedFiltros, gananciaDiaria]); // Dependencies updated
 
   const handleGananciaChange = (e) => {
@@ -295,7 +298,7 @@ const Inventario = ({ eventEmitter }) => {
 
     // Append the count of unidentified exits if there are any
     if (unidentifiedSalidasCount > 0) {
-      caption += ` (Salidas s/ID: ${unidentifiedSalidasCount})`;
+      caption += ` (Salidas sin ID: ${unidentifiedSalidasCount})`;
     }
 
     // Append the count of corrections if there are any
@@ -327,10 +330,8 @@ const Inventario = ({ eventEmitter }) => {
     const refreshHandler = () => {
       loadData();
     };
-    // Listen for the correct event name: 'dataRefreshed'
     eventEmitter.on("dataRefreshed", refreshHandler);
     return () => {
-      // Make sure to clean up the correct event name as well
       eventEmitter.off("dataRefreshed", refreshHandler);
     };
   }, [eventEmitter, loadData]);
