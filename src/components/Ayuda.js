@@ -3,7 +3,6 @@ import "../App.css";
 import IntegerMatrix from "./Matrix";
 import { resurrect } from "./Helpers";
 import Duplicados from "./Duplicados";
-import Codigos from "./Codigos";
 import { dataService } from "../services/DataService";
 
 
@@ -150,7 +149,7 @@ const Ayuda = ({ eventEmitter }) => {
                 checked={filtros.selectedOption === "optionRevisionCodigos"}
                 onChange={handleOptionChange}
               />
-              Revision Codigos
+              Mapeo de Correcciones
             </label>
           </div>
           </div>
@@ -175,9 +174,6 @@ const Ayuda = ({ eventEmitter }) => {
               nColumns={5}
               integers={gridDups}
             />
-        )}
-        {filtros.selectedOption === "optionRevisionCodigos" && (
-          <Codigos eventEmitter={eventEmitter} />
         )}
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
