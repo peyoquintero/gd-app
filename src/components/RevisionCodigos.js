@@ -13,11 +13,14 @@ const RevisionCodigos = ({ matches }) => {
             <th>Código</th>
             <th>Marca</th>
             <th>F. Compra</th>
+            <th>Peso Compra</th>
             <th>F. Últ. Control</th>
             <th>Últ. Peso</th>
             <th>F. Venta Potencial</th>
             <th>Peso Venta</th>
             <th>Peso Proyectado</th>
+            <th>GDP (kg/día)</th>
+            <th>Dif. (%)</th>
           </tr>
         </thead>
         <tbody>
@@ -26,11 +29,14 @@ const RevisionCodigos = ({ matches }) => {
               <td>{match.Codigo}</td>
               <td>{match.Marca}</td>
               <td>{match.FechaCompra}</td>
+              <td>{match.PesoCompra}</td>
               <td>{match.FechaUltimoControl}</td>
               <td>{match.PesoUltimoControl}</td>
               <td>{match.FechaVentaPotencial}</td>
               <td>{match.PesoVentaPotencial}</td>
               <td>{match.PesoProyectado}</td>
+              <td>{match.GDP}</td>
+              <td>{match.DiffPercent}</td>
             </tr>
           ))}
         </tbody>

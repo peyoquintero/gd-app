@@ -9,9 +9,9 @@ import { dataService } from "../services/DataService";
 
 const Ayuda = ({ eventEmitter }) => {
   const [filtros, setFiltros] = useState({
-    filtroDups: false,
-    filtroMuertos: false,
-    selectedOption: ""
+    selectedOption: "optionInconsistencias",
+    dailyGain: "0.350", // Default daily gain
+    tolerance: "0.30"   // Default tolerance
   });
   const [cleanDataRange, setCleanDataRange] = useState(() => {
     return localStorage.getItem('cleanDataRange') || '-0200/1750';
@@ -55,22 +55,30 @@ const Ayuda = ({ eventEmitter }) => {
     localStorage.setItem('cleanDataRange', value);
   }, []);
 
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFiltros(prev => ({ ...prev, [name]: value }));
+  };
+
   const initializeData = useCallback(() => {
     // --- START: FIX ---
     // 1. Get the original, complete dataset.
     const originalPesajes = dataService.getCachedData();
     if (!originalPesajes) return;
 
-    // 2. Call findPotentialMatches with the original, unfiltered data.
-    // This is crucial because it needs to see the sales with '?'.
-    setPotentialMatches(findPotentialMatches(originalPesajes));
+    // Parse values from state, with fallbacks to defaults
+    const dailyGain = parseFloat(filtros.dailyGain) || 0.350;
+    const tolerance = parseFloat(filtros.tolerance) || 0.30;
+
+    // Pass the configurable values to the matching function
+    setPotentialMatches(findPotentialMatches(originalPesajes, dailyGain, tolerance));
 
     // 3. Now, create a cleaned version for other calculations like 'resurrect'.
     const cleanedPesajes = originalPesajes.filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"));
     setHisPesajes(cleanedPesajes);
     setGridDups(resurrect(cleanedPesajes));
     // --- END: FIX ---
-  }, []);
+  }, [filtros.dailyGain, filtros.tolerance]); // Re-run when these values change
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -173,6 +181,33 @@ const Ayuda = ({ eventEmitter }) => {
             />
           </div>
         </div>
+        {/* Conditionally render inputs for Mapeo de Correcciones */}
+        {filtros.selectedOption === "optionRevisionCodigos" && (
+          <div className="filters-row" style={{ marginTop: '10px' }}>
+            <div className="filter-group">
+              <label>GDP (kg/día)</label>
+              <input
+                type="text"
+                name="dailyGain"
+                value={filtros.dailyGain}
+                onChange={handleFilterChange}
+                className="freeinputsmall"
+                style={{ width: '80px' }}
+              />
+            </div>
+            <div className="filter-group">
+              <label>Tolerancia (%)</label>
+              <input
+                type="text"
+                name="tolerance"
+                value={filtros.tolerance}
+                onChange={handleFilterChange}
+                className="freeinputsmall"
+                style={{ width: '80px' }}
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="content-section">

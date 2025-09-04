@@ -227,19 +227,22 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
         const projectedWeight = baselineWeight + (daysDiff * animalSpecificDailyGain);
         
         const weightDifference = Math.abs(projectedWeight - saleWeight);
-        const isMatch = (weightDifference / saleWeight) <= tolerance;
+        const percentageDiff = saleWeight > 0 ? (weightDifference / saleWeight) : 0;
+        const isMatch = percentageDiff <= tolerance;
 
         if (isMatch) {
           potentialMatches.push({
             Codigo: animalGroup.Codigo,
             Marca: compra.Marca,
             FechaCompra: compra.Fecha,
-            PesoCompra: compra.Peso, // Added Peso Compra to the result
+            PesoCompra: compra.Peso,
             FechaUltimoControl: baseline.Fecha,
             PesoUltimoControl: baseline.Peso,
             FechaVentaPotencial: sale.Fecha,
             PesoVentaPotencial: sale.Peso,
             PesoProyectado: Math.round(projectedWeight),
+            GDP: animalSpecificDailyGain.toFixed(3),
+            DiffPercent: (percentageDiff * 100).toFixed(1) + '%' // Add the formatted percentage difference
           });
           break; // Found the first match, move to the next animal
         }
