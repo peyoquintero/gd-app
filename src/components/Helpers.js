@@ -164,74 +164,64 @@ export const resurrect = (rows) => {
   return out;
 };
 
-// --- START: MODIFIED MATCHING FUNCTION ---
-export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 0.30) => {
+// --- START: REFACTORED MATCHING FUNCTION ---
+export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 0.30, forceDailyGain = false) => {
   if (!allPesajes || allPesajes.length === 0) return [];
 
-  // 1. Separate the data into relevant groups
+  // 1. Data Preparation
   const pesajesByCodigo = getPesajesByCodigo(allPesajes);
   
+  // Assign a unique ID to each unidentified sale to track them
   const unidentifiedSales = allPesajes
     .filter(p => p.Operacion?.toUpperCase() === 'VENTA' && p.Codigo?.includes('?'))
+    .map((sale, index) => ({ ...sale, saleId: `sale_${index}` }))
     .sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
 
   const correctionCodigos = Object.values(pesajesByCodigo).filter(group => 
     group.Pesajes.some(p => p.Operacion?.toUpperCase() === 'CORRECCION')
   );
 
-  const potentialMatches = [];
+  let allPotentialMatches = [];
 
-  // 2. For each animal with a 'CORRECCION'
+  // 2. Generate ALL possible matches within the tolerance
   for (const animalGroup of correctionCodigos) {
     const pesajes = animalGroup.Pesajes.sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
     
     const compra = pesajes.find(p => p.Operacion?.toUpperCase() === 'COMPRA');
-    if (!compra) continue; // Cannot process without a compra record
+    if (!compra) continue;
 
-    // Find the latest control or compra to use as a baseline for projection
     const lastControl = [...pesajes].reverse().find(p => p.Operacion?.toUpperCase() === 'CONTROL');
     const baseline = lastControl || compra;
     const baselineDate = new Date(baseline.Fecha);
     const baselineWeight = parseInt(baseline.Peso, 10);
 
-    // --- START: SOPHISTICATED DAILY GAIN CALCULATION ---
-    let animalSpecificDailyGain = dailyGain; // Start with the default daily gain
-
-    // If a control record exists, calculate the animal's actual daily gain
-    if (lastControl) {
+    let animalSpecificDailyGain = dailyGain;
+    if (lastControl && !forceDailyGain) {
       const compraDate = new Date(compra.Fecha);
       const compraWeight = parseInt(compra.Peso, 10);
       const lastControlDate = new Date(lastControl.Fecha);
       const lastControlWeight = parseInt(lastControl.Peso, 10);
-
-      // Ensure the control happened after the purchase to get a valid gain period
       if (lastControlDate > compraDate) {
         const daysBetween = (lastControlDate - compraDate) / (1000 * 60 * 60 * 24);
         if (daysBetween > 0) {
-          const weightGained = lastControlWeight - compraWeight;
-          animalSpecificDailyGain = weightGained / daysBetween;
+          animalSpecificDailyGain = (lastControlWeight - compraWeight) / daysBetween;
         }
       }
     }
-    // --- END: SOPHISTICATED DAILY GAIN CALCULATION ---
 
-    // 3. Find the first feasible sale match using the calculated daily gain
     for (const sale of unidentifiedSales) {
       const saleDate = new Date(sale.Fecha);
       const saleWeight = parseInt(sale.Peso, 10);
 
-      // Sale must be after the animal's last known date
       if (saleDate > baselineDate) {
         const daysDiff = (saleDate - baselineDate) / (1000 * 60 * 60 * 24);
-        // Use the specific daily gain for this animal's projection
         const projectedWeight = baselineWeight + (daysDiff * animalSpecificDailyGain);
         
         const weightDifference = Math.abs(projectedWeight - saleWeight);
         const percentageDiff = saleWeight > 0 ? (weightDifference / saleWeight) : 0;
-        const isMatch = percentageDiff <= tolerance;
-
-        if (isMatch) {
-          potentialMatches.push({
+        
+        if (percentageDiff <= tolerance) {
+          allPotentialMatches.push({
             Codigo: animalGroup.Codigo,
             Marca: compra.Marca,
             FechaCompra: compra.Fecha,
@@ -242,17 +232,38 @@ export const findPotentialMatches = (allPesajes, dailyGain = 0.350, tolerance = 
             PesoVentaPotencial: sale.Peso,
             PesoProyectado: Math.round(projectedWeight),
             GDP: animalSpecificDailyGain.toFixed(3),
-            DiffPercent: (percentageDiff * 100).toFixed(1) + '%' // Add the formatted percentage difference
+            DiffPercent: (percentageDiff * 100), // Store as number for sorting
+            saleId: sale.saleId // Keep track of which sale this is
           });
-          break; // Found the first match, move to the next animal
         }
       }
     }
   }
 
-  return potentialMatches;
+  // 3. Select the best one-to-one matches
+  // Sort all possibilities by the smallest percentage difference
+  allPotentialMatches.sort((a, b) => a.DiffPercent - b.DiffPercent);
+
+  const finalMatches = [];
+  const usedAnimalCodigos = new Set();
+  const usedSaleIds = new Set();
+
+  for (const match of allPotentialMatches) {
+    // If both the animal and the sale are not yet claimed, this is a valid one-to-one match
+    if (!usedAnimalCodigos.has(match.Codigo) && !usedSaleIds.has(match.saleId)) {
+      finalMatches.push({
+        ...match,
+        DiffPercent: match.DiffPercent.toFixed(1) + '%' // Format for display
+      });
+      // Mark both as used for future iterations
+      usedAnimalCodigos.add(match.Codigo);
+      usedSaleIds.add(match.saleId);
+    }
+  }
+
+  return finalMatches;
 };
-// --- END: MODIFIED MATCHING FUNCTION ---
+// --- END: REFACTORED MATCHING FUNCTION ---
 
 
 const gananciaDiaria = (pesoInicial,pesoFinal) =>

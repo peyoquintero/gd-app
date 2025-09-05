@@ -1,23 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "../App.css";
 import IntegerMatrix from "./Matrix";
-import { resurrect, findPotentialMatches } from "./Helpers"; // Import the new function
+import { resurrect, findPotentialMatches, compareNumAlphas } from "./Helpers"; // Import compareNumAlphas
 import Duplicados from "./Duplicados";
-import RevisionCodigos from "./RevisionCodigos"; // Import the new component
+import RevisionCodigos from "./RevisionCodigos";
 import { dataService } from "../services/DataService";
 
 
 const Ayuda = ({ eventEmitter }) => {
   const [filtros, setFiltros] = useState({
     selectedOption: "optionInconsistencias",
-    dailyGain: "0.350", // Default daily gain
-    tolerance: "0.30"   // Default tolerance
+    dailyGain: "0.350",
+    tolerance: "0.30",
+    forceDailyGain: false // Add state for the new checkbox
   });
   const [cleanDataRange, setCleanDataRange] = useState(() => {
     return localStorage.getItem('cleanDataRange') || '-0200/1750';
   });
   const [gridDups, setGridDups] = useState([]);
-  const [potentialMatches, setPotentialMatches] = useState([]); // New state for matches
+  const [potentialMatches, setPotentialMatches] = useState([]);
   const [hisPesajes, setHisPesajes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataUrl, setDataUrl] = useState('');
@@ -56,9 +57,43 @@ const Ayuda = ({ eventEmitter }) => {
   }, []);
 
   const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-    setFiltros(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = event.target;
+    // Handle both text inputs and checkboxes
+    setFiltros(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
+
+  // --- START: NEW SORTING STATE ---
+  const [sortConfig, setSortConfig] = useState({ key: 'Codigo', direction: 'ascending' });
+  // --- END: NEW SORTING STATE ---
+
+  // --- START: NEW SORTING HANDLER ---
+  const handleSort = useCallback((key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  }, [sortConfig]);
+  // --- END: NEW SORTING HANDLER ---
+
+  // --- START: MEMOIZED SORTING LOGIC ---
+  const sortedMatches = useMemo(() => {
+    let sortableItems = [...potentialMatches];
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        const valA = a[sortConfig.key];
+        const valB = b[sortConfig.key];
+
+        if (valA === null || valA === undefined) return 1;
+        if (valB === null || valB === undefined) return -1;
+
+        const comparison = compareNumAlphas(valA, valB);
+        return sortConfig.direction === 'ascending' ? comparison : -comparison;
+      });
+    }
+    return sortableItems;
+  }, [potentialMatches, sortConfig]);
+  // --- END: MEMOIZED SORTING LOGIC ---
 
   const initializeData = useCallback(() => {
     // --- START: FIX ---
@@ -66,19 +101,19 @@ const Ayuda = ({ eventEmitter }) => {
     const originalPesajes = dataService.getCachedData();
     if (!originalPesajes) return;
 
-    // Parse values from state, with fallbacks to defaults
     const dailyGain = parseFloat(filtros.dailyGain) || 0.350;
     const tolerance = parseFloat(filtros.tolerance) || 0.30;
+    const forceDailyGain = filtros.forceDailyGain; // Get the checkbox value
 
-    // Pass the configurable values to the matching function
-    setPotentialMatches(findPotentialMatches(originalPesajes, dailyGain, tolerance));
+    // Pass the new override flag to the matching function
+    setPotentialMatches(findPotentialMatches(originalPesajes, dailyGain, tolerance, forceDailyGain));
 
     // 3. Now, create a cleaned version for other calculations like 'resurrect'.
     const cleanedPesajes = originalPesajes.filter(w => w.Codigo && w.Marca && w.Operacion && w.Fecha && !w.Codigo.includes("?"));
     setHisPesajes(cleanedPesajes);
     setGridDups(resurrect(cleanedPesajes));
     // --- END: FIX ---
-  }, [filtros.dailyGain, filtros.tolerance]); // Re-run when these values change
+  }, [filtros.dailyGain, filtros.tolerance, filtros.forceDailyGain]); // Add new dependency
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -206,6 +241,20 @@ const Ayuda = ({ eventEmitter }) => {
                 style={{ width: '80px' }}
               />
             </div>
+            {/* --- START: FIX --- */}
+            <div className="filter-group" style={{ position: 'relative', bottom: '15px' }}>
+              <label>Forzar GDP</label>
+              {/* This container ensures the checkbox aligns vertically with the text inputs */}
+              <div style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  name="forceDailyGain"
+                  checked={filtros.forceDailyGain}
+                  onChange={handleFilterChange}
+                />
+              </div>
+            </div>
+            {/* --- END: FIX --- */}
           </div>
         )}
       </section>
@@ -217,13 +266,17 @@ const Ayuda = ({ eventEmitter }) => {
               integers={gridDups}
             />
         )}
-        {/* --- START: RENDER NEW COMPONENT --- */}
         {filtros.selectedOption === "optionRevisionCodigos" && (
-          <RevisionCodigos matches={potentialMatches} />
+          // Pass sorted data and handlers to the child component
+          <RevisionCodigos 
+            matches={sortedMatches} 
+            onSort={handleSort}
+            sortConfig={sortConfig}
+          />
         )}
-        {/* --- END: RENDER NEW COMPONENT --- */}
         {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
+      
       <section className="version-info">
         {/* Display the last update time from our state variable */}
         <label>Version 2.1.0 - {lastUpdate}</label>
