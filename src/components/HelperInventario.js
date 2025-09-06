@@ -28,6 +28,62 @@ const getProyeccion = (fechaUltimoPeso,ultimoPeso,fechaProyeccion,gananciaDiaria
 
 }
 
+export const getInventarioV2 = (data, fechaProyeccion, gananciaDiaria, smartGDP) => {
+  if (!smartGDP) {
+    // When not smart, still include the Gdia (gr/día) and days column for display consistency
+    const base = getInventario(data, fechaProyeccion, gananciaDiaria);
+    const gdiaGrs = Number(gananciaDiaria) > 0 ? Number(gananciaDiaria) : 350;
+    return base.map(it => ({ ...it, Gdia: Math.round(gdiaGrs), GdiaDias: '' }));
+  }
+
+  const groupedData = getPesajesByCodigo(data);
+  let result = Object.values(groupedData);
+  result = result.filter(w => w.Pesajes[0].Operacion?.toUpperCase() === 'COMPRA');
+  let codigosVendidos = data.filter(w => ['VENTA', 'MUERTE', 'CORRECCION'].includes(w?.Operacion?.toUpperCase())).map(x => x.Codigo);
+  result = result.filter(x => !codigosVendidos.includes(x.Codigo));
+  
+  const defaultGDP = gananciaDiaria > 0 ? gananciaDiaria / 1000 : 350 / 1000;
+
+  result = result.map(w => {
+    const ultimoPesaje = w.Pesajes[w.Pesajes.length - 1];
+    let gd = defaultGDP;
+    let gdDias = '';
+
+    if (w.Pesajes.length >= 2 && ultimoPesaje?.Peso > 320) {
+      const penultimoPesaje = w.Pesajes[w.Pesajes.length - 2];
+      const fecha1 = new Date(penultimoPesaje.Fecha);
+      const fecha2 = new Date(ultimoPesaje.Fecha);
+      const diasDiferencia = Math.ceil((fecha2 - fecha1) / (60000 * 60 * 24));
+      if (diasDiferencia > 21) {
+        const customGDP = (Number(ultimoPesaje.Peso) - Number(penultimoPesaje.Peso)) / diasDiferencia;
+        if (customGDP > 0) {
+          gd = customGDP;
+          gdDias = diasDiferencia;
+        }
+      }
+    }
+
+    return {
+      Codigo: w.Codigo,
+      Marca: w.Marca,
+      Chapeta: w.Chapeta,
+      FechaCompra: w.Pesajes[0]?.Fecha,
+      PesoInicial: w.Pesajes[0]?.Peso,
+      FechaUltimoControl: ultimoPesaje?.Fecha,
+      PesoFinal: ultimoPesaje?.Peso,
+      Gdia: Math.round(gd * 1000),      // gr/día usados
+      GdiaDias: gdDias,                 // días entre pesajes usados para Gdia
+      Proyeccion: getProyeccion(
+        ultimoPesaje?.Fecha,
+        ultimoPesaje?.Peso,
+        fechaProyeccion || Date.now(),
+        gd
+      )
+    };
+  });
+  return result;
+}
+
 export const getInventario = (data, fechaProyeccion,gananciaDiaria ) => {
   const groupedData = getPesajesByCodigo(data)
   let result = Object.values(groupedData);

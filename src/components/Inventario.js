@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"; // Add useMemo
 import Table from "./Table";
-import { getInventario, groupByFechaOperacion } from "./HelperInventario";
+import { getInventarioV2, groupByFechaOperacion } from "./HelperInventario";
 import { compareNumAlphas } from "./Helpers"; 
 import { dataService } from "../services/DataService";
 import "../App.css"; 
@@ -29,14 +29,15 @@ const Inventario = ({ eventEmitter }) => {
   ], []);
 
   const columnsInventario = useMemo(() => [
-    { label: "Codigo", accessor: "Codigo", width: "18%" },
+    { label: "Codigo", accessor: "Codigo", width: "15%" },
     { label: "Marca", accessor: "Marca", width: "8%" },
     { label: "Chapeta", accessor: "Chapeta", width: "10%" },
     { label: "F.Compra", accessor: "FechaCompra", width: "16%" },
-    { label: "Peso Inicial", accessor: "PesoInicial", width: "10%" },
+    { label: "P. Inicial", accessor: "PesoInicial", width: "10%" },
     { label: "Ult. Control", accessor: "FechaUltimoControl", width: "16%" },
-    { label: "Ultimo Peso", accessor: "PesoFinal", width: "10%" },
-    { label: "PRY", accessor: "Proyeccion", width: "12%" },
+    { label: "Ult. Peso", accessor: "PesoFinal", width: "10%" },
+    { label: "G. Dia", accessor: "Gdia", width: "8%" }, // New column shows grams/day used
+    { label: "PRY", accessor: "Proyeccion", width: "8%" },
   ], []);
 
   // State for immediate input changes
@@ -47,7 +48,8 @@ const Inventario = ({ eventEmitter }) => {
     projectionDate: new Date().toISOString().split("T")[0],
     filtroPeso: "",
     filtroCodigo: "",
-    filtroChapeta: ""
+    filtroChapeta: "",
+    useSmartGDP: false // Add state for the new checkbox
   });
 
   // Define style objects locally to avoid global CSS conflicts.
@@ -95,8 +97,15 @@ const Inventario = ({ eventEmitter }) => {
   }, []);
 
   const handleFilterChange = useCallback((event) => {
-    const { name, value } = event.target;
-    setFiltros((prev) => ({ ...prev, [name]: value.toUpperCase() }));
+    const { name, value, type, checked } = event.target;
+    // Handle text, date, and checkbox inputs appropriately
+    const newValue = type === 'checkbox' ? checked : value.toUpperCase();
+    // For date, don't uppercase
+    if (type === 'date') {
+      setFiltros((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setFiltros((prev) => ({ ...prev, [name]: newValue }));
+    }
   }, []);
 
   const handleSort = useCallback((key) => {
@@ -230,7 +239,8 @@ const Inventario = ({ eventEmitter }) => {
     }
 
     // 2. Calculate and set inventario. 
-    let inventario = getInventario(filteredData, debouncedFiltros.projectionDate, gananciaDiaria);
+    // Pass the new useSmartGDP flag to the helper function.
+    let inventario = getInventarioV2(filteredData, debouncedFiltros.projectionDate, gananciaDiaria, debouncedFiltros.useSmartGDP);
 
     const pesoFilter = debouncedFiltros.filtroPeso.trim();
     if (pesoFilter && pesoFilter !== "*") {
@@ -418,25 +428,35 @@ const Inventario = ({ eventEmitter }) => {
               style={{ width: '70px', textAlign: 'right' }}
             />
           </div>
-         <div className="filter-group">
-          <label>Rango PRY</label>
-          <input
-            className="freeinputsmall"
-            name="filtroPeso"
-            onChange={handleFilterChange}
-            value={filtros.filtroPeso}
-          />
-        </div>
-        <div className="filter-group">
-          <label>Top</label>
-          <input
-            type="number"
-            value={topX}
-            onChange={(e) => setTopX(e.target.value)}
-            style={{ width: '60px' }}
-            placeholder="N°"
-          />
-        </div>
+          <div className="filter-group" >
+            <label>Historico</label>
+            <input
+              type="checkbox"
+              name="useSmartGDP"
+              checked={filtros.useSmartGDP}
+              onChange={handleFilterChange}
+              style={{ width: '20px', marginBottom:'-10px' }}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Rango PRY</label>
+            <input
+              className="freeinputsmall"
+              name="filtroPeso"
+              onChange={handleFilterChange}
+              value={filtros.filtroPeso}
+            />
+          </div>
+          <div className="filter-group">
+            <label>Top</label>
+            <input
+              type="number"
+              value={topX}
+              onChange={(e) => setTopX(e.target.value)}
+              style={{ width: '60px' }}
+              placeholder="N°"
+            />
+          </div>
         </div>
       </section>
       <section className="totals">
@@ -474,10 +494,10 @@ const Inventario = ({ eventEmitter }) => {
           <Table data={gridMovimientos} columns={columns} onSort={() => {}} />
         ) : (
           <Table 
-            data={processedGridData} // Use the final processed data here
-            columns={columnsInventario} 
-            onSort={handleSort} // Pass the sort handler function
-            sortConfig={sortConfig} // Pass the current sort configuration
+            data={processedGridData}
+            columns={columnsInventario}
+            onSort={handleSort}
+            sortConfig={sortConfig}
           />
         )}
       </section>

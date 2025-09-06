@@ -222,13 +222,7 @@ const Ganancias = ({ eventEmitter }) => {
       const trimmedValue = upperValue.trim();
 
       if (trimmedValue !== "*" && trimmedValue !== "") {
-        let filteredPesajes;
-        if (trimmedValue.startsWith("~")) {
-          const brandToExclude = trimmedValue.substring(1);
-          filteredPesajes = hisPesajes.filter(w => w.Marca !== brandToExclude);
-        } else {
-          filteredPesajes = hisPesajes.filter(w => w.Marca === trimmedValue);
-        }
+        let filteredPesajes = hisPesajes.filter(w => w.Marca === trimmedValue);
         let allFechas = [...new Set(filteredPesajes.map(obj => obj.Fecha))];
         setFechasPesaje(allFechas);
       } else {
@@ -273,11 +267,6 @@ const Ganancias = ({ eventEmitter }) => {
     const field = (fieldValue || '').toUpperCase();
     const filter = filterValue.toUpperCase().trim();
     
-    // Handle negation with '~'
-    if (filter.startsWith("~")) {
-      return field !== filter.substring(1);
-    }
-
     // If no wildcards, use substring matching (contains)
     if (!filter.includes('*')) {
       return field.includes(filter);
