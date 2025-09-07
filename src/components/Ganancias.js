@@ -209,37 +209,16 @@ const Ganancias = ({ eventEmitter }) => {
         }));
      };
 
-   const handleFilterMarcaChange = (event) => {
-      const { name, value } = event.target;
-      const upperValue = value.toUpperCase();
-
-      // Use the functional update form
-      setFiltros(prevFiltros => ({
-        ...prevFiltros,
-        [name]: upperValue,
-      }));
-
-      const trimmedValue = upperValue.trim();
-
-      if (trimmedValue !== "*" && trimmedValue !== "") {
-        let filteredPesajes = hisPesajes.filter(w => w.Marca === trimmedValue);
-        let allFechas = [...new Set(filteredPesajes.map(obj => obj.Fecha))];
-        setFechasPesaje(allFechas);
-      } else {
-        let allFechas = [...new Set(hisPesajes.map(obj => obj.Fecha))];
-        setFechasPesaje(allFechas);
-      }
-    };
-
     const handleCheckboxChange = (event) => {
       const { name, checked } = event.target;
-      
-      // Use the functional update form
-      setFiltros(prevFiltros => ({
-        ...prevFiltros,
-        [name]: checked,
-      }));
-  
+
+      // Compute next filters state
+      const nextFiltros = { ...filtros, [name]: checked };
+
+      // Update filtros
+      setFiltros(nextFiltros);
+
+      // Update FechaFinal options depending on Ventas
       if (name === 'filtroVentas') {
         if (checked) {
           const ventaDates = hisPesajes
@@ -254,90 +233,92 @@ const Ganancias = ({ eventEmitter }) => {
           setFechasPesajeDesc(allFechasDesc);
         }
       }
+
+      // If toggling Ventas, immediately apply filters with the updated value
+      if (name === 'filtroVentas') {
+        applyFilters(nextFiltros);
+      }
     };
 
-    const applyFilters = (event) => {
-  // Helper function for enhanced filtering with wildcard support
-  const matchesFilter = (fieldValue, filterValue) => {
-    // If filterValue is null, undefined, or an empty string, it's always a match.
-    if (!filterValue || filterValue.trim() === "") {
-      return true;
-    }
-    
-    const field = (fieldValue || '').toUpperCase();
-    const filter = filterValue.toUpperCase().trim();
-    
-    // If no wildcards, use substring matching (contains)
-    if (!filter.includes('*')) {
-      return field.includes(filter);
-    }
-    
-    // Convert wildcard pattern to regex
-    const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-    const regexPattern = escapedFilter.replace(/\*/g, '.*');
-    const regex = new RegExp(`^${regexPattern}$`);
-    
-    return regex.test(field);
-  };
+    // Refactor: allow passing an overrides object (e.g., when toggling Ventas)
+    const applyFilters = (overrides) => {
+      const eff = overrides ? { ...filtros, ...overrides } : filtros;
 
-  // 1. Identify and exclude any animal codes that have a 'CORRECCION' / 'MUERTE' record.
-  const codigosToExclude = new Set(
-    hisPesajes
-      .filter(p => p.Operacion?.toUpperCase() === 'CORRECCION' || p.Operacion?.toUpperCase() === 'MUERTE')
-      .map(p => p.Codigo)
-  );
+      const matchesFilter = (fieldValue, filterValue) => {
+        if (!filterValue || filterValue.trim() === "") {
+          return true;
+        }
+        const field = (fieldValue || '').toUpperCase();
+        const filter = filterValue.toUpperCase().trim();
+        if (!filter.includes('*')) {
+          return field.includes(filter);
+        }
+        const escapedFilter = filter.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+        const regexPattern = escapedFilter.replace(/\*/g, '.*');
+        const regex = new RegExp(`^${regexPattern}$`);
+        return regex.test(field);
+      };
 
-  let hispesajesToProcess = hisPesajes.filter(pesaje => !codigosToExclude.has(pesaje.Codigo));
+      const matchesFilterList = (fieldValue, filterValue) => {
+        if (!filterValue || String(filterValue).trim() === "") return true;
+        const tokens = String(filterValue)
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean);
+        if (tokens.length === 0) return true;
+        return tokens.some(tok => matchesFilter(fieldValue, tok));
+      };
 
-  // 2. Calculate gains based on date criteria and Ventas filter ONLY.
-  let gridDataResults = ganancias(
-    hispesajesToProcess,
-    filtros.fechaInicial,
-    filtros.fiComparator,
-    filtros.fechaFinal,
-    filtros.ffComparator,
-    filtros.filtroVentas
-  );
+      const codigosToExclude = new Set(
+        hisPesajes
+          .filter(p => p.Operacion?.toUpperCase() === 'CORRECCION' || p.Operacion?.toUpperCase() === 'MUERTE')
+          .map(p => p.Codigo)
+      );
 
-  // 3. Apply all text and weight filters to the results from the ganancias function.
-  gridDataResults = gridDataResults.filter(res => 
-    matchesFilter(res.Marca, filtros.filtroMarca) &&
-    matchesFilter(res.Codigo, filtros.filtroCodigo) &&
-    matchesFilter(res.Chapeta, filtros.filtroChapeta)
-  );
-  
-  // Apply peso filter separately as it has different logic
-  if (filtros.filtroPeso && filtros.filtroPeso.trim() !== "" && filtros.filtroPeso !== "*") {
-      const array = filtros.filtroPeso.split("-");
-      if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
+      let hispesajesToProcess = hisPesajes.filter(pesaje => !codigosToExclude.has(pesaje.Codigo));
+
+      let gridDataResults = ganancias(
+        hispesajesToProcess,
+        eff.fechaInicial,
+        eff.fiComparator,
+        eff.fechaFinal,
+        eff.ffComparator,
+        eff.filtroVentas
+      );
+
+      gridDataResults = gridDataResults.filter(res => 
+        matchesFilterList(res.Marca, eff.filtroMarca) &&
+        matchesFilter(res.Codigo, eff.filtroCodigo) &&
+        matchesFilter(res.Chapeta, eff.filtroChapeta)
+      );
+
+      if (eff.filtroPeso && eff.filtroPeso.trim() !== "" && eff.filtroPeso !== "*") {
+        const array = eff.filtroPeso.split("-");
+        if (array.length === 2 && !isNaN(parseInt(array[0])) && array[1].trim() !== "" && !isNaN(parseInt(array[1]))) {
           const minPeso = parseInt(array[0]);
           const maxPeso = parseInt(array[1]);
           gridDataResults = gridDataResults.filter(pesaje => 
-              parseInt(pesaje.PesoInicial) >= minPeso && 
-              parseInt(pesaje.PesoInicial) <= maxPeso
+            parseInt(pesaje.PesoInicial) >= minPeso && 
+            parseInt(pesaje.PesoInicial) <= maxPeso
           );
+        }
       }
-  }
 
-  // Add IDs
-  gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
+      gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
 
-  // Exclude dubious data and update state
-  const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0100/1250';
-  const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
-  let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
-  
-  setGridData(scrubbedData);
-  
-  // Update captions
-  setCaptions({
-      resultGanancia: captionGanancia(scrubbedData),
-      resultCabezas: captionCabezas(scrubbedData.length, gridDataResults.length),
-      resultUltPeso: captionUltPeso(scrubbedData),
-      resultDias: captionDias(scrubbedData),
-      resultMedia: captionMedia(scrubbedData)
-  });
-};
+      const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0100/1250';
+      const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
+      let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
+      
+      setGridData(scrubbedData);
+      setCaptions({
+        resultGanancia: captionGanancia(scrubbedData),
+        resultCabezas: captionCabezas(scrubbedData.length, gridDataResults.length),
+        resultUltPeso: captionUltPeso(scrubbedData),
+        resultDias: captionDias(scrubbedData),
+        resultMedia: captionMedia(scrubbedData)
+      });
+    };
 
    if (isLoading) {
         return <div>Cargando...</div>;
@@ -369,14 +350,14 @@ const Ganancias = ({ eventEmitter }) => {
           />
         </div>
         <div className="filter-group">
-          <label>Marca</label>
+          <label>Marcas</label>
           <input 
             id="marca" 
-            className="freeinputtiny" 
+            className="freeinputsmall" 
             name="filtroMarca" 
-            onChange={handleFilterMarcaChange} 
+            onChange={handleFilterChange} 
             value={filtros.filtroMarca}
-            maxLength={4}
+            maxLength={15}
           />
         </div>
         <div className="filter-group">
@@ -442,7 +423,7 @@ const Ganancias = ({ eventEmitter }) => {
             </div>
         </div>
 
-        <button className="filter-button" onClick={applyFilters}>Ok</button>
+        <button className="filter-button" onClick={() => applyFilters()}>Ok</button>
       </div>
     </section>
 
