@@ -8,7 +8,6 @@ import {
   captionMedia,
   captionDias,
   captionUltPeso,
-  validLoteOptions,
   mapApiDataToPesajes,
   resurrect,
   ganancias,
@@ -68,16 +67,27 @@ describe('Helpers.js', () => {
   });
 
   describe('cleanData', () => {
-    test('filters by Ganancia range and positive weights', () => {
+    test('filters by Ganancia range and positive weights (short period ≤90 days)', () => {
       const items = [
-        { Ganancia: 100, PesoInicial: 1, PesoFinal: 2 },
-        { Ganancia: -2000, PesoInicial: 1, PesoFinal: 2 },  // out of min
-        { Ganancia: 150, PesoInicial: 0, PesoFinal: 2 },    // invalid weight
-        { Ganancia: 5000, PesoInicial: 1, PesoFinal: 2 },   // out of max
+        { Ganancia: 100,   Dias: 30, PesoInicial: 1, PesoFinal: 2 }, // passes
+        { Ganancia: -2000, Dias: 30, PesoInicial: 1, PesoFinal: 2 }, // below min
+        { Ganancia: 150,   Dias: 30, PesoInicial: 0, PesoFinal: 2 }, // invalid weight
+        { Ganancia: 5000,  Dias: 30, PesoInicial: 1, PesoFinal: 2 }, // above shortMax
       ];
-      const res = cleanData(items, -1000, 2000);
+      const res = cleanData(items, -1000, 2000, 1500);
       expect(res).toHaveLength(1);
       expect(res[0].Ganancia).toBe(100);
+    });
+
+    test('applies stricter longMax for periods >90 days', () => {
+      const items = [
+        { Ganancia: 800,  Dias: 120, PesoInicial: 1, PesoFinal: 2 }, // passes (< longMax 1000)
+        { Ganancia: 1200, Dias: 120, PesoInicial: 1, PesoFinal: 2 }, // above longMax, excluded
+        { Ganancia: 1200, Dias: 60,  PesoInicial: 1, PesoFinal: 2 }, // same gain but short period, passes
+      ];
+      const res = cleanData(items, -200, 1800, 1000);
+      expect(res).toHaveLength(2);
+      expect(res.map(r => r.Dias)).toEqual([120, 60]);
     });
   });
 
@@ -110,16 +120,6 @@ describe('Helpers.js', () => {
       expect(captionUltPeso(below)).toMatch(/Prom\. Ultimo Peso/);
       const above = [{ PesoFinal: 600 }, { PesoFinal: 620 }, { PesoFinal: 610 }];
       expect(captionUltPeso(above)).toBe('');
-    });
-  });
-
-  describe('validLoteOptions', () => {
-    test('adds "*" and filters out "NULL"', () => {
-      const lotes = ['L1', 'NULL', 'L2'];
-      const res = validLoteOptions([...lotes]);
-      expect(res).toContain('*');
-      expect(res).not.toContain('NULL');
-      expect(res).toEqual(expect.arrayContaining(['L1', 'L2']));
     });
   });
 
