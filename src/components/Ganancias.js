@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Table from "./Table"
-import {cleanData, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, compareNumAlphas} from "./Helpers"
+import {cleanData, parseCleanDataRange, captionCabezas,captionGanancia,captionMedia,captionUltPeso,captionDias,  ganancias, compareNumAlphas} from "./Helpers"
 import { dataService } from "../services/DataService";
 import "../App.css"; 
 
@@ -306,9 +306,8 @@ const Ganancias = ({ eventEmitter }) => {
 
       gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
 
-      const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1800';
-      const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
-      let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
+      const { min: minValue, shortMax, longMax } = parseCleanDataRange(localStorage.getItem('cleanDataRange'));
+      let scrubbedData = cleanData(gridDataResults, minValue, shortMax, longMax);
       
       setGridData(scrubbedData);
       setCaptions({

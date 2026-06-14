@@ -51,10 +51,22 @@ const daysBetweenDates = (fechaInicial,fechaFinal) =>
   return diffDays>0?diffDays:0;    
 }
 
-export const cleanData= (gridData,min,max) =>
-{
-return gridData.filter(w=>(w.Ganancia>min && w.Ganancia<max && w.PesoInicial>0 && w.PesoFinal>0)) ;
-}
+export const parseCleanDataRange = (raw) => {
+  const parts = (raw || '-0200/1800/1000').split('/').map(val => parseInt(val.trim(), 10));
+  const min      = parts[0];
+  const shortMax = parts[1];
+  const longMax  = parts.length >= 3 ? parts[2] : shortMax;
+  return { min, shortMax, longMax };
+};
+
+const DAYS_THRESHOLD = 90;
+
+export const cleanData = (gridData, min, shortMax, longMax) => {
+  return gridData.filter(w => {
+    const max = w.Dias <= DAYS_THRESHOLD ? shortMax : longMax;
+    return w.Ganancia > min && w.Ganancia < max && w.PesoInicial > 0 && w.PesoFinal > 0;
+  });
+};
 
 export const  captionCabezas = (cleanDataCount,gridDataCount) =>
 { var cabezas = cleanDataCount>0 ? ` Cabezas: ${gridDataCount}`: `No hay datos disponibles`;

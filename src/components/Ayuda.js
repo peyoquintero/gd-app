@@ -15,7 +15,7 @@ const Ayuda = ({ eventEmitter }) => {
     forceDailyGain: false // Add state for the new checkbox
   });
   const [cleanDataRange, setCleanDataRange] = useState(() => {
-    return localStorage.getItem('cleanDataRange') || '-0200/1800';
+    return localStorage.getItem('cleanDataRange') || '-0200/1800/1000';
   });
   const [gridDups, setGridDups] = useState([]);
   const [potentialMatches, setPotentialMatches] = useState([]);
@@ -205,14 +205,14 @@ const Ayuda = ({ eventEmitter }) => {
           </div>
         <div className="filters-row">
           <div className="filter-group">
-            <label>Rango Ganancias</label>
+            <label>Rango Ganancias (min/máx≤90d/máx>90d)</label>
             <input
               type="text"
               value={cleanDataRange}
               onChange={handleCleanDataRangeChange}
-              placeholder="-0200/1800"
+              placeholder="-0200/1800/1000"
               className="freeinputsmall"
-              style={{ width: '100px' }}
+              style={{ width: '130px' }}
             />
           </div>
         </div>

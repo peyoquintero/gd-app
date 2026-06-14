@@ -10,28 +10,30 @@
  * @param {string} tableData.title - Title for the export
  * @returns {string} Complete HTML document as string
  */
+import { parseCleanDataRange } from '../components/Helpers';
+
 export const generateTableHTML = ({ data, columns, title }) => {
   const timestamp = new Date().toLocaleString();
-  
-  // Get clean data range for highlighting logic
-  const getHighlightStyle = (value, accessor, label) => {
-    const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
-    const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
-    const isOutsideRange = (accessor === 'Ganancia' || accessor === 'Proyeccion' || label === 'PRY') && 
-                           value !== '—' && 
-                           (parseInt(value) <= minValue || parseInt(value) >= maxValue);
+
+  const { min: minValue, shortMax, longMax } = parseCleanDataRange(localStorage.getItem('cleanDataRange'));
+
+  const getHighlightStyle = (value, accessor, label, row) => {
+    const maxForRow = (row?.Dias ?? 0) <= 90 ? shortMax : longMax;
+    const isOutsideRange = (accessor === 'Ganancia' || accessor === 'Proyeccion' || label === 'PRY') &&
+                           value !== '—' &&
+                           (parseInt(value) <= minValue || parseInt(value) >= maxForRow);
     return isOutsideRange ? ' class="highlight"' : '';
   };
 
   // Generate table headers
   const tableHeaders = columns.map(col => `<th>${col.label}</th>`).join('');
-  
+
   // Generate table rows
   const tableRows = data.map(row => `
     <tr>
       ${columns.map(col => {
         const value = row[col.accessor] || '—';
-        const highlightStyle = getHighlightStyle(value, col.accessor, col.label);
+        const highlightStyle = getHighlightStyle(value, col.accessor, col.label, row);
         return `<td${highlightStyle}>${value}</td>`;
       }).join('')}
     </tr>

@@ -1,15 +1,10 @@
+import { parseCleanDataRange } from './Helpers';
+
 const TableBody = ({ tableData, columns }) => {
     if (!tableData)
     {return <tbody></tbody>}
 
-    // Get clean data range parameters
-    const getCleanDataRange = () => {
-      const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1750';
-      const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
-      return { minValue, maxValue };
-    };
-
-    const { minValue, maxValue } = getCleanDataRange();
+    const { min: minValue, shortMax, longMax } = parseCleanDataRange(localStorage.getItem('cleanDataRange'));
 
     return (
      <tbody>
@@ -19,10 +14,11 @@ const TableBody = ({ tableData, columns }) => {
          {columns.map(({accessor, label},index2) => {
           const tData = data[accessor] ? data[accessor] : "—";
 
-          // Check if this is a Ganancia or PRY column and if value is outside range
+          const rowDias = data.Dias ?? 0;
+          const maxForRow = rowDias <= 90 ? shortMax : longMax;
           const isOutsideRange = (accessor === 'Ganancia' || accessor === 'Proyeccion' || label === 'PRY') &&
                                  tData !== "—" &&
-                                 (parseInt(tData) <= minValue || parseInt(tData) >= maxValue);
+                                 (parseInt(tData) <= minValue || parseInt(tData) >= maxForRow);
 
           return (
             <td
