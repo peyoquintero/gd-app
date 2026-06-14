@@ -206,7 +206,7 @@ const Inventario = ({ eventEmitter }) => {
       }
     }
 
-    if (debouncedFiltros.filtroChapeta?.length > 1) {
+    if (debouncedFiltros.filtroChapeta?.length > 0) {
       filteredData = filteredData.filter(w => matchesFilter(w.Chapeta, debouncedFiltros.filtroChapeta));
     }
 

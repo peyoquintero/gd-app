@@ -28,7 +28,7 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroEx
   if (filterKey&&filterKey.includes("^")) {
        let fkeys = filterKey.split("^").filter(w=>w!=='');
        filteredData = filteredData.filter((row) => { 
-       return containsAll(Object.values(row).map(w=>w.toLowerCase()),fkeys); 
+       return containsAll(Object.values(row).map(w=>String(w ?? '').toLowerCase()),fkeys);
       })        
    }
 
@@ -101,7 +101,7 @@ return ultpeso;
 
 export const mapApiDataToPesajes= (apiResult) => {
   const rows = [];
-  const rawRows = apiResult.values || [];
+  const rawRows = [...(apiResult.values || [])];
   const headers = rawRows.shift();
     rawRows.forEach((row) => {
     const rowData = {};

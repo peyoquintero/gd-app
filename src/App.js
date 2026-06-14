@@ -65,9 +65,13 @@ export function App() {
   
   const dataUrl = localStorage.getItem('googleSheetDataUrl') || hardcodedUrl;
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (forceRefresh = false) => {
     setIsLoading(true);
     try {
+      if (!forceRefresh && dataService.isCacheValid()) {
+        eventEmitter.emit('dataRefreshed');
+        return;
+      }
       const data = await dataService.fetchData(dataUrl);
       if (data) {
         eventEmitter.emit('dataRefreshed');
@@ -77,7 +81,7 @@ export function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [dataUrl, eventEmitter]); // Add eventEmitter as a dependency
+  }, [dataUrl, eventEmitter]);
 
   useEffect(() => {
     loadData();
@@ -120,7 +124,7 @@ export function App() {
                 className={`refresh-button ${online ? "online" : "offline"}`}
                 // Apply the style directly based on the 'online' state.
                 style={online ? onlineStyle : offlineStyle}
-                onClick={loadData}
+                onClick={() => loadData(true)}
                 disabled={isLoading}
                 title={`Status: ${online ? 'Online' : 'Offline'}`}
               >

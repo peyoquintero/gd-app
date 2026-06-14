@@ -329,11 +329,12 @@ const Ganancias = ({ eventEmitter }) => {
       <div className="filters-row" style={styles.filtersRow}>
         <div className="filter-group">
           <label>Codigo</label>
-          <input 
-            className="freeinputsmall" 
-            name="filtroCodigo" 
-            placeholder="Codigo" 
+          <input
+            className="freeinputsmall"
+            name="filtroCodigo"
+            placeholder="Codigo"
             onChange={handleFilterChange}
+            value={filtros.filtroCodigo}
             maxLength={10}
           />
         </div>
@@ -361,11 +362,12 @@ const Ganancias = ({ eventEmitter }) => {
         </div>
         <div className="filter-group">
           <label>Rango Peso</label>
-          <input 
-            id="pesoI" 
-            className="freeinputsmall" 
-            name="filtroPeso" 
+          <input
+            id="pesoI"
+            className="freeinputsmall"
+            name="filtroPeso"
             onChange={handleFilterChange}
+            value={filtros.filtroPeso}
           />
         </div>
         <div className="filter-group checkbox-group">
