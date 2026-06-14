@@ -212,7 +212,7 @@ const Ayuda = ({ eventEmitter }) => {
               placeholder="-0200/1800/1000"
               title="Formato: min/máx≤90días/máx>90días"
               className="freeinputsmall"
-              style={{ width: '200px' }}
+              style={{ width: '200px', maxWidth: '200px' }}
             />
           </div>
         </div>
