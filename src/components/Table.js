@@ -1,6 +1,6 @@
 import React from "react";
 
-const Table = ({ data, columns, onSort, sortConfig }) => {
+const Table = ({ data, columns, onSort = () => {}, sortConfig }) => {
   if (!data || data.length === 0) {
     return <div className="no-data">No hay datos para mostrar</div>;
   }

@@ -1,7 +1,6 @@
 export const getPesajesByCodigo = (data)=>{
-    data.sort((a, b) => a.Codigo.localeCompare(b.Codigo));
-    data.sort(function(a,b){return new Date(a.Fecha) - new Date(b.Fecha); })
-    return data.reduce((acc, item) => {
+    const sorted = [...data].sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+    return sorted.reduce((acc, item) => {
         const key = `${item.Codigo}`;
         if (!acc[key]) {
           acc[key] = {

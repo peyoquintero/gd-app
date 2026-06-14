@@ -35,10 +35,10 @@ export const filteredGData = (filteredData,filterKeyValue,excludeColumn,filtroEx
   return filteredData;
 }
 
-const median = (arr) =>  {
-  const mid = Math.floor(arr.length / 2),
-  nums = [...arr].sort((a, b) => a - b);
-return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+const median = (arr) => {
+  const mid = Math.floor(arr.length / 2);
+  const nums = [...arr].map(Number).sort((a, b) => a - b);
+  return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
 }
 
 const daysBetweenDates = (fechaInicial,fechaFinal) =>
@@ -52,10 +52,11 @@ const daysBetweenDates = (fechaInicial,fechaFinal) =>
 }
 
 export const parseCleanDataRange = (raw) => {
+  const defaults = { min: -200, shortMax: 1800, longMax: 1000 };
   const parts = (raw || '-0200/1800/1000').split('/').map(val => parseInt(val.trim(), 10));
-  const min      = parts[0];
-  const shortMax = parts[1];
-  const longMax  = parts.length >= 3 ? parts[2] : shortMax;
+  const min      = isNaN(parts[0]) ? defaults.min      : parts[0];
+  const shortMax = isNaN(parts[1]) ? defaults.shortMax : parts[1];
+  const longMax  = parts.length >= 3 ? (isNaN(parts[2]) ? defaults.longMax : parts[2]) : shortMax;
   return { min, shortMax, longMax };
 };
 

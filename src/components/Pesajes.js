@@ -204,7 +204,9 @@ const Pesajes = ({ eventEmitter }) => {
   const loadData = useCallback(() => {
     setIsLoading(true);
     try {
-      const allPesajes = dataService.getCachedData().map(p => ({ ...p, Fecha: formatDate(p.Fecha) }));
+      const cached = dataService.getCachedData();
+      if (!cached) return;
+      const allPesajes = cached.map(p => ({ ...p, Fecha: formatDate(p.Fecha) }));
       setHisPesajes(allPesajes);
       let allFechas = [...new Set(allPesajes.map(obj => obj.Fecha.trim()))]
         .filter(Boolean)

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "../App.css";
 import IntegerMatrix from "./Matrix";
 import { resurrect, findPotentialMatches, compareNumAlphas } from "./Helpers"; // Import compareNumAlphas
-import Duplicados from "./Duplicados";
 import RevisionCodigos from "./RevisionCodigos";
 import { dataService } from "../services/DataService";
 
@@ -213,7 +212,7 @@ const Ayuda = ({ eventEmitter }) => {
               placeholder="-0200/1800/1000"
               title="Formato: min/máx≤90días/máx>90días"
               className="freeinputsmall"
-              style={{ width: '150px' }}
+              style={{ width: '200px' }}
             />
           </div>
         </div>
@@ -275,7 +274,6 @@ const Ayuda = ({ eventEmitter }) => {
             sortConfig={sortConfig}
           />
         )}
-        {filtros.selectedOption === "optionDuplicados" && <Duplicados />}
       </section>
       
       <section className="version-info">

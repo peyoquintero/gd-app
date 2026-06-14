@@ -17,8 +17,8 @@ const [gridData, setGridData] = useState([]);
   }
 
   useEffect(()=>{
-    setGridData(integers[0]?.pesajes);
-  },[]);
+    setGridData(integers[0]?.pesajes ?? []);
+  },[integers]);
 
   const columns = [
     { label: "Codigo", accessor: "Codigo" },  { label: "Fecha", accessor: "Fecha" },  { label: "Peso", accessor: "Peso" },

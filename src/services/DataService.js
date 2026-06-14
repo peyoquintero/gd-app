@@ -10,7 +10,6 @@ export const dataService = {
     try {
       const response = await axios.get(dataUrl);
       const allPesajes = mapApiDataToPesajes(response.data);
-      this.updateCache(allPesajes);
       if (allPesajes?.length) {
         this.updateCache(allPesajes);
         return allPesajes;
