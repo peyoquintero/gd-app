@@ -372,7 +372,7 @@ const Ganancias = ({ eventEmitter }) => {
         </div>
         <div className="filter-group checkbox-group">
           <label>Ventas</label>
-          <input type="checkbox" name="filtroVentas" onChange={handleCheckboxChange}/>
+          <input type="checkbox" name="filtroVentas" checked={filtros.filtroVentas} onChange={handleCheckboxChange}/>
         </div>
 
       </div>

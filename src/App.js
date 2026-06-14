@@ -66,12 +66,12 @@ export function App() {
   const dataUrl = localStorage.getItem('googleSheetDataUrl') || hardcodedUrl;
 
   const loadData = useCallback(async (forceRefresh = false) => {
+    if (!forceRefresh && dataService.isCacheValid()) {
+      eventEmitter.emit('dataRefreshed');
+      return;
+    }
     setIsLoading(true);
     try {
-      if (!forceRefresh && dataService.isCacheValid()) {
-        eventEmitter.emit('dataRefreshed');
-        return;
-      }
       const data = await dataService.fetchData(dataUrl);
       if (data) {
         eventEmitter.emit('dataRefreshed');
