@@ -205,14 +205,15 @@ const Ayuda = ({ eventEmitter }) => {
           </div>
         <div className="filters-row">
           <div className="filter-group">
-            <label>Rango Ganancias (min/máx≤90d/máx>90d)</label>
+            <label>Rango Ganancias</label>
             <input
               type="text"
               value={cleanDataRange}
               onChange={handleCleanDataRangeChange}
               placeholder="-0200/1800/1000"
+              title="Formato: min/máx≤90días/máx>90días"
               className="freeinputsmall"
-              style={{ width: '130px' }}
+              style={{ width: '150px' }}
             />
           </div>
         </div>
