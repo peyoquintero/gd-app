@@ -306,7 +306,7 @@ const Ganancias = ({ eventEmitter }) => {
 
       gridDataResults = gridDataResults.map((obj, index) => ({ ...obj, id: index }));
 
-      const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0100/1250';
+      const cleanDataRange = localStorage.getItem('cleanDataRange') || '-0200/1800';
       const [minValue, maxValue] = cleanDataRange.split('/').map(val => parseInt(val.trim()));
       let scrubbedData = cleanData(gridDataResults, minValue, maxValue);
       

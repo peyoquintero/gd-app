@@ -15,7 +15,7 @@ const Ayuda = ({ eventEmitter }) => {
     forceDailyGain: false // Add state for the new checkbox
   });
   const [cleanDataRange, setCleanDataRange] = useState(() => {
-    return localStorage.getItem('cleanDataRange') || '-0200/1750';
+    return localStorage.getItem('cleanDataRange') || '-0200/1800';
   });
   const [gridDups, setGridDups] = useState([]);
   const [potentialMatches, setPotentialMatches] = useState([]);
@@ -210,7 +210,7 @@ const Ayuda = ({ eventEmitter }) => {
               type="text"
               value={cleanDataRange}
               onChange={handleCleanDataRangeChange}
-              placeholder="-0200/1750"
+              placeholder="-0200/1800"
               className="freeinputsmall"
               style={{ width: '100px' }}
             />
