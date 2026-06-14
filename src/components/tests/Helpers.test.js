@@ -3,6 +3,7 @@ import {
   matchCodigo,
   filteredGData,
   cleanData,
+  parseCleanDataRange,
   captionCabezas,
   captionGanancia,
   captionMedia,
@@ -11,6 +12,7 @@ import {
   mapApiDataToPesajes,
   resurrect,
   ganancias,
+  findPotentialMatches,
   compareNumAlphas,
 } from '../Helpers';
 
@@ -184,25 +186,35 @@ describe('Helpers.js', () => {
     });
   });
 
+  describe('parseCleanDataRange', () => {
+    test('parses 3-part format', () => {
+      expect(parseCleanDataRange('-0200/1800/1000')).toEqual({ min: -200, shortMax: 1800, longMax: 1000 });
+    });
+
+    test('2-part format uses shortMax as longMax (backward compat)', () => {
+      expect(parseCleanDataRange('-0200/1800')).toEqual({ min: -200, shortMax: 1800, longMax: 1800 });
+    });
+
+    test('null input returns defaults', () => {
+      expect(parseCleanDataRange(null)).toEqual({ min: -200, shortMax: 1800, longMax: 1000 });
+    });
+
+    test('undefined input returns defaults', () => {
+      expect(parseCleanDataRange(undefined)).toEqual({ min: -200, shortMax: 1800, longMax: 1000 });
+    });
+  });
+
   describe('ganancias', () => {
     const hispesajes = [
-      { Codigo: 'C1', Chapeta: 'CH1', Fecha: '2024-01-01', Peso: 200, Operacion: 'COMPRA' },
-      { Codigo: 'C1', Chapeta: 'CH1', Fecha: '2024-01-31', Peso: 260, Operacion: 'CONTROL' },
-      { Codigo: 'C2', Chapeta: 'CH2', Fecha: '2024-02-01', Peso: 300, Operacion: 'COMPRA' },
+      { Codigo: 'C1', Chapeta: 'CH1', Marca: 'A', Fecha: '2024-01-01', Peso: 200, Operacion: 'COMPRA' },
+      { Codigo: 'C1', Chapeta: 'CH1', Marca: 'A', Fecha: '2024-01-31', Peso: 260, Operacion: 'CONTROL' },
+      { Codigo: 'C2', Chapeta: 'CH2', Marca: 'A', Fecha: '2024-02-01', Peso: 300, Operacion: 'COMPRA' },
     ];
 
     test('computes per-code metrics within date range and outputs expected fields', () => {
-      const out = ganancias(
-        hispesajes,
-        '2024-01-01',
-        false,
-        '2024-01-31',
-        false,
-        false
-      );
+      const out = ganancias(hispesajes, '2024-01-01', false, '2024-01-31', false, false);
 
       expect(Array.isArray(out)).toBe(true);
-      // Only C1 has 2+ pesajes
       expect(out).toHaveLength(1);
       const row = out[0];
       expect(row).toMatchObject({
@@ -212,11 +224,131 @@ describe('Helpers.js', () => {
         PesoFinal: 260,
         Dias: 30,
       });
-      // Ganancia grams/day: round((60/30)*1000) = 2000
-      expect(row.Ganancia).toBe(2000);
-      // Dates in ISO format
+      expect(row.Ganancia).toBe(2000); // round((60/30)*1000)
       expect(row.FechaInicial).toBe('2024-01-01');
       expect(row.FechaFinal).toBe('2024-01-31');
+    });
+
+    test('>= / <= comparators include animal whose pesajes span the range', () => {
+      const pesajes = [
+        { Codigo: 'T1', Chapeta: '', Marca: 'A', Fecha: '2024-01-01', Peso: '200', Operacion: 'COMPRA' },
+        { Codigo: 'T1', Chapeta: '', Marca: 'A', Fecha: '2024-04-01', Peso: '293', Operacion: 'CONTROL' },
+      ];
+      const out = ganancias(pesajes, '2024-01-01', '>=', '2024-04-01', '<=', false);
+      expect(out).toHaveLength(1);
+      expect(out[0].Codigo).toBe('T1');
+      expect(out[0].Dias).toBe(91); // Jan(31)+Feb(29)+Mar(31)=91
+    });
+
+    test('= comparator excludes animals with no pesaje on the exact dates', () => {
+      const pesajes = [
+        // E1 has pesajes on exactly the boundary dates
+        { Codigo: 'E1', Chapeta: '', Marca: 'A', Fecha: '2024-03-01', Peso: '250', Operacion: 'COMPRA' },
+        { Codigo: 'E1', Chapeta: '', Marca: 'A', Fecha: '2024-06-01', Peso: '350', Operacion: 'CONTROL' },
+        // E2 has no pesaje on either boundary date
+        { Codigo: 'E2', Chapeta: '', Marca: 'A', Fecha: '2024-01-01', Peso: '200', Operacion: 'COMPRA' },
+        { Codigo: 'E2', Chapeta: '', Marca: 'A', Fecha: '2024-05-01', Peso: '300', Operacion: 'CONTROL' },
+      ];
+      const out = ganancias(pesajes, '2024-03-01', '=', '2024-06-01', '=', false);
+      expect(out.map(r => r.Codigo)).toEqual(['E1']);
+    });
+
+    test('filtroVentas=true uses COMPRA as minP and VENTA as maxP, excludes animals without VENTA', () => {
+      const pesajes = [
+        { Codigo: 'V1', Chapeta: '', Marca: 'A', Fecha: '2024-01-01', Peso: '200', Operacion: 'COMPRA' },
+        { Codigo: 'V1', Chapeta: '', Marca: 'A', Fecha: '2024-04-01', Peso: '300', Operacion: 'VENTA' },
+        { Codigo: 'V2', Chapeta: '', Marca: 'A', Fecha: '2024-01-01', Peso: '250', Operacion: 'COMPRA' },
+        { Codigo: 'V2', Chapeta: '', Marca: 'A', Fecha: '2024-02-01', Peso: '280', Operacion: 'CONTROL' },
+      ];
+      const out = ganancias(pesajes, '2024-01-01', '>=', '2024-04-30', '<=', true);
+      expect(out.map(r => r.Codigo)).toEqual(['V1']);
+      expect(out[0].PesoInicial).toBe('200'); // COMPRA weight (string as stored in spreadsheet)
+      expect(out[0].PesoFinal).toBe('300');   // VENTA weight
+    });
+  });
+
+  describe('findPotentialMatches', () => {
+    beforeEach(() => {
+      getPesajesByCodigo.mockReset();
+    });
+
+    test('returns empty array for empty or null input', () => {
+      expect(findPotentialMatches([])).toEqual([]);
+      expect(findPotentialMatches(null)).toEqual([]);
+    });
+
+    test('matches an unidentified sale to an animal within tolerance', () => {
+      // A1: COMPRA 2024-01-01 at 200kg; 100 days to 2024-04-10
+      // Projected with GDP 0.350 kg/day: 200 + 100*0.350 = 235kg → sale at 235 = 0% diff
+      getPesajesByCodigo.mockReturnValue({
+        'A1': { Codigo: 'A1', Pesajes: [
+          { Operacion: 'COMPRA',    Fecha: '2024-01-01', Peso: '200', Marca: 'X' },
+          { Operacion: 'CORRECCION', Fecha: '2024-02-01', Peso: '215', Marca: 'X' },
+        ]},
+      });
+      const out = findPotentialMatches(
+        [{ Codigo: '?', Operacion: 'VENTA', Fecha: '2024-04-10', Peso: '235' }],
+        0.350, 0.30
+      );
+      expect(out).toHaveLength(1);
+      expect(out[0].Codigo).toBe('A1');
+    });
+
+    test('returns no match when sale weight is outside tolerance', () => {
+      getPesajesByCodigo.mockReturnValue({
+        'A1': { Codigo: 'A1', Pesajes: [
+          { Operacion: 'COMPRA',    Fecha: '2024-01-01', Peso: '200', Marca: 'X' },
+          { Operacion: 'CORRECCION', Fecha: '2024-02-01', Peso: '215', Marca: 'X' },
+        ]},
+      });
+      // Projected = 235kg but sale = 400kg → 41% diff, outside 30% tolerance
+      const out = findPotentialMatches(
+        [{ Codigo: '?', Operacion: 'VENTA', Fecha: '2024-04-10', Peso: '400' }],
+        0.350, 0.30
+      );
+      expect(out).toHaveLength(0);
+    });
+
+    test('one-to-one: when two animals match the same sale, only the best match is returned', () => {
+      // A1 projected = 235kg (0% diff), A2 projected = 245kg (~4.3% diff); sale = 235
+      getPesajesByCodigo.mockReturnValue({
+        'A1': { Codigo: 'A1', Pesajes: [
+          { Operacion: 'COMPRA',    Fecha: '2024-01-01', Peso: '200', Marca: 'X' },
+          { Operacion: 'CORRECCION', Fecha: '2024-02-01', Peso: '215', Marca: 'X' },
+        ]},
+        'A2': { Codigo: 'A2', Pesajes: [
+          { Operacion: 'COMPRA',    Fecha: '2024-01-01', Peso: '210', Marca: 'X' },
+          { Operacion: 'CORRECCION', Fecha: '2024-02-01', Peso: '225', Marca: 'X' },
+        ]},
+      });
+      const out = findPotentialMatches(
+        [{ Codigo: '?', Operacion: 'VENTA', Fecha: '2024-04-10', Peso: '235' }],
+        0.350, 0.30
+      );
+      expect(out).toHaveLength(1);
+      expect(out[0].Codigo).toBe('A1');
+    });
+
+    test('smart GDP: uses actual gain between COMPRA and last CONTROL when forceDailyGain=false', () => {
+      // S1: COMPRA 200kg (2024-01-01) → CONTROL 230kg (2024-02-10, 40 days later)
+      // Smart GDP = (230-200)/40 = 0.750 kg/day
+      // baseline = CONTROL; 60 days to sale (2024-04-10): projected = 230 + 60*0.750 = 275kg
+      // sale at 275 → 0% diff → matches with tight tolerance of 5%
+      // But with forceDailyGain=true (default 0.350): projected = 230 + 60*0.350 = 251 → 8.7% diff → no match
+      getPesajesByCodigo.mockReturnValue({
+        'S1': { Codigo: 'S1', Pesajes: [
+          { Operacion: 'COMPRA',    Fecha: '2024-01-01', Peso: '200', Marca: 'X' },
+          { Operacion: 'CONTROL',   Fecha: '2024-02-10', Peso: '230', Marca: 'X' },
+          { Operacion: 'CORRECCION', Fecha: '2024-02-15', Peso: '232', Marca: 'X' },
+        ]},
+      });
+      const allPesajes = [{ Codigo: '?', Operacion: 'VENTA', Fecha: '2024-04-10', Peso: '275' }];
+
+      const withSmartGDP = findPotentialMatches(allPesajes, 0.350, 0.05, false);
+      expect(withSmartGDP).toHaveLength(1);
+
+      const withForcedGDP = findPotentialMatches(allPesajes, 0.350, 0.05, true);
+      expect(withForcedGDP).toHaveLength(0);
     });
   });
 
