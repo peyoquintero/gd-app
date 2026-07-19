@@ -93,7 +93,7 @@ var dias = data.length>0 ? `Dias:  ${avgDias}`: "";
 return dias;
 }
 export const captionUltPeso= (data) =>
-{ let promUltPeso = median(data.map(function(element){return element.PesoFinal}));
+{ let promUltPeso = Math.round(data.reduce((ac,a) => a.PesoFinal + ac,0)/data.length);
 let labelPromUltPeso = promUltPeso>500? '' : `Prom. Ultimo Peso:  ${promUltPeso}`
 var ultpeso = data.length>0 ? `${labelPromUltPeso}`: ""; 
 return ultpeso;

@@ -117,9 +117,10 @@ describe('Helpers.js', () => {
       expect(captionDias(data)).toBe('Dias:  8'); // round((10+5)/2)=8
     });
 
-    test('captionUltPeso (median; suppressed if > 500)', () => {
+    test('captionUltPeso (average; suppressed if > 500)', () => {
       const below = [{ PesoFinal: 450 }, { PesoFinal: 470 }, { PesoFinal: 490 }];
-      expect(captionUltPeso(below)).toMatch(/Prom\. Ultimo Peso/);
+      // avg = (450+470+490)/3 = 470
+      expect(captionUltPeso(below)).toBe('Prom. Ultimo Peso:  470');
       const above = [{ PesoFinal: 600 }, { PesoFinal: 620 }, { PesoFinal: 610 }];
       expect(captionUltPeso(above)).toBe('');
     });
